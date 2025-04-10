@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello HotelsController!{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-16">
+    <h1 class="text-2xl font-bold mb-4">Hotels</h1>
+    <p class="mb-6">Explore our curated list of hotels to find the perfect stay for your next trip. Whether you're looking for luxury or budget-friendly options, we have something for everyone.</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white shadow-md rounded-lg p-4">
+            <h2 class="text-lg font-semibold">Hotel Paradise</h2>
+            <p class="text-sm text-gray-600">Located in the heart of the city, offering premium amenities and services.</p>
+            <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">View Details</button>
+        </div>
+        <div class="bg-white shadow-md rounded-lg p-4">
+            <h2 class="text-lg font-semibold">Cozy Inn</h2>
+            <p class="text-sm text-gray-600">A budget-friendly option with comfortable rooms and great service.</p>
+            <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">View Details</button>
+        </div>
+        <div class="bg-white shadow-md rounded-lg p-4">
+            <h2 class="text-lg font-semibold">Seaside Resort</h2>
+            <p class="text-sm text-gray-600">Enjoy breathtaking ocean views and luxurious accommodations.</p>
+            <button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">View Details</button>
+        </div>
+    </div>
+</div>
+{% endblock body %}
