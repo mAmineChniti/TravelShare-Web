@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Profile{% endblock %}</title>
+
+    <!-- Lien vers la favicon -->
+    <link rel="icon" href="{{ asset('images2/favicon.svg') }}" type="image/x-icon">
+
+    {% block css%}
+        <!-- Lien vers Bootstrap 4 CSS -->
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Lien vers Font Awesome pour les icônes -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <!-- Lien vers le CSS personnalisé -->
+        <link href="{{ asset('css2/style.css') }}" rel="stylesheet">
+    {% endblock%}
+</head>
+
+{% block body %}
+<body>
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+
+                <div class="card-header text-center position-relative">
+                    <div class="position-absolute" style="left: 20px; top: 50%; transform: translateY(-50%);">
+                        <a href="{{ path('app_home') }}" class="btn btn-link text-white p-0">
+                            <i class="fas fa-arrow-left fa-lg"></i>
+                        </a>
+                    </div>
+                    <h3 class="d-inline-block m-0">Profile</h3>
+                </div>
+
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Colonne de gauche - Photo de profil -->
+                        <div class="col-md-4">
+                            <div class="avatar-container">
+                                <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-thumbnail" alt="avatar" id="profileImage">
+                                <label for="file-upload" class="upload-label">
+                                    <i class="fas fa-camera"></i> Changer la photo
+                                </label>
+                                <input type="file" id="file-upload" class="file-upload" accept="image/*">
+                            </div>
+
+                            <div class="d-none d-md-block">
+                                <div class="text-center mt-3">
+                                    <p class="text-muted">
+                                        <i class="fas fa-info-circle"></i> Veuillez remplir tous les champs obligatoires
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Colonne de droite - Formulaire -->
+                        <div class="col-md-8">
+                            <form action="" method="POST" id="profileForm">
+                                <!-- Section Informations Générales -->
+                                <div class="mb-4">
+                                    <h4 class="section-title">Informations Générales</h4>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="info-group">
+                                                <label for="first_name">Prénom</label>
+                                                <input type="text" class="form-control" name="first_name" id="first_name" placeholder="Entrez votre prénom" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="info-group">
+                                                <label for="last_name">Nom</label>
+                                                <input type="text" class="form-control" name="last_name" id="last_name" placeholder="Entrez votre nom" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="info-group">
+                                                <label for="phone">Téléphone</label>
+                                                <input type="tel" class="form-control" name="phone" id="phone" placeholder="Numéro de téléphone" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="info-group">
+                                                <label for="mobile">Mobile</label>
+                                                <input type="tel" class="form-control" name="mobile" id="mobile" placeholder="Numéro de mobile" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="info-group">
+                                        <label for="location">Adresse</label>
+                                        <input type="text" class="form-control" id="location" placeholder="Votre adresse complète" required>
+                                    </div>
+                                </div>
+
+                                <!-- Section Informations du Compte -->
+                                <div class="mb-4">
+                                    <h4 class="section-title">Informations du Compte</h4>
+                                    <div class="info-group">
+                                        <label for="email">Email</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                            </div>
+                                            <input type="email" class="form-control" name="email" id="email" placeholder="example@email.com" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="info-group">
+                                                <label for="password">Mot de passe</label>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                                    </div>
+                                                    <input type="password" class="form-control" name="password" id="password" placeholder="Créez un mot de passe" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="info-group">
+                                                <label for="password2">Confirmation</label>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                                    </div>
+                                                    <input type="password" class="form-control" name="password2" id="password2" placeholder="Confirmez le mot de passe" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group text-right mt-4">
+                                    <a href="{{ path('app_home') }}" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save"></i> Enregistrer
+                                    </a>
+                                </div>
+
+                                <div class="form-group text-right mt-4">
+                                    <a href="{{ path('app_logup') }}" class="btn btn-danger btn-lg">
+                                        <i class="fas fa-trash-alt mr-2"></i> Supprimer le compte
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js%}
+    <!-- Lien vers jQuery, Popper.js et Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Script pour prévisualiser l'image uploadée
+        $(document).ready(function() {
+            $('#file-upload').change(function(e) {
+                if (this.files && this.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        $('#profileImage').attr('src', e.target.result);
+                    }
+
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            // Validation des mots de passe
+            $('#profileForm').submit(function(e) {
+                var password = $('#password').val();
+                var password2 = $('#password2').val();
+
+                if (password !== password2) {
+                    alert('Les mots de passe ne correspondent pas!');
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+</body>
+</html>

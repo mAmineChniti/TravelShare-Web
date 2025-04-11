@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block css %}
+    <!-- MATERIAL DESIGN ICONIC FONT -->
+    <link rel="stylesheet" href="{{ asset('fonts2/material-design-iconic-font/css/material-design-iconic-font.min.css') }}">
+
+    <!-- STYLE CSS -->
+    <link href="{{ asset('css2/style.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <div class="wrapper" style="background-image: url('{{ asset('images2/imagett.jpg') }}');">
+        <div class="inner">
+            <div class="image-holder">
+                <img src="{{ asset('images2/agence.png') }}" alt="Logo">
+                <div class="already-have-account">
+                    <a href="{{ path('app_logup') }}">Vous n'avez pas de compte ?</a>
+                </div>
+            </div>
+
+            <!-- Formulaire de connexion -->
+            <form action="{{ path('app_login') }}" method="post">
+                <h3>Connexion</h3>
+
+                <!-- Affichage des erreurs de connexion -->
+                {% if error %}
+                    <div class="alert alert-danger">
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                {% endif %}
+
+                <!-- Champ pour l'email -->
+                <div class="form-wrapper">
+                    <input type="text" name="_username" value="{{ last_username }}" placeholder="Email Address" class="form-control" required>
+                    <i class="zmdi zmdi-email"></i>
+                </div>
+
+                <!-- Champ pour le mot de passe -->
+                <div class="form-wrapper">
+                    <input type="password" name="_password" placeholder="Password" class="form-control" required>
+                    <i class="zmdi zmdi-lock"></i>
+                </div>
+
+                <div class="row button-row">
+                    <div>
+                        <button type="button" class="round-button">
+                            <img src="{{ asset('images2/google.svg') }}" alt="Google">
+                        </button>
+                    </div>
+                    <div>
+                        <button type="button" class="round-button">
+                            <img src="{{ asset('images2/facebook.svg') }}" alt="Facebook">
+                        </button>
+                    </div>
+                    <div>
+                        <button type="button" class="round-button">
+                            <img src="{{ asset('images2/twitter.svg') }}" alt="Twitter">
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bouton de soumission du formulaire -->
+                <button type="submit" class="btn btn-primary">
+                    Connecter
+                    <i class="zmdi zmdi-arrow-right"></i>
+                </button>
+
+                <div class="forgot-password">
+                    <a href="">Mot de passe oublié ?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
