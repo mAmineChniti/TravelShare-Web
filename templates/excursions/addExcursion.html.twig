@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Excursion</title>
+    <style>
+        /* Style de base inchangé */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add Excursion</h1>
+        
+        <form action="{{ path('app_excursions_add') }}" method="post" enctype="multipart/form-data">
+            {% if app.session.flashbag.has('error') %}
+                <div class="alert alert-danger">
+                    <ul>
+                        {% for message in app.session.flashbag.get('error') %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            
+            {{ form_start(form) }}
+            
+            <div class="form-group">
+                {{ form_label(form.title) }}
+                {{ form_widget(form.title, { 'attr': {'class': 'form-control'} }) }}
+                {{ form_errors(form.title) }}
+            </div>
+            
+            <div class="form-group">
+                {{ form_label(form.description) }}
+                {{ form_widget(form.description, { 'attr': {'class': 'form-control'} }) }}
+                {{ form_errors(form.description) }}
+            </div>
+            
+            <div class="form-group">
+                {{ form_label(form.dateExcursion) }}
+                {{ form_widget(form.dateExcursion, { 'attr': {'class': 'form-control'} }) }}
+                {{ form_errors(form.dateExcursion) }}
+            </div>
+            
+            <div class="form-group">
+                {{ form_label(form.guide) }}
+                {{ form_widget(form.guide, { 'attr': {'class': 'form-control'} }) }}
+                {{ form_errors(form.guide) }}
+            </div>
+            
+            <div class="form-group">
+                {{ form_label(form.dateFin) }}
+                {{ form_widget(form.dateFin, { 'attr': {'class': 'form-control'} }) }}
+                {{ form_errors(form.dateFin) }}
+            </div>
+            
+            <div class="form-group">
+                {{ form_label(form.prix) }}
+                {{ form_widget(form.prix, { 'attr': {'class': 'form-control'} }) }}
+                {{ form_errors(form.prix) }}
+            </div>
+            
+            <div class="upload-area">
+                <p>Upload Image</p>
+                <p><em>{{ form.image.vars.value is empty ? 'No file selected' : form.image.vars.value }}</em></p>
+                {{ form_widget(form.image, { 'attr': {'class': 'form-control'} }) }}
+                {{ form_errors(form.image) }}
+            </div>
+            
+            <button type="submit" class="button">Add</button>
+            
+            {{ form_end(form) }}
+        </form>
+        
+        <a href="{{ path('home') }}" class="back-button">Back</a>
+    </div>
+
+    <script>
+        // Script pour gérer le clic sur la zone d'upload
+        document.querySelector('.upload-area').addEventListener('click', function() {
+            document.getElementById('image-upload').click();
+        });
+        
+        // Script pour afficher le nom du fichier sélectionné
+        document.getElementById('image-upload').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'No file selected';
+            document.querySelector('.upload-area p:last-child').innerHTML = `<em>${fileName}</em>`;
+        });
+    </script>
+</body>
+</html>

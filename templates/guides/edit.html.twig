@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>{% block title %}Ajouter Un Guide | Admin Dashboard{% endblock %}</title>
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport"/>
+
+    <!-- Lien vers la favicon -->
+    <link rel="icon" href="{{ asset('images2/favicon.svg') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('images2/favicon.ico') }}" />
+
+    {% block js %}
+        <!-- Fonts and icons -->
+        <script src="{{ asset('js2/plugin/webfont/webfont.min.js') }}"></script>
+        <script>
+            WebFont.load({
+                google: { families: ["Public Sans:300,400,500,600,700"] },
+                custom: {
+                    families: [
+                        "Font Awesome 5 Solid",
+                        "Font Awesome 5 Regular",
+                        "Font Awesome 5 Brands",
+                        "simple-line-icons",
+                    ],
+                    urls: ["css3/fonts.min.css"],
+                },
+                active: function () {
+                    sessionStorage.fonts = true;
+                },
+            });
+        </script>
+    {% endblock %}
+
+    {% block css %}
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <!-- CSS Files -->
+        <link rel="stylesheet" href="{{ asset('css3/bootstrap.min.css') }}" />
+        <link rel="stylesheet" href="{{ asset('css3/plugins.min.css') }}" />
+        <link rel="stylesheet" href="{{ asset('css3/kaiadmin.min.css') }}" />
+
+        <!-- CSS Just for demo purpose, don't include it in your project -->
+        <link rel="stylesheet" href="{{ asset('css3/demo.css') }}" />
+        
+        <style>
+            .form-guide-card {
+                max-width: 800px;
+                margin: 0 auto;
+                border-radius: 12px;
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+                border: none;
+            }
+            
+            .form-guide-card .card-header {
+                background: linear-gradient(135deg, #6777ef 0%, #6777ef 100%);
+                color: white;
+                border-bottom: none;
+                padding: 1.5rem 2rem;
+                border-radius: 12px 12px 0 0 !important;
+            }
+            
+            .form-guide-card .card-header h4 {
+                font-weight: 600;
+                margin-bottom: 0;
+            }
+            
+            .form-guide-card .card-body {
+                padding: 2.5rem;
+                background-color: #f8f9fa;
+            }
+            
+            .form-control {
+                border-radius: 6px;
+                border: 1px solid #e0e0e0;
+                height: calc(1.5em + 1.1rem + 2px);
+                padding: 0.6rem 1.2rem;
+                transition: all 0.3s;
+                background-color: #fff;
+            }
+            
+            .form-control:focus {
+                border-color: #6777ef;
+                box-shadow: 0 0 0 0.2rem rgba(103, 119, 239, 0.25);
+            }
+            
+            .form-group label {
+                font-weight: 500;
+                margin-bottom: 0.5rem;
+                color: #495057;
+                font-size: 0.9rem;
+            }
+            
+            .btn-primary {
+                background-color: #6777ef;
+                border-color: #6777ef;
+                padding: 0.6rem 1.5rem;
+                border-radius: 6px;
+                font-weight: 500;
+                transition: all 0.3s;
+            }
+            
+            .btn-primary:hover {
+                background-color: #5166ea;
+                border-color: #5166ea;
+                transform: translateY(-2px);
+            }
+            
+            .btn-secondary {
+                padding: 0.6rem 1.5rem;
+                border-radius: 6px;
+                font-weight: 500;
+                transition: all 0.3s;
+            }
+            
+            .btn-secondary:hover {
+                transform: translateY(-2px);
+            }
+            
+            .form-section {
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .form-section h5 {
+                color: #6777ef;
+                font-weight: 600;
+                margin-bottom: 1rem;
+            }
+            
+            .form-actions {
+                background-color: #f8f9fa;
+                padding: 1.5rem;
+                border-top: 1px solid #eee;
+                border-radius: 0 0 12px 12px;
+                display: flex;
+                justify-content: space-between;
+            }
+            
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+            
+            .card {
+                overflow: hidden;
+            }
+            
+        </style>
+    {% endblock %}
+</head>
+
+{% block body %}
+<div class="wrapper">
+    <div class="main-panel">
+        <div class="content">
+            <div class="page-inner">
+                <div class="page-header">
+                    <h4 class="page-title">Modifier un Guide</h4>
+                    <ul class="breadcrumbs">
+                        <li class="nav-home">
+                            <a href="{{ path('app_accueil_admin') }}">
+                                <i class="flaticon-home"></i>
+                            </a>
+                        </li>
+                        <li class="separator">
+                            <i class="flaticon-right-arrow"></i>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ path('app_guides_read') }}">Guides</a>
+                        </li>
+                        <li class="separator">
+                            <i class="flaticon-right-arrow"></i>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#">Modifier</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="card form-guide-card">
+                            <div class="card-header">
+                                <h4 class="card-title"><i class="fas fa-user-edit mr-2"></i>Modifier le guide</h4>
+                            </div>
+                            <div class="card-body">
+                                {{ form_start(form) }}
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-user-circle mr-2"></i>Informations personnelles</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.name) }}
+                                                    {{ form_widget(form.name, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Prénom du guide'
+                                                        }
+                                                    }) }}
+                                                    {{ form_errors(form.name) }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.lastName) }}
+                                                    {{ form_widget(form.lastName, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Nom du guide'
+                                                        }
+                                                    }) }}
+                                                    {{ form_errors(form.lastName) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-address-card mr-2"></i>Coordonnées</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.email) }}
+                                                    {{ form_widget(form.email, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Email du guide'
+                                                        }
+                                                    }) }}
+                                                    {{ form_errors(form.email) }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.phoneNum) }}
+                                                    {{ form_widget(form.phoneNum, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Numéro de téléphone'
+                                                        }
+                                                    }) }}
+                                                    {{ form_errors(form.phoneNum) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-globe mr-2"></i>Informations professionnelles</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.language) }}
+                                                    {{ form_widget(form.language, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Langues parlées'
+                                                        }
+                                                    }) }}
+                                                    {{ form_errors(form.language) }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.experience) }}
+                                                    {{ form_widget(form.experience, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Années d\'expérience'
+                                                        }
+                                                    }) }}
+                                                    {{ form_errors(form.experience) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <a href="{{ path('app_guides_read') }}" class="btn btn-secondary">
+                                            <i class="fas fa-arrow-left mr-2"></i> Retour à la liste
+                                        </a>
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fas fa-save mr-2"></i> Enregistrer les modifications
+                                        </button>
+                                    </div>
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
