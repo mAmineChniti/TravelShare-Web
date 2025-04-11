@@ -11,4 +11,5 @@ class PostComponent
     public string $text;
     public string $likesCount;
     public array $comments;
+    public bool $isLiked;
 }

@@ -19,10 +19,10 @@ class Posts
     #[ORM\Column(name: "Owner_id")]
     private ?int $ownerId = null;
 
-    #[ORM\Column(name: "created_at", type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: "created_at", type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(name: "updated_at", type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: "updated_at", type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(name: "text_content", length: 255)]
