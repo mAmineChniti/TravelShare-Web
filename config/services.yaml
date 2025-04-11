@@ -6,6 +6,11 @@
 parameters:
 
 services:
+    Symfony\Contracts\HttpClient\HttpClientInterface:
+        factory: ['Symfony\Component\HttpClient\HttpClient', 'create']
+        arguments:
+            - { max_duration: 10, headers: { 'accept': 'application/json' }, http_version: '1.1' }
+
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.

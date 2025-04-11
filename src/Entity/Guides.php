@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\GuidesRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'guides')]
 #[ORM\Entity(repositoryClass: GuidesRepository::class)]
@@ -16,21 +17,34 @@ class Guides
     private ?int $guideId = null;
 
     #[ORM\Column(name: "name", length: 50)]
+    #[Assert\NotBlank(message: "Le prénom ne peut pas être vide.")]
+    #[Assert\Length(max: 50, maxMessage: "Le prénom ne peut pas dépasser 50 caractères.")]
     private ?string $name = null;
 
     #[ORM\Column(name: "last_name", length: 50)]
+    #[Assert\NotBlank(message: "Le nom de famille ne peut pas être vide.")]
+    #[Assert\Length(max: 50, maxMessage: "Le nom de famille ne peut pas dépasser 50 caractères.")]
     private ?string $lastName = null;
 
     #[ORM\Column(name: "email", length: 50)]
+    #[Assert\NotBlank(message: "L'email ne peut pas être vide.")]
+    #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide.")]
+    #[Assert\Length(max: 50, maxMessage: "L'email ne peut pas dépasser 50 caractères.")]
     private ?string $email = null;
 
     #[ORM\Column(name: "phone_num", length: 50)]
+    #[Assert\NotBlank(message: "Le numéro de téléphone ne peut pas être vide.")]
+    #[Assert\Length(max: 50, maxMessage: "Le numéro de téléphone ne peut pas dépasser 50 caractères.")]
     private ?string $phoneNum = null;
 
     #[ORM\Column(name: "language", length: 50)]
+    #[Assert\NotBlank(message: "La langue ne peut pas être vide.")]
+    #[Assert\Length(max: 50, maxMessage: "La langue ne peut pas dépasser 50 caractères.")]
     private ?string $language = null;
 
     #[ORM\Column(name: "experience")]
+    #[Assert\NotBlank(message: "L'expérience ne peut pas être vide.")]
+    #[Assert\GreaterThanOrEqual(0, message: "L'expérience doit être un nombre positif.")]
     private ?int $experience = null;
 
     public function getGuideId(): ?int
