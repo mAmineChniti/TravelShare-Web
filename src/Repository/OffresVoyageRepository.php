@@ -3,46 +3,60 @@
 namespace App\Repository;
 
 use App\Entity\OffresVoyage;
+use App\Entity\Reponses;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<OffresVoyage>
- *
- * @method OffresVoyage|null find($id, $lockMode = null, $lockVersion = null)
- * @method OffresVoyage|null findOneBy(array $criteria, array $orderBy = null)
- * @method OffresVoyage[]    findAll()
- * @method OffresVoyage[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
-class OffresVoyageRepository extends ServiceEntityRepository
+class OffresVoyageRepository  extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private EntityManagerInterface $em;
+
+    public function __construct(EntityManagerInterface $em)
     {
-        parent::__construct($registry, OffresVoyage::class);
+        $this->em = $em;
     }
 
-//    /**
-//     * @return OffresVoyage[] Returns an array of OffresVoyage objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function add(OffresVoyage $offreVoyage): void
+    {
+        $this->em->persist($offreVoyage);
+        $this->em->flush();
+    }
 
-//    public function findOneBySomeField($value): ?OffresVoyage
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function update(OffresVoyage $offreVoyage): void
+    {
+        $existing = $this->em->getRepository(OffresVoyage::class)->find($offreVoyage->getId());
+
+        if (!$existing) {
+            throw new EntityNotFoundException('Offre not found.');
+        }
+
+        $existing->setTitre($offreVoyage->getTitre());
+        $existing->setDestination($offreVoyage->getDestination());
+        $existing->setDescription($offreVoyage->getDescription());
+        $existing->setDateDepart($offreVoyage->getDateDepart());
+        $existing->setDateRetour($offreVoyage->getDateRetour());
+        $existing->setPrix($offreVoyage->getPrix());
+        $existing->setPlacesDisponibles($offreVoyage->getPlacesDisponibles());
+
+        $this->em->flush();
+    }
+
+    public function delete(int $id): void
+    {
+        $offre = $this->em->getRepository(OffresVoyage::class)->find($id);
+        if (!$offre) {
+            throw new EntityNotFoundException('Offre not found.');
+        }
+
+        $this->em->remove($offre);
+        $this->em->flush();
+    }
+
+    /**
+     * @return OffresVoyage[]
+     */
+    public function listAll(): array
+    {
+        return $this->em->getRepository(OffresVoyage::class)->findAll();
+    }
 }
