@@ -14,12 +14,19 @@
 			integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
 			crossorigin="anonymous"
 		></script>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+			integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
 		{% block stylesheets %} {{ encore_entry_link_tags('app') }} {% endblock %} {% block javascripts %} {{
 		encore_entry_script_tags('app') }} {% endblock %}
 	</head>
 	<body class="min-h-screen">
-		{% include 'components/navbar.html.twig' %}
+		{% include 'components/Navbar.html.twig' %}
 		<main class="pt-25 pb-10 w-full bg-background text-primary-foreground">{% block body %} {% endblock %}</main>
-		{% include 'components/footer.html.twig' %}
+		{% include 'components/Footer.html.twig' %}
 	</body>
 </html>
