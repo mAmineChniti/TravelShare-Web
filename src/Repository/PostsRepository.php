@@ -32,7 +32,13 @@ class PostsRepository extends ServiceEntityRepository
     public function update(Posts $post): void
     {
         $entityManager = $this->getEntityManager();
-        $entityManager->merge($post);
+        $existingPost = $this->find($post->getPostId());
+        if (!$existingPost) {
+            throw new \Exception('Post not found');
+        }
+        $existingPost->setTextContent($post->getTextContent());
+        $existingPost->setUpdatedAt(new \DateTimeImmutable(date('Y-m-d H:i:s')));
+        $entityManager->persist($existingPost);
         $entityManager->flush();
     }
 
@@ -53,7 +59,7 @@ class PostsRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
-            'SELECT p.postId, p.textContent, u.name, u.lastName, p.createdAt
+            'SELECT p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId
          FROM App\Entity\Posts p 
          JOIN App\Entity\Users u WITH p.ownerId = u.userId 
          LEFT JOIN App\Entity\FlaggedContent f WITH p.postId = f.postId AND f.flaggerId = :userId 

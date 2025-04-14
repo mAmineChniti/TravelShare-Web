@@ -31,7 +31,12 @@ class CommentsRepository extends ServiceEntityRepository
     public function update(Comments $comment): void
     {
         $entityManager = $this->getEntityManager();
-        $entityManager->merge($comment);
+        $existingComment = $this->find($comment->getCommentId());
+        if (!$existingComment) {
+            throw new \Exception('Comment not found');
+        }
+        $existingComment->setComment($comment->getComment());
+        $existingComment->setUpdatedAt(new \DateTimeImmutable(date('Y-m-d H:i:s')));
         $entityManager->flush();
     }
 
@@ -56,13 +61,13 @@ class CommentsRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
             'SELECT c.commentId, c.comment , c.commentedAt, c.updatedAt, 
-                    u.name, u.lastName
+                    u.name, u.lastName, c.commenterId
              FROM App\Entity\Comments c
              JOIN App\Entity\Users u WITH c.commenterId = u.userId
              WHERE c.postId = :postId
              ORDER BY c.commentedAt DESC'
         )
-        ->setParameter('postId', $postId);
+            ->setParameter('postId', $postId);
 
         return $query->getResult();
     }
