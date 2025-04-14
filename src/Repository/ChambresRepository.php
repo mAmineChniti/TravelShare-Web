@@ -21,28 +21,31 @@ class ChambresRepository extends ServiceEntityRepository
         parent::__construct($registry, Chambres::class);
     }
 
-//    /**
-//     * @return Chambres[] Returns an array of Chambres objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * Retourne les chambres disponibles pour un hôtel spécifique
+     *
+     * @param int $hotelId
+     * @return Chambres[]
+     */
+    public function findByHotelId(int $hotelId): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.hotel = :hotelId')
+            ->setParameter('hotelId', $hotelId)
+            ->getQuery()
+            ->getResult();
+    }
 
-//    public function findOneBySomeField($value): ?Chambres
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * Retourne les chambres *disponibles* pour un hôtel
+     */
+    public function findAvailableByHotelId(int $hotelId): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.hotel = :hotelId')
+            ->andWhere('c.disponible = true')
+            ->setParameter('hotelId', $hotelId)
+            ->getQuery()
+            ->getResult();
+    }
 }

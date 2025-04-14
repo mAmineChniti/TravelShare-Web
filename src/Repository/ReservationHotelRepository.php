@@ -21,28 +21,39 @@ class ReservationHotelRepository extends ServiceEntityRepository
         parent::__construct($registry, ReservationHotel::class);
     }
 
-//    /**
-//     * @return ReservationHotel[] Returns an array of ReservationHotel objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function add(ReservationHotel $reservation, bool $flush = true): void
+    {
+        $this->_em->persist($reservation);
+        if ($flush) {
+            $this->_em->flush();
+        }
+    }
 
-//    public function findOneBySomeField($value): ?ReservationHotel
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function update(ReservationHotel $reservation, bool $flush = true): void
+    {
+        // La méthode update peut simplement persister à nouveau et flush,
+        // car Doctrine se charge de synchroniser les changements.
+        $this->_em->persist($reservation);
+        if ($flush) {
+            $this->_em->flush();
+        }
+    }
+
+    public function remove(ReservationHotel $reservation, bool $flush = true): void
+    {
+        $this->_em->remove($reservation);
+        if ($flush) {
+            $this->_em->flush();
+        }
+    }
+
+    /**
+     * Retourne toutes les réservations.
+     *
+     * @return ReservationHotel[]
+     */
+    public function listAll(): array
+    {
+        return $this->findAll();
+    }
 }

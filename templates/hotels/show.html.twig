@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ hotel.nom }}{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-16">
+    <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <h1 class="text-3xl font-bold text-gray-800">{{ hotel.nom }}</h1>
+        <p class="text-gray-600 mt-2"><strong>Address:</strong> {{ hotel.adress }}</p>
+        <p class="text-gray-600"><strong>Phone:</strong> {{ hotel.telephone }}</p>
+        <p class="text-gray-600"><strong>Capacity:</strong> {{ hotel.capaciteTotale }} guests</p>
+
+        {% if hotel.imageH %}
+            <div class="mt-4">
+                <img src="data:image/jpeg;base64,{{ hotel.imageH|base64_encode }}" alt="{{ hotel.nom }}" class="rounded-lg shadow-md w-full">
+            </div>
+        {% endif %}
+
+        <a href="{{ path('app_hotels') }}" class="mt-6 inline-block bg-blue-500 text-white px-6 py-2 rounded">Back to List</a>
+
+    </div>
+</div>
+{% endblock %}

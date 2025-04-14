@@ -16,8 +16,9 @@ class Chambres
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
     private ?int $chambreId = null;
 
-    #[ORM\Column(name: "hotel_id")]
-    private ?int $hotelId = null;
+    #[ORM\ManyToOne(targetEntity: Hotels::class)]
+    #[ORM\JoinColumn(name: "hotel_id", referencedColumnName: "hotel_id", nullable: false)]
+    private ?Hotels $hotel = null;
 
     #[ORM\Column(name: "numero_chambre", length: 255)]
     private ?string $numeroChambre = null;
@@ -31,20 +32,21 @@ class Chambres
     #[ORM\Column(name: "disponible")]
     private ?int $disponible = null;
 
+    // Getters and Setters
+
     public function getChambreId(): ?int
     {
         return $this->chambreId;
     }
 
-    public function getHotelId(): ?int
+    public function getHotel(): ?Hotels
     {
-        return $this->hotelId;
+        return $this->hotel;
     }
 
-    public function setHotelId(int $hotelId): static
+    public function setHotel(?Hotels $hotel): static
     {
-        $this->hotelId = $hotelId;
-
+        $this->hotel = $hotel;
         return $this;
     }
 
@@ -56,7 +58,6 @@ class Chambres
     public function setNumeroChambre(string $numeroChambre): static
     {
         $this->numeroChambre = $numeroChambre;
-
         return $this;
     }
 
@@ -68,7 +69,6 @@ class Chambres
     public function setTypeEnu(string $typeEnu): static
     {
         $this->typeEnu = $typeEnu;
-
         return $this;
     }
 
@@ -80,7 +80,6 @@ class Chambres
     public function setPrixParNuit(string $prixParNuit): static
     {
         $this->prixParNuit = $prixParNuit;
-
         return $this;
     }
 
@@ -92,7 +91,6 @@ class Chambres
     public function setDisponible(int $disponible): static
     {
         $this->disponible = $disponible;
-
         return $this;
     }
 }

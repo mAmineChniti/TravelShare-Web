@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réserver une chambre{% endblock %}
+
+{% block body %}
+<div class="max-w-2xl mx-auto mt-10 bg-white p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-6">Réserver la chambre {{ chambre.numeroChambre }}</h1>
+
+    <p>Type: {{ chambre.typeEnu }}</p>
+    <p>Prix par nuit: {{ chambre.prixParNuit }} TND</p>
+
+    {# Message d'erreurs backend #}
+    {% if errors is defined and errors %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <ul class="list-disc pl-5">
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if success is defined and success %}
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            Réservation enregistrée avec succès ! Redirection vers les hôtels en cours...
+        </div>
+    {% endif %}
+
+    <form method="POST" action="/hotel/{{hotelId}}/chambres/{{chambreId}}/reservation" class="mt-6 space-y-4" onsubmit="return validateDates();">
+        <div>
+            <label for="date_debut" class="block mb-1 font-medium">Date début</label>
+            <input type="date" id="date_debut" name="date_debut" required class="w-full border p-2 rounded">
+        </div>
+
+        <div>
+            <label for="date_fin" class="block mb-1 font-medium">Date fin</label>
+            <input type="date" id="date_fin" name="date_fin" required class="w-full border p-2 rounded">
+        </div>
+
+        <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition">
+            Confirmer la réservation
+        </button>
+    </form>
+</div>
+
+<script>
+    function validateDates() {
+        const dateDebut = new Date(document.getElementById('date_debut').value);
+        const dateFin = new Date(document.getElementById('date_fin').value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let errors = [];
+
+        if (dateDebut < today) {
+            errors.push("La date de début ne peut pas être dans le passé.");
+        }
+
+        if (dateFin <= dateDebut) {
+            errors.push("La date de fin doit être après la date de début.");
+        }
+
+        if (errors.length > 0) {
+            displayClientErrors(errors);
+            return false;
+        }
+
+        return true;
+    }
+
+    function displayClientErrors(errors) {
+        const existingAlert = document.getElementById('client-error');
+        if (existingAlert) existingAlert.remove();
+
+        const errorContainer = document.createElement('div');
+        errorContainer.id = 'client-error';
+        errorContainer.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4';
+
+        const ul = document.createElement('ul');
+        ul.className = 'list-disc pl-5';
+
+        errors.forEach(function (error) {
+            const li = document.createElement('li');
+            li.innerText = error;
+            ul.appendChild(li);
+        });
+
+        errorContainer.appendChild(ul);
+
+        const form = document.querySelector('form');
+        form.parentNode.insertBefore(errorContainer, form);
+    }
+</script>
+{% endblock %}

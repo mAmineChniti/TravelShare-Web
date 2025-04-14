@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chambres disponibles{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-2">Chambres disponibles de l'hôtel : {{ hotel.nom }}</h2>
+    <p class="text-gray-600 mb-6"><strong>Adresse :</strong> {{ hotel.adress }}</p>
+
+    {% if chambres is not empty %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for chambre in chambres %}
+                <div class="border rounded-lg p-4 shadow-md bg-white">
+                    <h3 class="text-lg font-bold mb-2">Chambre n° {{ chambre.numeroChambre }}</h3>
+                    <p><strong>Type :</strong> {{ chambre.typeEnu }}</p>
+                    <p><strong>Prix par nuit :</strong> {{ chambre.prixParNuit }} TND</p>
+                    <p><strong>Disponible :</strong> 
+                        {% if chambre.disponible == 1 %}
+                            <span class="text-green-500">Oui</span>
+                        {% else %}
+                            <span class="text-red-500">Non</span>
+                        {% endif %}
+                    </p>
+
+                    {% if chambre.disponible == 1 %}
+                        <div class="flex space-x-4 mt-4">
+                            <a href="{{ path('app_reservation', {'hotelId': hotel.hotelId, 'chambreId': chambre.chambreId}) }}"
+                               class="inline-block bg-red-500 text-white px-6 py-3 rounded hover:bg-red-600 transition-colors duration-300">
+                                Réserver
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Aucune chambre disponible pour le moment.</p>
+    {% endif %}
+</div>
+{% endblock %}
