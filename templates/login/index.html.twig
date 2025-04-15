@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Connexion{% endblock %}
+{% block title %}Log In{% endblock %}
 
 {% block css %}
     <!-- MATERIAL DESIGN ICONIC FONT -->
@@ -16,13 +16,13 @@
             <div class="image-holder">
                 <img src="{{ asset('images2/agence.png') }}" alt="Logo">
                 <div class="already-have-account">
-                    <a href="{{ path('app_logup') }}">Vous n'avez pas de compte ?</a>
+                    <a href="{{ path('app_logup') }}">You don't have account ?</a>
                 </div>
             </div>
 
             <!-- Formulaire de connexion -->
             <form action="{{ path('app_login') }}" method="post">
-                <h3>Connexion</h3>
+                <h3>Log In</h3>
 
                 <!-- Affichage des erreurs de connexion -->
                 {% if error %}
@@ -33,7 +33,7 @@
 
                 <!-- Champ pour l'email -->
                 <div class="form-wrapper">
-                    <input type="text" name="_username" value="{{ last_username }}" placeholder="Email Address" class="form-control" required>
+                    <input type="text" name="_email" placeholder="Email Address" class="form-control" required>
                     <i class="zmdi zmdi-email"></i>
                 </div>
 
@@ -63,12 +63,12 @@
 
                 <!-- Bouton de soumission du formulaire -->
                 <button type="submit" class="btn btn-primary">
-                    Connecter
+                    Connect
                     <i class="zmdi zmdi-arrow-right"></i>
                 </button>
 
                 <div class="forgot-password">
-                    <a href="">Mot de passe oublié ?</a>
+                    <a href="">Forget password ?</a>
                 </div>
             </form>
         </div>

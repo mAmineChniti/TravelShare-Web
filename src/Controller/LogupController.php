@@ -33,17 +33,26 @@ class LogupController extends AbstractController
                 // Set default values
                 $user->setRole(0); // Default role
                 $user->setCompte(0); // Inactive account
-                $user->setPhoto("https://cdn-icons-png.flaticon.com/512/9187/9187604.png"); // Default avatar
 
-                // Persist to database
+                // Télécharger l'image par défaut et la convertir en BLOB
+                $defaultImageUrl = 'https://cdn-icons-png.flaticon.com/512/9187/9187604.png';
+                $defaultImageData = @file_get_contents($defaultImageUrl); // Le @ évite les warnings
+
+                if ($defaultImageData !== false) {
+                    $user->setPhoto($defaultImageData); // Enregistrer en BLOB
+                } else {
+                    $this->addFlash('error', "Erreur lors du chargement de la photo par défaut.");
+                }
+
+                // Enregistrer l'utilisateur
                 $entityManager->persist($user);
                 $entityManager->flush();
 
-                $this->addFlash('success', 'Inscription réussie ! Vous pouvez maintenant vous connecter.');
+                //$this->addFlash('success', 'Inscription réussie ! Vous pouvez maintenant vous connecter.');
                 return $this->redirectToRoute('app_login');
             }
 
-            // Show form errors
+            // Afficher les erreurs du formulaire
             foreach ($form->getErrors(true) as $error) {
                 $this->addFlash('error', $error->getMessage());
             }

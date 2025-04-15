@@ -30,7 +30,7 @@ security:
                 login_path: app_login      # The route for login form (from LoginController)
                 check_path: app_login      # The path to submit the login form to
                 default_target_path: app_home  # The default route to redirect to after successful login
-                username_parameter: _username  # Field for username (email in this case)
+                username_parameter: _email  # Field for username (email in this case)
                 password_parameter: _password  # Field for password
                 # If necessary, you can configure the authenticator here
 

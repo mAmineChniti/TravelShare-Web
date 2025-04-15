@@ -82,10 +82,10 @@ class RegistrationFormType extends AbstractType
                     'Female' => 'female',
                     'Other' => 'other',
                 ],
-                'placeholder' => 'Select Gender',
+                'placeholder' => 'Select Address',
                 'attr' => ['class' => 'form-control'],
                 'constraints' => [
-                    new NotBlank(['message' => 'Please select your gender'])
+                    new NotBlank(['message' => 'Please select your address'])
                 ]
             ]);
     }
