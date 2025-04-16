@@ -8,7 +8,13 @@
 
     {% if voyages is not empty %}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% if voyages|length == 0 or voyages|filter(v => v.placesDisponibles == 0)|length > 0 %}
+                <div class="col-span-1 md:col-span-2 lg:col-span-3">
+                    <p class="text-gray-500">No flights available at the moment.</p>
+                </div>
+            {% else %}
             {% for voyage in voyages %}
+                {% if voyage.placesDisponibles > 0 %}
                 <div class="bg-white shadow-lg rounded-lg overflow-hidden">
                     <div class="p-6">
                         <h2 class="text-xl font-semibold mb-2">{{ voyage.titre }}</h2>
@@ -18,7 +24,9 @@
                         <a href="{{ path('app_flight_details', {id: voyage.offresVoyageId}) }}" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">View Details</a>
                     </div>
                 </div>
+                {% endif %}
             {% endfor %}
+            {% endif %}
         </div>
     {% else %}
         <p class="text-gray-500">No flights available at the moment.</p>

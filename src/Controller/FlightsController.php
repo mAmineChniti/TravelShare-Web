@@ -81,27 +81,32 @@ final class FlightsController extends AbstractController
     public function addFlight(Request $request, OffresVoyageRepository $voyageService): Response
     {
         if ($request->isMethod('POST')) {
-            $titre = $request->request->get('titre');
-            $destination = $request->request->get('destination');
-            $description = $request->request->get('description');
-            $prix = (float) $request->request->get('prix');
-            $placesDisponibles = (int) $request->request->get('placesDisponibles');
-            $dateDepart = new \DateTime($request->request->get('dateDepart'));
-            $dateRetour = new \DateTime($request->request->get('dateRetour'));
+            try {
+                $titre = $request->request->get('titre');
+                $destination = $request->request->get('destination');
+                $description = $request->request->get('description');
+                $prix = (float) $request->request->get('prix');
+                $placesDisponibles = (int) $request->request->get('placesDisponibles');
+                $dateDepart = new \DateTime($request->request->get('dateDepart'));
+                $dateRetour = new \DateTime($request->request->get('dateRetour'));
 
-            $voyage = new OffresVoyage();
-            $voyage->setTitre($titre);
-            $voyage->setDestination($destination);
-            $voyage->setDescription($description);
-            $voyage->setPrix($prix);
-            $voyage->setPlacesDisponibles($placesDisponibles);
-            $voyage->setDateDepart($dateDepart);
-            $voyage->setDateRetour($dateRetour);
+                $voyage = new OffresVoyage();
+                $voyage->setTitre($titre);
+                $voyage->setDestination($destination);
+                $voyage->setDescription($description);
+                $voyage->setPrix($prix);
+                $voyage->setPlacesDisponibles($placesDisponibles);
+                $voyage->setDateDepart($dateDepart);
+                $voyage->setDateRetour($dateRetour);
 
-            $voyageService->add($voyage);
+                $voyageService->add($voyage);
 
-            $this->addFlash('success', 'Flight added successfully!');
-            return $this->redirectToRoute('app_dashboard_flights');
+                $this->addFlash('success', 'Flight added successfully!');
+                return $this->redirectToRoute('app_dashboard_flights');
+            } catch (\InvalidArgumentException $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_add_flight');
+            }
         }
 
         return $this->render('dashboard/add_flight.html.twig');
@@ -117,18 +122,23 @@ final class FlightsController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
-            $voyage->setTitre($request->request->get('titre'));
-            $voyage->setDestination($request->request->get('destination'));
-            $voyage->setDescription($request->request->get('description'));
-            $voyage->setPrix((float) $request->request->get('prix'));
-            $voyage->setPlacesDisponibles((int) $request->request->get('placesDisponibles'));
-            $voyage->setDateDepart(new \DateTime($request->request->get('dateDepart')));
-            $voyage->setDateRetour(new \DateTime($request->request->get('dateRetour')));
+            try {
+                $voyage->setTitre($request->request->get('titre'));
+                $voyage->setDestination($request->request->get('destination'));
+                $voyage->setDescription($request->request->get('description'));
+                $voyage->setPrix((float) $request->request->get('prix'));
+                $voyage->setPlacesDisponibles((int) $request->request->get('placesDisponibles'));
+                $voyage->setDateDepart(new \DateTime($request->request->get('dateDepart')));
+                $voyage->setDateRetour(new \DateTime($request->request->get('dateRetour')));
 
-            $voyageService->update($voyage);
+                $voyageService->update($voyage);
 
-            $this->addFlash('success', 'Flight updated successfully!');
-            return $this->redirectToRoute('app_dashboard_flights');
+                $this->addFlash('success', 'Flight updated successfully!');
+                return $this->redirectToRoute('app_dashboard_flights');
+            } catch (\InvalidArgumentException $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('app_edit_flight', ['id' => $id]);
+            }
         }
 
         return $this->render('dashboard/edit_flight.html.twig', [
@@ -143,6 +153,7 @@ final class FlightsController extends AbstractController
 
         if (!$voyage) {
             throw $this->createNotFoundException('Flight not found');
+            return $this->redirectToRoute('app_dashboard_flights');
         }
 
         $voyageService->delete($voyage);
