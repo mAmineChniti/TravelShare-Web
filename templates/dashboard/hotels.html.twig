@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hotels{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-16">
+    {% for hotel in hotels %}
+        <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 mb-6">
+            <div class="mb-4">
+                <h1 class="text-3xl font-bold text-gray-800">{{ hotel.nom }}</h1>
+                <p class="text-gray-600 mt-2"><strong>Address:</strong> {{ hotel.adress }}</p>
+                <p class="text-gray-600"><strong>Phone:</strong> {{ hotel.telephone }}</p>
+                <p class="text-gray-600"><strong>Capacity:</strong> {{ hotel.capaciteTotale }} guests</p>
+            </div>
+
+            {% if hotel.imageH %}
+                <div class="mt-4">
+                    <img src="data:image/jpeg;base64,{{ hotel.base64Image }}" alt="{{ hotel.nom }}" class="rounded-lg shadow-md w-full">
+                </div>
+            {% endif %}
+
+            <div class="mt-6">
+                <a href="{{ path('chambres_by_hotel', { id: hotel.id }) }}" class="inline-block bg-blue-500 text-white px-6 py-2 rounded">
+                    Voir les chambres disponibles
+                </a>
+            </div>
+
+            <div class="mt-4 flex space-x-4">
+                <a href="{{ path('hotel_edit', { id: hotel.id }) }}" class="inline-block bg-yellow-500 text-white px-6 py-2 rounded hover:bg-yellow-600">
+                    Editer
+                </a>
+                <a href="{{ path('hotel_delete', { id: hotel.id }) }}" class="inline-block bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet hôtel ?');">
+                    Supprimer
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="mt-8 text-center">
+        <a href="{{ path('hotel_add') }}" class="inline-block bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+            Ajouter un hôtel
+        </a>
+    </div>
+</div>
+{% endblock %}
