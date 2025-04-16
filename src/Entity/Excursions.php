@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\ExcursionsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Table(name: 'excursions')]
 #[ORM\Index(name: 'fk_id_guide', columns: ['guide_id'])]
@@ -15,6 +17,10 @@ class Excursions
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
     private ?int $excursionId = null;
+
+#[ORM\ManyToOne(targetEntity: Guides::class, inversedBy: "excursions")]
+#[ORM\JoinColumn(name: "guide_id", referencedColumnName: "guide_id", onDelete: "CASCADE")]
+private ?Guides $guide = null;
 
     #[ORM\Column(name: "guide_id")]
     private ?int $guideId = null;
@@ -31,19 +37,14 @@ class Excursions
 
     #[ORM\Column(name: "date_excursion", type: Types::DATE_MUTABLE)]
     #[Assert\NotBlank(message: "La date de l'excursion est requise.")]
-    #[Assert\Type("\DateTimeInterface", message: "La date doit être au format valide.")]
-    #[Assert\GreaterThan("today", message: "La date de l'excursion doit être dans le futur.")]
     private ?\DateTimeInterface $dateExcursion = null;
-
+    
     #[ORM\Column(name: "date_fin", type: Types::DATE_MUTABLE)]
-    #[Assert\NotBlank(message: "La date de fin de l'excursion est requise.")]
-    #[Assert\Type("\DateTimeInterface", message: "La date de fin doit être au format valide.")]
-    #[Assert\GreaterThan(propertyPath: "dateExcursion", message: "La date de fin doit être après la date de l'excursion.")]
+    #[Assert\NotBlank(message: "La date de fin est requise.")]
     private ?\DateTimeInterface $dateFin = null;
 
-    #[ORM\Column(name: "image", type: Types::BLOB)]
-    #[Assert\NotBlank(message: "L'image est requise.")]
-    private $image = null;
+    #[ORM\Column(name: "image", type: "string", length: 255, nullable: true)]
+    private ?string $image = null; 
 
     #[ORM\Column(name: "prix")]
     #[Assert\NotBlank(message: "Le prix est requis.")]
@@ -55,14 +56,14 @@ class Excursions
         return $this->excursionId;
     }
 
-    public function getGuideId(): ?int
+    public function getGuide(): ?Guides
     {
-        return $this->guideId;
+        return $this->guide;
     }
 
-    public function setGuideId(int $guideId): static
+    public function setGuide(?Guides $guide): static
     {
-        $this->guideId = $guideId;
+        $this->guide = $guide;
 
         return $this;
     }
@@ -115,15 +116,14 @@ class Excursions
         return $this;
     }
 
-    public function getImage()
+    public function getImage(): ?string
     {
         return $this->image;
     }
-
-    public function setImage($image): static
+    
+    public function setImage(?string $image): self
     {
         $this->image = $image;
-
         return $this;
     }
 

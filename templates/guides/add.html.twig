@@ -3,10 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>{% block title %}Ajouter Un Guide | Admin Dashboard{% endblock %}</title>
+    <title>{% block title %}Add Guide | Admin Dashboard{% endblock %}</title>
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport"/>
 
-    <!-- Lien vers la favicon -->
+    <!-- Favicon -->
     <link rel="icon" href="{{ asset('images2/favicon.svg') }}" type="image/x-icon">
     <link rel="icon" href="{{ asset('images2/favicon.ico') }}" />
 
@@ -38,8 +38,6 @@
         <link rel="stylesheet" href="{{ asset('css3/bootstrap.min.css') }}" />
         <link rel="stylesheet" href="{{ asset('css3/plugins.min.css') }}" />
         <link rel="stylesheet" href="{{ asset('css3/kaiadmin.min.css') }}" />
-
-        <!-- CSS Just for demo purpose, don't include it in your project -->
         <link rel="stylesheet" href="{{ asset('css3/demo.css') }}" />
         
         <style>
@@ -76,6 +74,7 @@
                 padding: 0.6rem 1.2rem;
                 transition: all 0.3s;
                 background-color: #fff;
+                margin-bottom: 0.5rem;
             }
             
             .form-control:focus {
@@ -145,23 +144,36 @@
                 overflow: hidden;
             }
             
+            .error-message {
+                color: #dc3545;
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+            }
+            
+            .is-invalid {
+                border-color: #dc3545 !important;
+            }
+            
+            .is-invalid:focus {
+                box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+            }
         </style>
     {% endblock %}
 </head>
 
 <body>
 <div class="wrapper">
-    <!-- Sidebar (conservez votre sidebar existante) -->
+    <!-- Sidebar -->
     <!-- ... -->
 
     <div class="main-panel">
-        <!-- Header (conservez votre header existant) -->
+        <!-- Header -->
         <!-- ... -->
 
         <div class="content">
             <div class="page-inner">
                 <div class="page-header">
-                    <h4 class="page-title">Ajouter un Guide</h4>
+                    <h4 class="page-title">Add a Guide</h4>
                     <ul class="breadcrumbs">
                         <li class="nav-home">
                             <a href="{{ path('app_accueil_admin') }}">
@@ -178,93 +190,98 @@
                     <div class="col-md-10">
                         <div class="card form-guide-card">
                             <div class="card-header">
-                                <h4 class="card-title"><i class="fas fa-user-plus mr-2"></i>Ajouter un nouveau guide</h4>
+                                <h4 class="card-title"><i class="fas fa-user-plus mr-2"></i>Add a new guide</h4>
                             </div>
                             <div class="card-body">
-                                {{ form_start(form) }}
+                                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
                                     <div class="form-section">
-                                        <h5><i class="fas fa-user-circle mr-2"></i>  Informations personnelles</h5>
+                                        <h5><i class="fas fa-user-circle mr-2"></i> Personal informations</h5>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    {{ form_label(form.name) }}
+                                                    {{ form_label(form.name, "First Name", {'label_attr': {'class': 'form-label'}}) }}
                                                     {{ form_widget(form.name, {
                                                         'attr': {
                                                             'class': 'form-control',
-                                                            'placeholder': 'Prénom du guide'
+                                                            'placeholder': 'Guide\'s first name'
                                                         }
                                                     }) }}
-                                                     {{ form_errors(form.name) }}
+                                                    <div class="error-message">{{ form_errors(form.name) }}</div>
                                                 </div>
                                             </div>
                                             
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    {{ form_label(form.lastName) }}
+                                                    {{ form_label(form.lastName, "Last Name", {'label_attr': {'class': 'form-label'}}) }}
                                                     {{ form_widget(form.lastName, {
                                                         'attr': {
                                                             'class': 'form-control',
-                                                            'placeholder': 'Nom du guide'
+                                                            'placeholder': 'Guide\'s last name'
                                                         }
                                                     }) }}
+                                                    <div class="error-message">{{ form_errors(form.lastName) }}</div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     
                                     <div class="form-section">
-                                        <h5><i class="fas fa-address-card mr-2"></i>  Coordonnées</h5>
+                                        <h5><i class="fas fa-address-card mr-2"></i> Contact details</h5>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    {{ form_label(form.email) }}
+                                                    {{ form_label(form.email, "Email", {'label_attr': {'class': 'form-label'}}) }}
                                                     {{ form_widget(form.email, {
                                                         'attr': {
                                                             'class': 'form-control',
-                                                            'placeholder': 'Email du guide'
+                                                            'placeholder': 'Email of the guide'
                                                         }
                                                     }) }}
+                                                    <div class="error-message">{{ form_errors(form.email) }}</div>
                                                 </div>
                                             </div>
                                             
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    {{ form_label(form.phoneNum) }}
+                                                    {{ form_label(form.phoneNum, "Phone Number", {'label_attr': {'class': 'form-label'}}) }}
                                                     {{ form_widget(form.phoneNum, {
                                                         'attr': {
                                                             'class': 'form-control',
-                                                            'placeholder': 'Numéro de téléphone'
+                                                            'placeholder': 'Phone number'
                                                         }
                                                     }) }}
+                                                    <div class="error-message">{{ form_errors(form.phoneNum) }}</div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     
                                     <div class="form-section">
-                                        <h5><i class="fas fa-globe mr-2"></i>  Informations professionnelles</h5>
+                                        <h5><i class="fas fa-globe mr-2"></i> Professional information</h5>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    {{ form_label(form.language) }}
+                                                    {{ form_label(form.language, "Language", {'label_attr': {'class': 'form-label'}}) }}
                                                     {{ form_widget(form.language, {
                                                         'attr': {
                                                             'class': 'form-control',
-                                                            'placeholder': 'Langues parlées'
+                                                            'placeholder': 'Languages spoken'
                                                         }
                                                     }) }}
+                                                    <div class="error-message">{{ form_errors(form.language) }}</div>
                                                 </div>
                                             </div>
                                             
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    {{ form_label(form.experience) }}
+                                                    {{ form_label(form.experience, "Experience", {'label_attr': {'class': 'form-label'}}) }}
                                                     {{ form_widget(form.experience, {
                                                         'attr': {
                                                             'class': 'form-control',
-                                                            'placeholder': 'Années d\'expérience'
+                                                            'placeholder': 'Years of experience'
                                                         }
                                                     }) }}
+                                                    <div class="error-message">{{ form_errors(form.experience) }}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -272,10 +289,10 @@
 
                                     <div class="form-actions">
                                         <a href="{{ path('app_guides_read') }}" class="btn btn-secondary">
-                                            <i class="fas fa-arrow-left mr-2"></i> Retour à la liste
+                                            <i class="fas fa-arrow-left mr-2"></i> Back to list
                                         </a>
                                         <button class="btn btn-primary" type="submit">
-                                            <i class="fas fa-save mr-2"></i> Enregistrer le guide
+                                            <i class="fas fa-save mr-2"></i> Save guide
                                         </button>
                                     </div>
                                 {{ form_end(form) }}
@@ -289,12 +306,30 @@
 </div>
 
 {% block js2 %}
-    <!-- Core JS Files   -->
+    <!-- Core JS Files -->
     <script src="{{ asset('js2/core/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ asset('js2/core/popper.min.js') }}"></script>
     <script src="{{ asset('js2/core/bootstrap.min.js') }}"></script>
 
-    <!-- ... (conservez le reste de vos scripts JS existants) ... -->
+    <!-- Script pour la gestion des erreurs -->
+    <script>
+        $(document).ready(function() {
+            // Ajoute la classe is-invalid aux champs qui ont des erreurs
+            $('.form-control').each(function() {
+                if ($(this).next('.error-message').text().trim() !== '') {
+                    $(this).addClass('is-invalid');
+                }
+            });
+
+            // Gestion dynamique des erreurs lors de la saisie
+            $('.form-control').on('input', function() {
+                if ($(this).val().trim() !== '') {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.error-message').text('');
+                }
+            });
+        });
+    </script>
 {% endblock %}
 </body>
 </html>

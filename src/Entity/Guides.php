@@ -5,12 +5,25 @@ namespace App\Entity;
 use App\Repository\GuidesRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\Excursions;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'guides')]
 #[ORM\Entity(repositoryClass: GuidesRepository::class)]
 class Guides
 {
+
+    #[ORM\OneToMany(mappedBy: "guide", targetEntity: Excursions::class, cascade: ["persist", "remove"], orphanRemoval: true)]
+private Collection $excursions;
+
+public function __construct()
+{
+    $this->excursions = new ArrayCollection();
+}
+
+
     #[ORM\Column(name: "guide_id")]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
@@ -123,4 +136,29 @@ class Guides
 
         return $this;
     }
+
+    public function getExcursions(): Collection
+{
+    return $this->excursions;
+}
+
+public function addExcursion(Excursions $excursion): self
+{
+    if (!$this->excursions->contains($excursion)) {
+        $this->excursions->add($excursion);
+        $excursion->setGuide($this);
+    }
+    return $this;
+}
+
+public function removeExcursion(Excursions $excursion): self
+{
+    if ($this->excursions->removeElement($excursion)) {
+        // set the owning side to null (unless already changed)
+        if ($excursion->getGuide() === $this) {
+            $excursion->setGuide(null);
+        }
+    }
+    return $this;
+}
 }

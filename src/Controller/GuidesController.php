@@ -82,24 +82,17 @@ class GuidesController extends AbstractController
     }
     
 
-    #[Route('/guides/{guideId}/delete', name: 'app_guides_delete', methods: ['POST'])]
-    public function delete(
-        Request $request,
-        int $guideId,
-        GuidesRepository $guidesRepository,
-        ManagerRegistry $doctrine
-    ): Response {
-        $guide = $guidesRepository->find($guideId);
-        
-        if (!$guide) {
-            throw $this->createNotFoundException('Guide not found');
-        }
-    
-        if ($this->isCsrfTokenValid('delete'.$guideId, $request->request->get('_token'))) {
-            $em = $doctrine->getManager();
-            $em->remove($guide);
-            $em->flush();
-            $this->addFlash('success', 'Guide deleted successfully!');
+    #[Route('/guides/delete/{id}', name: 'app_guides_delete', methods: ['POST'])]
+    public function delete(Request $request, Guides $guide, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$guide->getGuideId(), $request->request->get('_token'))) {
+            // La suppression en cascade est gérée automatiquement par Doctrine
+            $entityManager->remove($guide);
+            $entityManager->flush();
+            
+            $this->addFlash('success', 'Le guide et ses excursions associées ont été supprimés avec succès.');
+        } else {
+            $this->addFlash('error', 'Token CSRF invalide, suppression annulée.');
         }
     
         return $this->redirectToRoute('app_guides_read');

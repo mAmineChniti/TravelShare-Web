@@ -24,7 +24,7 @@ class GuidesType extends AbstractType
             ->add('phoneNum', TextType::class)
             ->add('language', ChoiceType::class, [
                 'choices' => $this->languageService->getLanguages(),
-                'placeholder' => 'Choisir une langue',
+                'placeholder' => 'Languages ​​spoken',
                 'attr' => ['class' => 'form-control mb-3'],
             ])
             ->add('experience', ChoiceType::class, [
@@ -35,7 +35,7 @@ class GuidesType extends AbstractType
                     '20 ans' => '20',
                     '25 ans et plus' => '25+',
                 ],
-                'placeholder' => 'Sélectionner l\'expérience',
+                'placeholder' => 'Years of experience',
                 'attr' => ['class' => 'form-control mb-3'],
             ])
         ;

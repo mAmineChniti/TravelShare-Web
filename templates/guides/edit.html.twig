@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>{% block title %}Ajouter Un Guide | Admin Dashboard{% endblock %}</title>
+    <title>{% block title %}Add A Guide | Admin Dashboard{% endblock %}</title>
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport"/>
 
     <!-- Lien vers la favicon -->
@@ -155,7 +155,7 @@
         <div class="content">
             <div class="page-inner">
                 <div class="page-header">
-                    <h4 class="page-title">Modifier un Guide</h4>
+                    <h4 class="page-title">Edit a Guide</h4>
                     <ul class="breadcrumbs">
                         <li class="nav-home">
                             <a href="{{ path('app_accueil_admin') }}">
@@ -181,12 +181,12 @@
                     <div class="col-md-10">
                         <div class="card form-guide-card">
                             <div class="card-header">
-                                <h4 class="card-title"><i class="fas fa-user-edit mr-2"></i>Modifier le guide</h4>
+                                <h4 class="card-title"><i class="fas fa-user-edit mr-2"></i>Edit Guide</h4>
                             </div>
                             <div class="card-body">
                                 {{ form_start(form) }}
                                     <div class="form-section">
-                                        <h5><i class="fas fa-user-circle mr-2"></i>Informations personnelles</h5>
+                                        <h5><i class="fas fa-user-circle mr-2"></i>Personal information</h5>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
@@ -194,7 +194,7 @@
                                                     {{ form_widget(form.name, {
                                                         'attr': {
                                                             'class': 'form-control',
-                                                            'placeholder': 'Prénom du guide'
+                                                            'placeholder': 'Guide\s first name'
                                                         }
                                                     }) }}
                                                     {{ form_errors(form.name) }}
@@ -207,7 +207,7 @@
                                                     {{ form_widget(form.lastName, {
                                                         'attr': {
                                                             'class': 'form-control',
-                                                            'placeholder': 'Nom du guide'
+                                                            'placeholder': 'Guide Name'
                                                         }
                                                     }) }}
                                                     {{ form_errors(form.lastName) }}
@@ -217,7 +217,7 @@
                                     </div>
                                     
                                     <div class="form-section">
-                                        <h5><i class="fas fa-address-card mr-2"></i>Coordonnées</h5>
+                                        <h5><i class="fas fa-address-card mr-2"></i>Contact detailss</h5>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
@@ -225,7 +225,7 @@
                                                     {{ form_widget(form.email, {
                                                         'attr': {
                                                             'class': 'form-control',
-                                                            'placeholder': 'Email du guide'
+                                                            'placeholder': 'Email of the guide'
                                                         }
                                                     }) }}
                                                     {{ form_errors(form.email) }}
@@ -238,7 +238,7 @@
                                                     {{ form_widget(form.phoneNum, {
                                                         'attr': {
                                                             'class': 'form-control',
-                                                            'placeholder': 'Numéro de téléphone'
+                                                            'placeholder': 'Phone number'
                                                         }
                                                     }) }}
                                                     {{ form_errors(form.phoneNum) }}
@@ -248,7 +248,7 @@
                                     </div>
                                     
                                     <div class="form-section">
-                                        <h5><i class="fas fa-globe mr-2"></i>Informations professionnelles</h5>
+                                        <h5><i class="fas fa-globe mr-2"></i>Professional information</h5>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
@@ -256,7 +256,7 @@
                                                     {{ form_widget(form.language, {
                                                         'attr': {
                                                             'class': 'form-control',
-                                                            'placeholder': 'Langues parlées'
+                                                            'placeholder': 'Languages ​​spoken'
                                                         }
                                                     }) }}
                                                     {{ form_errors(form.language) }}
@@ -269,7 +269,7 @@
                                                     {{ form_widget(form.experience, {
                                                         'attr': {
                                                             'class': 'form-control',
-                                                            'placeholder': 'Années d\'expérience'
+                                                            'placeholder': 'Years of experience'
                                                         }
                                                     }) }}
                                                     {{ form_errors(form.experience) }}
@@ -280,10 +280,10 @@
 
                                     <div class="form-actions">
                                         <a href="{{ path('app_guides_read') }}" class="btn btn-secondary">
-                                            <i class="fas fa-arrow-left mr-2"></i> Retour à la liste
+                                            <i class="fas fa-arrow-left mr-2"></i> Back to list
                                         </a>
                                         <button class="btn btn-primary" type="submit">
-                                            <i class="fas fa-save mr-2"></i> Enregistrer les modifications
+                                            <i class="fas fa-save mr-2"></i> Save changes
                                         </button>
                                     </div>
                                 {{ form_end(form) }}

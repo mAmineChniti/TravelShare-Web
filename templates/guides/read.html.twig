@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>{% block title %}Liste des Guides | Admin Dashboard{% endblock %}</title>
+    <title>{% block title %}List of Guides | Admin Dashboard{% endblock %}</title>
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport"/>
 
     <!-- Lien vers la favicon -->
@@ -142,6 +142,13 @@
                             <p>Guides</p>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="{{ path('app_excursions_read') }}">
+                            <i class="fas fa-umbrella-beach"></i>
+                            <p>Excursions</p>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -164,7 +171,7 @@
                             </div>
                             <input
                                     type="text"
-                                    placeholder="Rechercher ..."
+                                    placeholder="To research ..."
                                     class="form-control"
                             />
                         </div>
@@ -522,7 +529,8 @@
                             <i class="flaticon-right-arrow"></i>
                         </li>
                         <li class="nav-item">
-                            <a href="#">Liste des Guides</a>
+                            <a href="#">
+List of Guides</a>
                         </li>
                     </ul>
                 </div>
@@ -532,9 +540,10 @@
                         <div class="card card-guides">
                            <div class="card-header">
     <div class="d-flex align-items-center justify-content-between">
-        <h4 class="card-title">Liste des Guides</h4>
+        <h4 class="card-title">
+List of Guides</h4>
         <a href="{{ path('app_guides_add') }}" class="btn btn-primary btn-round ml-auto">
-            <i class="fas fa-plus mr-2"></i> Nouveau Guide
+            <i class="fas fa-plus mr-2"></i>New Guide
         </a>
     </div>
 </div>
@@ -544,13 +553,13 @@
                                         <table class="table table-striped table-hover table-guides">
                                             <thead>
                                                 <tr>
-                                                    <th>Prénom</th>
-                                                    <th>Nom</th>
-                                                    <th>Email</th>
-                                                    <th>Téléphone</th>
-                                                    <th>Langue</th>
-                                                    <th>Expérience</th>
-                                                    <th class="text-end">Actions</th>
+                                                   <th>First Name</th>
+                                                   <th>Last Name</th>
+                                                   <th>Email</th>
+                                                   <th>Phone Number</th>
+                                                   <th>Language</th>
+                                                   <th>Experience</th>
+                                                   <th class="text-end">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -575,26 +584,23 @@
                                                             </span>
                                                         </td>
                                                         <td class="text-end">
-                                                            <div class="d-flex justify-content-end gap-2">
-                                                                <a href="{{ path('app_guides_edit', {'guideId': guide.guideId}) }}"
-                                                                   class="btn btn-primary btn-sm action-btn"
-                                                                   data-toggle="tooltip" 
-                                                                   title="Modifier">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a>
+                                                           <div class="d-flex justify-content-end gap-2">
+    <a href="{{ path('app_guides_edit', {'guideId': guide.guideId}) }}"
+       class="btn btn-primary btn-sm action-btn"
+       data-toggle="tooltip" 
+       title="Update">
+        <i class="fas fa-edit"></i>
+    </a>
 
-                                                                <form method="post" 
-                                                                      action="{{ path('app_guides_delete', {'guideId': guide.guideId}) }}" 
-                                                                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce guide ?');">
-                                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ guide.guideId) }}">
-                                                                    <button type="submit" 
-                                                                            class="btn btn-danger btn-sm action-btn"
-                                                                            data-toggle="tooltip" 
-                                                                            title="Supprimer">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </button>
-                                                                </form>
-                                                            </div>
+    <form method="post" 
+          action="{{ path('app_guides_delete', {'id': guide.guideId}) }}" 
+          onsubmit="return confirm('Are you sure you want to delete this guide??');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ guide.guideId) }}">
+        <button class="btn btn-danger btn-sm action-btn" data-toggle="tooltip" title="Delete">
+            <i class="fas fa-trash"></i>
+        </button>
+    </form>
+</div>
                                                         </td>
                                                     </tr>
                                                 {% endfor %}
@@ -604,10 +610,10 @@
                                 {% else %}
                                     <div class="empty-state">
                                         <i class="fas fa-users-slash"></i>
-                                        <h3 class="h5 mt-3">Aucun guide trouvé</h3>
-                                        <p class="text-muted">Commencez par ajouter un nouveau guide</p>
+                                        <h3 class="h5 mt-3">No guides found</h3>
+                                        <p class="text-muted">Start by adding a new guide</p>
                                         <a href="{{ path('app_guides_add') }}" class="btn btn-success mt-2">
-                                            <i class="fas fa-plus mr-2"></i>Ajouter un guide
+                                            <i class="fas fa-plus mr-2"></i>Add Guide
                                         </a>
                                     </div>
                                 {% endif %}
@@ -638,7 +644,7 @@
             
             // Confirmation de suppression
             $('form[action*="delete"]').on('submit', function(e) {
-                if (!confirm('Êtes-vous sûr de vouloir supprimer ce guide ?')) {
+                if (!confirm('Are you sure you want to delete this guide? ?')) {
                     e.preventDefault();
                 }
             });
