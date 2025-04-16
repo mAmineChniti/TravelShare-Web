@@ -1,87 +1,75 @@
 <?php
-namespace App\Service;
+
+namespace App\Repository;
 
 use App\Entity\ReservationOffresVoyage;
-use App\Entity\OffresVoyage;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityNotFoundException;
-use Doctrine\DBAL\Exception;
+use App\Entity\OffresVoyage;
 
-class ReservationOffresVoyageService
+class ReservationOffresVoyageRepository extends ServiceEntityRepository
 {
-    private EntityManagerInterface $em;
+    private $entityManager;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
-        $this->em = $em;
+        parent::__construct($registry, ReservationOffresVoyage::class);
+        $this->entityManager = $entityManager;
     }
 
     public function add(ReservationOffresVoyage $reservation): void
     {
-        $offre = $this->em->getRepository(OffresVoyage::class)->find($reservation->getOffre());
+        $offre = $this->entityManager->getRepository(OffresVoyage::class)->find($reservation->getOffreId());
 
-        if (!$offre) {
-            throw new EntityNotFoundException('Offre not found');
-        }
-
-        if ($reservation->getNbrPlace() > $offre->getPlacesDisponibles()) {
-            throw new \Exception('Not enough available places for this reservation.');
+        if ($offre->getPlacesDisponibles() < $reservation->getNbrPlace()) {
+            throw new \Exception("Not enough available places for this reservation.");
         }
 
         $totalPrix = $offre->getPrix() * $reservation->getNbrPlace();
         $reservation->setPrix($totalPrix);
-        $offre->setPlacesDisponibles($offre->getPlacesDisponibles() - $reservation->getNbrPlace());
 
-        $this->em->persist($reservation);
-        $this->em->flush();
+        $offre->setPlacesDisponibles($offre->getPlacesDisponibles() - $reservation->getNbrPlace());
+        $reservation->setDateReserved(new \DateTime());
+        $reservation->setStatus(1);
+        $this->entityManager->persist($reservation);
+        $this->entityManager->persist($offre);
+        $this->entityManager->flush();
     }
 
     public function update(ReservationOffresVoyage $reservation): void
     {
-        $existingReservation = $this->em->getRepository(ReservationOffresVoyage::class)->find($reservation->getId());
+        $existingReservation = $this->find($reservation->getReservationId());
         if (!$existingReservation) {
-            throw new EntityNotFoundException('Reservation not found');
+            throw new \Exception("Reservation not found.");
+        }
+        $offre = $this->entityManager->getRepository(OffresVoyage::class)->find($reservation->getOffreId());
+
+        $placesDifference = $reservation->getNbrPlace() - $existingReservation->getNbrPlace();
+
+        if ($offre->getPlacesDisponibles() < $placesDifference) {
+            throw new \Exception("Not enough available places for this reservation.");
         }
 
-        $offre = $this->em->getRepository(OffresVoyage::class)->find($reservation->getOffre());
-        if (!$offre) {
-            throw new EntityNotFoundException('Offre not found');
-        }
+        $totalPrix = $offre->getPrix() * $reservation->getNbrPlace();
+        $reservation->setPrix($totalPrix);
 
-        $oldNbrPlace = $existingReservation->getNbrPlace();
-        $diff = $reservation->getNbrPlace() - $oldNbrPlace;
+        $offre->setPlacesDisponibles($offre->getPlacesDisponibles() - $placesDifference);
 
-        if ($diff > 0 && $diff > $offre->getPlacesDisponibles()) {
-            throw new \Exception('Not enough available places for update.');
-        }
-
-        $offre->setPlacesDisponibles($offre->getPlacesDisponibles() - $diff);
-
-        $reservation->setPrix($offre->getPrix() * $reservation->getNbrPlace());
-        $this->em->merge($reservation);
-        $this->em->flush();
+        $this->entityManager->flush();
     }
 
-    public function delete(int $id): void
+    public function delete(ReservationOffresVoyage $reservation): void
     {
-        $reservation = $this->em->getRepository(ReservationOffresVoyage::class)->find($id);
-
-        if (!$reservation) {
-            throw new EntityNotFoundException('Reservation not found');
-        }
-
-        $offre = $reservation->getOffre();
+        $offre = $this->entityManager->getRepository(OffresVoyage::class)->find($reservation->getOffreId());
         $offre->setPlacesDisponibles($offre->getPlacesDisponibles() + $reservation->getNbrPlace());
 
-        $this->em->remove($reservation);
-        $this->em->flush();
+        $this->entityManager->remove($reservation);
+        $this->entityManager->flush();
     }
 
-    /**
-     * @return ReservationOffresVoyage[]
-     */
-    public function listAll(): array
+    public function findAllReservations(): array
     {
-        return $this->em->getRepository(ReservationOffresVoyage::class)->findAll();
+        return $this->findAll();
     }
 }

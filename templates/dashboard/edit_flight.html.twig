@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Flight{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-16">
+    <h1 class="text-4xl font-extrabold text-gray-800 mb-6">Edit Flight</h1>
+    
+    {% for message in app.flashes('success') %}
+        <div class="mb-4 p-4 bg-green-100 text-green-800 rounded-lg">
+            {{ message }}
+        </div>
+    {% endfor %}
+    
+    {% for message in app.flashes('error') %}
+        <div class="mb-4 p-4 bg-red-100 text-red-800 rounded-lg">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <form method="post" action="{{ path('app_edit_flight', {id: voyage.offresVoyageId}) }}" class="bg-white shadow-lg rounded-lg p-6 space-y-4">
+        <div>
+            <label for="titre" class="block text-lg font-medium text-gray-700">Title</label>
+            <input type="text" id="titre" name="titre" value="{{ voyage.titre }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+        </div>
+        <div>
+            <label for="destination" class="block text-lg font-medium text-gray-700">Destination</label>
+            <input type="text" id="destination" name="destination" value="{{ voyage.destination }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+        </div>
+        <div>
+            <label for="description" class="block text-lg font-medium text-gray-700">Description</label>
+            <textarea id="description" name="description" rows="4" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>{{ voyage.description }}</textarea>
+        </div>
+        <div>
+            <label for="prix" class="block text-lg font-medium text-gray-700">Price (€)</label>
+            <input type="number" id="prix" name="prix" value="{{ voyage.prix }}" step="0.01" min="0" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+        </div>
+        <div>
+            <label for="placesDisponibles" class="block text-lg font-medium text-gray-700">Available Places</label>
+            <input type="number" id="placesDisponibles" name="placesDisponibles" value="{{ voyage.placesDisponibles }}" min="0" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+        </div>
+        <div>
+            <label for="dateDepart" class="block text-lg font-medium text-gray-700">Departure Date</label>
+            <input type="date" id="dateDepart" name="dateDepart" value="{{ voyage.dateDepart|date('Y-m-d') }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+        </div>
+        <div>
+            <label for="dateRetour" class="block text-lg font-medium text-gray-700">Return Date</label>
+            <input type="date" id="dateRetour" name="dateRetour" value="{{ voyage.dateRetour|date('Y-m-d') }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+        </div>
+        <div class="flex space-x-4">
+            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">Update Flight</button>
+            <a href="{{ path('app_dashboard_flights') }}" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700 transition duration-300">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

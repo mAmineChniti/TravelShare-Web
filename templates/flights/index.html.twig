@@ -4,24 +4,24 @@
 
 {% block body %}
 <div class="container mx-auto px-4 py-16">
-    <h1 class="text-2xl font-bold mb-4">Available Flights</h1>
+    <h1 class="text-3xl font-bold mb-8">Available Flights</h1>
 
     {% if voyages is not empty %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for voyage in voyages %}
-                <div class="bg-white shadow-md rounded-lg p-6">
-                    <h2 class="text-lg font-semibold mb-2">{{ voyage.titre }}</h2>
-                    <p class="text-gray-700 mb-1"><strong>Destination:</strong> {{ voyage.destination }}</p>
-                    <p class="text-gray-700 mb-1"><strong>Description:</strong> {{ voyage.description }}</p>
-                    <p class="text-gray-700 mb-1"><strong>From:</strong> {{ voyage.dateDepart|date('Y-m-d') }}</p>
-                    <p class="text-gray-700 mb-1"><strong>To:</strong> {{ voyage.dateRetour|date('Y-m-d') }}</p>
-                    <p class="text-gray-700 mb-1"><strong>Price:</strong> €{{ voyage.prix }}</p>
-                    <p class="text-gray-700"><strong>Available Seats:</strong> {{ voyage.placesDisponibles }}</p>
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold mb-2">{{ voyage.titre }}</h2>
+                        <p class="text-gray-600 mb-2">Destination: <span class="font-medium">{{ voyage.destination }}</span></p>
+                        <p class="text-gray-600 mb-2">Price: <span class="font-medium">{{ voyage.prix }} €</span></p>
+                        <p class="text-gray-600 mb-2">Available Places: <span class="font-medium">{{ voyage.placesDisponibles }}</span></p>
+                        <a href="{{ path('app_flight_details', {id: voyage.offresVoyageId}) }}" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">View Details</a>
+                    </div>
                 </div>
             {% endfor %}
         </div>
     {% else %}
-        <p>No flights available at the moment.</p>
+        <p class="text-gray-500">No flights available at the moment.</p>
     {% endif %}
 </div>
 {% endblock %}
