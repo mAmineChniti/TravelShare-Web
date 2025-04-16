@@ -16,24 +16,22 @@ class ChambresController extends AbstractController
 {
     #[Route('/hotel/{id}/chambres', name: 'chambres_by_hotel')]
     public function chambresByHotel(int $id, HotelsRepository $hotelRepo, ChambresRepository $chambresRepo): Response
-{
-    $hotel = $hotelRepo->find($id);
-    if (!$hotel) {
-        throw $this->createNotFoundException('Hôtel non trouvé.');
+    {
+        $hotel = $hotelRepo->find($id);
+        if (!$hotel) {
+            throw $this->createNotFoundException('Hôtel non trouvé.');
+        }
+
+        $chambresDisponibles = $chambresRepo->findBy([
+            'hotel' => $hotel, 
+            'disponible' => true,
+        ]);
+
+        return $this->render('chambres/index.html.twig', [
+            'hotel' => $hotel,
+            'chambres' => $chambresDisponibles,
+        ]);
     }
-
-    $chambresDisponibles = $chambresRepo->findBy([
-        'hotel' => $hotel, 
-        'disponible' => true,
-    ]);
-
-    return $this->render('chambres/index.html.twig', [
-        'hotel' => $hotel,
-        'chambres' => $chambresDisponibles,
-    ]);
-}
-
-    
 
     #[Route('/chambre/add/{hotelId}', name: 'chambre_add')]
     public function addChambre(int $hotelId, Request $request, EntityManagerInterface $em): Response
@@ -64,15 +62,20 @@ class ChambresController extends AbstractController
     }
 
     #[Route('/chambre/edit/{id}', name: 'chambre_edit')]
-    public function editChambre(Chambres $chambre, Request $request, EntityManagerInterface $em): Response
+    public function editChambre(int $id, Request $request, ChambresRepository $chambresRepo, EntityManagerInterface $em): Response
     {
+        $chambre = $chambresRepo->find($id);
+        if (!$chambre) {
+            throw $this->createNotFoundException('Chambre non trouvée.');
+        }
+
         if ($request->isMethod('POST')) {
             $chambre->setNumeroChambre($request->request->get('numero_chambre'));
             $chambre->setTypeEnu($request->request->get('type_enu'));
             $chambre->setPrixParNuit((float)$request->request->get('prix_par_nuit'));
             $chambre->setDisponible($request->request->get('disponible') === '1');
 
-            $em->flush();
+            $chambresRepo->update($chambre);
 
             return $this->redirectToRoute('chambres_by_hotel', [
                 'id' => $chambre->getHotel()->getId()
@@ -85,12 +88,16 @@ class ChambresController extends AbstractController
     }
 
     #[Route('/chambre/delete/{id}', name: 'chambre_delete')]
-    public function deleteChambre(Chambres $chambre, EntityManagerInterface $em): Response
+    public function deleteChambre(int $id, ChambresRepository $chambresRepo, EntityManagerInterface $em): Response
     {
+        $chambre = $chambresRepo->find($id);
+        if (!$chambre) {
+            throw $this->createNotFoundException('Chambre non trouvée.');
+        }
+
         $hotelId = $chambre->getHotel()->getId();
 
-        $em->remove($chambre);
-        $em->flush();
+        $chambresRepo->delete($id);
 
         return $this->redirectToRoute('chambres_by_hotel', ['id' => $hotelId]);
     }

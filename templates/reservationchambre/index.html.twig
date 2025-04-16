@@ -25,13 +25,18 @@
         </button>
     </form>
     {% for message in app.flashes('success') %}
-    <div class="bg-green-100 border border-green-500 text-green-700 px-5">
-    {{ message }}
+    <div class="bg-green-100 border border-green-500 text-green-700 px-5 py-3 rounded mb-4">
+        {{ message }}
     </div>
     {% endfor %}
     {%for message in app.flashes('error')%}
     <div class="bg-red-100 border border-red-500 text-red-700 px-5">
     {{ message }}
+    </div>
+    {% endfor %}
+    {% for message in app.flashes('debug') %}
+    <div class="bg-blue-100 border border-blue-500 text-blue-700 px-5">
+        {{ message }}
     </div>
     {% endfor %}
 </div>

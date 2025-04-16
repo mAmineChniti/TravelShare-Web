@@ -21,29 +21,47 @@ class ChambresRepository extends ServiceEntityRepository
         parent::__construct($registry, Chambres::class);
     }
 
-    /**
-     * Retourne les chambres disponibles pour un hôtel spécifique
-     *
-     * @param int $hotelId
-     * @return Chambres[]
-     */
-    public function findByHotelId(int $hotelId): array
+    public function add(Chambres $chambre): void
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.hotel = :hotelId')
-            ->setParameter('hotelId', $hotelId)
-            ->getQuery()
-            ->getResult();
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($chambre);
+        $entityManager->flush();
     }
 
-    /**
-     * Retourne les chambres *disponibles* pour un hôtel
-     */
-    public function findAvailableByHotelId(int $hotelId): array
+    public function update(Chambres $chambre): void
+    {
+        $entityManager = $this->getEntityManager();
+        $existingChambre = $this->find($chambre->getChambreId());
+        if (!$existingChambre) {
+            throw new \Exception('Chambre not found');
+        }
+        $existingChambre->setNumeroChambre($chambre->getNumeroChambre());
+        $existingChambre->setTypeEnu($chambre->getTypeEnu());
+        $existingChambre->setPrixParNuit($chambre->getPrixParNuit());
+        $existingChambre->setDisponible($chambre->getDisponible());
+        $existingChambre->setHotel($chambre->getHotel());
+        $entityManager->flush();
+    }
+
+    public function delete(int $id): void
+    {
+        $entityManager = $this->getEntityManager();
+        $chambre = $entityManager->getReference(Chambres::class, $id);
+        $entityManager->remove($chambre);
+        $entityManager->flush();
+    }
+
+    public function listAll(): array
+    {
+        return $this->findAll();
+    }
+
+    public function listByHotelId(int $hotelId): array
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.hotel = :hotelId')
-            ->andWhere('c.disponible = true')
+            ->join('c.hotel', 'h')
+            ->addSelect('h')
+            ->where('c.hotel = :hotelId')
             ->setParameter('hotelId', $hotelId)
             ->getQuery()
             ->getResult();

@@ -4,44 +4,46 @@ namespace App\Repository;
 
 use App\Entity\Hotels;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 class HotelsRepository extends ServiceEntityRepository
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Hotels::class);
-        $this->entityManager = $entityManager;
     }
 
-    public function add(Hotels $hotel, bool $flush = true): void
+    public function add(Hotels $hotel): void
     {
-        $this->entityManager->persist($hotel);
-        if ($flush) {
-            $this->entityManager->flush();
-        }
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($hotel);
+        $entityManager->flush();
     }
 
-    public function update(Hotels $hotel, bool $flush = true): void
+    public function update(Hotels $hotel): void
     {
-        $this->entityManager->persist($hotel);
-        if ($flush) {
-            $this->entityManager->flush();
+        $entityManager = $this->getEntityManager();
+        $existingHotel = $this->find($hotel->getHotelId());
+        if (!$existingHotel) {
+            throw new \Exception('Hotel not found');
         }
+        $existingHotel->setNom($hotel->getNom());
+        $existingHotel->setAdress($hotel->getAdress());
+        $existingHotel->setTelephone($hotel->getTelephone());
+        $existingHotel->setCapaciteTotale($hotel->getCapaciteTotale());
+        $existingHotel->setImageH($hotel->getImageH());
+        $entityManager->flush();
     }
 
-    public function delete(Hotels $hotel, bool $flush = true): void
+    public function delete(int $id): void
     {
-        $this->entityManager->remove($hotel);
-        if ($flush) {
-            $this->entityManager->flush();
-        }
+        $entityManager = $this->getEntityManager();
+        $hotel = $entityManager->getReference(Hotels::class, $id);
+        $entityManager->remove($hotel);
+        $entityManager->flush();
     }
 
-    public function findAllHotels(): array
+    public function listAll(): array
     {
         return $this->findAll();
     }

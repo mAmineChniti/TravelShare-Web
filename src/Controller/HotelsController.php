@@ -60,19 +60,21 @@ class HotelsController extends AbstractController
     }
 
     #[Route('/hotel/edit/{id}', name: 'hotel_edit')]
-    public function editHotel(Hotels $hotel, Request $request, EntityManagerInterface $entityManager): Response
+    public function editHotel(int $id, Request $request, HotelsRepository $hotelsRepo): Response
     {
-        /**if (!$this->isGranted('ROLE_ADMIN')) {
-            return $this->redirectToRoute('hotel_list');
-        }**/
+        $hotel = $hotelsRepo->find($id);
+        if (!$hotel) {
+            throw $this->createNotFoundException('Hôtel non trouvé.');
+        }
 
         if ($request->isMethod('POST')) {
             $hotel->setNom($request->request->get('nom'));
             $hotel->setAdress($request->request->get('adress'));
             $hotel->setTelephone($request->request->get('telephone'));
-            $hotel->setCapaciteTotale((int) $request->request->get('capacite_totale'));
+            $hotel->setCapaciteTotale((int)$request->request->get('capacite_totale'));
 
-            $entityManager->flush();
+            $hotelsRepo->update($hotel);
+
             return $this->redirectToRoute('app_hotels');
         }
 
@@ -82,14 +84,14 @@ class HotelsController extends AbstractController
     }
 
     #[Route('/hotel/delete/{id}', name: 'hotel_delete')]
-    public function deleteHotel(Hotels $hotel, EntityManagerInterface $entityManager): Response
+    public function deleteHotel(int $id, HotelsRepository $hotelsRepo): Response
     {
-       /** if (!$this->isGranted('ROLE_ADMIN')) {
-            return $this->redirectToRoute('hotel_list');
-        }**/
+        $hotel = $hotelsRepo->find($id);
+        if (!$hotel) {
+            throw $this->createNotFoundException('Hôtel non trouvé.');
+        }
 
-        $entityManager->remove($hotel);
-        $entityManager->flush();
+        $hotelsRepo->delete($id);
 
         return $this->redirectToRoute('app_hotels');
     }

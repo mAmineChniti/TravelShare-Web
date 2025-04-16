@@ -21,37 +21,37 @@ class ReservationHotelRepository extends ServiceEntityRepository
         parent::__construct($registry, ReservationHotel::class);
     }
 
-    public function add(ReservationHotel $reservation, bool $flush = true): void
+    public function add(ReservationHotel $reservationHotel): void
     {
-        $this->_em->persist($reservation);
-        if ($flush) {
-            $this->_em->flush();
-        }
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($reservationHotel);
+        $entityManager->flush();
     }
 
-    public function update(ReservationHotel $reservation, bool $flush = true): void
+    public function update(ReservationHotel $reservationHotel): void
     {
-        // La méthode update peut simplement persister à nouveau et flush,
-        // car Doctrine se charge de synchroniser les changements.
-        $this->_em->persist($reservation);
-        if ($flush) {
-            $this->_em->flush();
+        $entityManager = $this->getEntityManager();
+        $existingReservation = $this->find($reservationHotel->getReservationHotelId());
+        if (!$existingReservation) {
+            throw new \Exception('Reservation not found');
         }
+        $existingReservation->setClientId($reservationHotel->getClientId());
+        $existingReservation->setChambreId($reservationHotel->getChambreId());
+        $existingReservation->setDateDebut($reservationHotel->getDateDebut());
+        $existingReservation->setDateFin($reservationHotel->getDateFin());
+        $existingReservation->setStatusEnu($reservationHotel->getStatusEnu());
+        $existingReservation->setPrixTotale($reservationHotel->getPrixTotale());
+        $entityManager->flush();
     }
 
-    public function remove(ReservationHotel $reservation, bool $flush = true): void
+    public function delete(int $id): void
     {
-        $this->_em->remove($reservation);
-        if ($flush) {
-            $this->_em->flush();
-        }
+        $entityManager = $this->getEntityManager();
+        $reservation = $entityManager->getReference(ReservationHotel::class, $id);
+        $entityManager->remove($reservation);
+        $entityManager->flush();
     }
 
-    /**
-     * Retourne toutes les réservations.
-     *
-     * @return ReservationHotel[]
-     */
     public function listAll(): array
     {
         return $this->findAll();
