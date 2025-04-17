@@ -8,6 +8,21 @@
 
     <!-- STYLE CSS -->
     <link href="{{ asset('css2/style.css') }}" rel="stylesheet">
+
+    <style>
+        .form-group-inline {
+            display: flex;
+            gap: 20px;
+        }
+        .form-group-inline > div {
+            flex: 1;
+        }
+        .text-danger {
+            color: red;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
@@ -26,7 +41,7 @@
 
                 <!-- Affichage des erreurs de connexion -->
                 {% if error %}
-                    <div class="alert alert-danger">
+                    <div class="text-danger">
                         {{ error.messageKey|trans(error.messageData, 'security') }}
                     </div>
                 {% endif %}

@@ -7,6 +7,21 @@
     <link rel="stylesheet" href="{{ asset('fonts2/material-design-iconic-font/css/material-design-iconic-font.min.css') }}">
     <!-- STYLE CSS -->
     <link href="{{ asset('css2/style.css') }}" rel="stylesheet">
+
+    <style>
+        .form-group-inline {
+            display: flex;
+            gap: 20px;
+        }
+        .form-group-inline > div {
+            flex: 1;
+        }
+        .text-danger {
+            color: red;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
@@ -42,7 +57,9 @@
                         'class': 'form-control'
                     }
                 }) }}
-                {{ form_errors(registrationForm.name) }}  {# Affichage des erreurs spécifiques du champ "name" #}
+                <div class="text-danger">
+                    {{ form_errors(registrationForm.name) }}
+                </div>
 
                 {{ form_widget(registrationForm.last_name, {
                     'attr': {
@@ -50,7 +67,9 @@
                         'class': 'form-control'
                     }
                 }) }}
-                {{ form_errors(registrationForm.last_name) }}  {# Affichage des erreurs spécifiques du champ "last_name" #}
+                <div class="text-danger">
+                    {{ form_errors(registrationForm.last_name) }}
+                </div>
             </div>
 
             <div class="form-wrapper">
@@ -61,7 +80,9 @@
                     }
                 }) }}
                 <i class="zmdi zmdi-email input-icon"></i>
-                {{ form_errors(registrationForm.email) }} {# Affichage des erreurs pour l'email #}
+                <div class="text-danger">
+                    {{ form_errors(registrationForm.email) }}
+                </div>
             </div>
 
             {# Champ mot de passe avec RepeatedType #}
@@ -74,7 +95,9 @@
                     }
                 }) }}
                 <i class="zmdi zmdi-lock input-icon"></i>
-                {{ form_errors(registrationForm.plainPassword.first) }} {# Affichage des erreurs pour le premier champ mot de passe #}
+                <div class="text-danger">
+                    {{ form_errors(registrationForm.plainPassword.first) }}
+                </div>
             </div>
 
             <div class="form-wrapper">
@@ -85,7 +108,9 @@
                     }
                 }) }}
                 <i class="zmdi zmdi-lock input-icon"></i>
-                {{ form_errors(registrationForm.plainPassword.second) }} {# Affichage des erreurs pour le deuxième champ mot de passe #}
+                <div class="text-danger">
+                    {{ form_errors(registrationForm.plainPassword.second) }}
+                </div>
             </div>
 
             <div class="form-wrapper">
@@ -96,7 +121,9 @@
                     }
                 }) }}
                 <i class="zmdi zmdi-phone input-icon"></i>
-                {{ form_errors(registrationForm.phone_num) }} {# Affichage des erreurs pour le numéro de téléphone #}
+                <div class="text-danger">
+                    {{ form_errors(registrationForm.phone_num) }}
+                </div>
             </div>
 
             <div class="form-wrapper">
@@ -106,7 +133,9 @@
                     }
                 }) }}
                 <i class="zmdi zmdi-caret-down select-icon" style="font-size: 17px"></i>
-                {{ form_errors(registrationForm.address) }} {# Affichage des erreurs pour l'adresse #}
+                <div class="text-danger">
+                    {{ form_errors(registrationForm.address) }}
+                </div>
             </div>
 
             <div class="social-buttons">

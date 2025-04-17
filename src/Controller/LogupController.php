@@ -35,7 +35,7 @@ class LogupController extends AbstractController
                 $user->setCompte(0); // Inactive account
 
                 // Télécharger l'image par défaut et la convertir en BLOB
-                $defaultImageUrl = 'https://cdn-icons-png.flaticon.com/512/9187/9187604.png';
+                $defaultImageUrl = 'images2/9187604.png';
                 $defaultImageData = @file_get_contents($defaultImageUrl); // Le @ évite les warnings
 
                 if ($defaultImageData !== false) {

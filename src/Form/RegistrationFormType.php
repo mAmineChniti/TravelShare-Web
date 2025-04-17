@@ -24,27 +24,14 @@ class RegistrationFormType extends AbstractType
             ->add('name', TextType::class, [
                 'label' => false,
                 'attr' => ['placeholder' => 'First Name', 'class' => 'form-control'],
-                'constraints' => [
-                    new NotBlank(['message' => 'Please enter your first name']),
-                    new Length(['min' => 2, 'max' => 50])
-                ]
             ])
             ->add('last_name', TextType::class, [
                 'label' => false,
                 'attr' => ['placeholder' => 'Last Name', 'class' => 'form-control'],
-                'constraints' => [
-                    new NotBlank(['message' => 'Please enter your last name']),
-                    new Length(['min' => 2, 'max' => 50])
-                ]
             ])
             ->add('email', EmailType::class, [
                 'label' => false,
                 'attr' => ['placeholder' => 'Email Address', 'class' => 'form-control'],
-                'constraints' => [
-                    new NotBlank(['message' => 'Please enter your email']),
-                    new Email(['message' => 'Please enter a valid email address']),
-                    new Length(['max' => 180])
-                ]
             ])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
@@ -53,14 +40,6 @@ class RegistrationFormType extends AbstractType
                 'first_options' => [
                     'label' => false,
                     'attr' => ['placeholder' => 'Password', 'class' => 'form-control password-field'],
-                    'constraints' => [
-                        new NotBlank(['message' => 'Please enter a password']),
-                        new Length([
-                            'min' => 8,
-                            'minMessage' => 'Your password should be at least {{ limit }} characters',
-                            'max' => 4096,
-                        ])
-                    ]
                 ],
                 'second_options' => [
                     'label' => false,
@@ -70,10 +49,6 @@ class RegistrationFormType extends AbstractType
             ->add('phone_num', TelType::class, [
                 'label' => false,
                 'attr' => ['placeholder' => 'Phone Number', 'class' => 'form-control'],
-                'constraints' => [
-                    new NotBlank(['message' => 'Please enter your phone number']),
-                    new Length(['min' => 8, 'max' => 20])
-                ]
             ])
             ->add('address', ChoiceType::class, [
                 'label' => false,
@@ -84,9 +59,6 @@ class RegistrationFormType extends AbstractType
                 ],
                 'placeholder' => 'Select Address',
                 'attr' => ['class' => 'form-control'],
-                'constraints' => [
-                    new NotBlank(['message' => 'Please select your address'])
-                ]
             ]);
     }
 

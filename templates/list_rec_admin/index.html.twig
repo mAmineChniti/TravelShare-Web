@@ -91,6 +91,13 @@
                             <p>Reclamation</p>
                         </a>
                     </li>
+                    <!-- Lien vers Reponse -->
+                    <li class="nav-item ">
+                        <a href="{{ path('app_list_rep_admin') }}">
+                            <i class="fas fa-pen-square"></i>
+                            <p>Reponse</p>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -458,7 +465,7 @@
                 <!-- Header avec titre et filtres -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="mb-0">
-                        <i class="fas fa-pen-square text-primary me-2"></i>Gestion des Réclamations
+                        <i class="fas fa-pen-square text-primary me-2"></i>Liste des Réclamations
                     </h2>
 
                     <div class="d-flex">
@@ -485,151 +492,90 @@
                     </div>
                 </div>
 
-                <!-- Liste des réclamations -->
+
                 <div class="card shadow-sm">
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead class="table-light">
                                 <tr>
-                                    <th width="5%">Nom Client</th>
+                                    <th width="15%">Nom Client</th>
                                     <th width="20%">Titre</th>
                                     <th width="30%">Description</th>
-                                    <th width="15%">Statut</th>
+                                    <th width="10%">Statut</th>
                                     <th width="15%">Date</th>
-                                    <th width="15%">Actions</th>
+                                    <th width="10%">Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <!-- Réclamation En cours -->
-                                <tr class="align-middle">
-                                    <td>test</td>
-                                    <td>Facture erronée</td>
-                                    <td class="text-truncate" style="max-width: 250px;">La facture de juin contient des erreurs de calcul...</td>
-                                    <td>
-                                        <span class="badge bg-warning text-dark">En cours</span>
-                                    </td>
-                                    <td>10/06/2023</td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#responseModal" data-id="154">
-                                                <i class="fas fa-reply"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                {% for reclamation in reclamations %}
+                                    <tr class="align-middle">
+                                        <td>{{ reclamation.user.name }}</td>
+                                        <td>{{ reclamation.title }}</td>
+                                        <td class="text-truncate" style="max-width: 250px;">{{ reclamation.description }}</td>
+                                        <td>
+                                            {% if reclamation.etat == 'repondu' %}
+                                                <span class="badge bg-success">Répondu</span>
+                                            {% elseif reclamation.etat == 'en cours' %}
+                                                <span class="badge bg-danger">En cours</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">En cours</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ reclamation.dateReclamation ? reclamation.dateReclamation|date('d/m/Y') : '' }}</td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <!-- Répondre -->
+                                                <button class="btn btn-sm btn-outline-primary"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#responseModal"
+                                                        onclick="openResponseModal({{ reclamation.reclamationId }}, '{{ reclamation.description|e('js') }}')">
+                                                    <i class="fas fa-reply"></i>
+                                                </button>
 
-                                <!-- Réclamation Répondu -->
-                                <tr class="align-middle">
-                                    <td>test</td>
-                                    <td>Livraison manquante</td>
-                                    <td class="text-truncate" style="max-width: 250px;">Commande #4587 non reçue alors que marquée comme livrée...</td>
-                                    <td>
-                                        <span class="badge bg-success">Répondu</span>
-                                    </td>
-                                    <td>05/06/2023</td>
-                                    <td>
-                                        <div class="d-flex gap-2">
-                                            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editResponseModal" data-id="153">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteResponseModal" data-id="153">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">Aucune réclamation trouvée.</td>
+                                    </tr>
+                                {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Modale pour répondre la réclamation -->
+                <!-- Modale pour répondre à une réclamation -->
                 <div class="modal fade" id="responseModal" tabindex="-1" data-bs-backdrop="false" aria-hidden="true">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header bg-primary text-white">
-                                <h5 class="modal-title">Répondre à la réclamation <span id="responseRecId"></span></h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <h5 class="modal-title">Répondre à la réclamation</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
                             </div>
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Message original</label>
-                                    <div class="card card-body bg-light mb-3" id="originalMessage"></div>
+                            <form method="post" action="{{ path('app_add_response', {id: '__ID__'}) }}" id="responseForm">
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Message original</label>
+                                        <div class="card card-body bg-light mb-3" id="originalMessage"></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Votre réponse</label>
+                                        <textarea class="form-control" name="responseText" rows="5" placeholder="Écrivez votre réponse ici..." required></textarea>
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Votre réponse</label>
-                                    <textarea class="form-control" id="responseText" rows="5" placeholder="Écrivez votre réponse ici..."></textarea>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <button type="submit" class="btn btn-primary">Envoyer</button>
                                 </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                                <button type="button" class="btn btn-primary" id="sendResponseBtn">Envoyer</button>
-                            </div>
+                            </form>
                         </div>
                     </div>
                 </div>
 
-                <!-- Modale pour modifier la réclamation -->
-                <div class="modal fade" id="editResponseModal" tabindex="-1" data-bs-backdrop="false" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header bg-warning text-white">
-                                <h5 class="modal-title">Modifier la réponse <span id="editRecId"></span></h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Réponse actuelle</label>
-                                    <textarea class="form-control" id="editResponseText" rows="5"></textarea>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                                <button type="button" class="btn btn-warning text-white" id="saveEditBtn">Enregistrer</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Modale pour supprimer la réclamation -->
-                <div class="modal fade" id="deleteResponseModal" tabindex="-1" data-bs-backdrop="false" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header bg-danger text-white">
-                                <h5 class="modal-title">Confirmer la suppression</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="alert alert-danger mb-0">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                    <span id="deleteConfirmText">Êtes-vous sûr de vouloir supprimer cette réponse ?</span>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Supprimer</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-                <!-- Pagination -->
-                <nav class="mt-3">
-                    <ul class="pagination pagination-sm justify-content-end">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#">Précédent</a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Suivant</a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
 
         </div>
@@ -708,6 +654,19 @@
             lineColor: "#ffa534",
             fillColor: "rgba(255, 165, 52, .14)",
         });
+
+        function openResponseModal(id, message) {
+            // Update form action with the correct ID
+            const form = document.getElementById('responseForm');
+            form.action = form.action.replace('__ID__', id);
+
+            // Display original message
+            document.getElementById('originalMessage').textContent = message;
+
+            // Show modal
+            new bootstrap.Modal(document.getElementById('responseModal')).show();
+        }
+
     </script>
 
 {% endblock %}

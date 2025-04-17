@@ -16,6 +16,11 @@ class Reponses
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
     private ?int $reponseId = null;
 
+    //
+    #[ORM\ManyToOne(targetEntity: Reclamations::class, inversedBy: "reponses")]
+    #[ORM\JoinColumn(name: "reclamation_id", referencedColumnName: "reclamation_id", nullable: false, onDelete: "CASCADE")]
+    private ?Reclamations $reclamation = null;
+
     #[ORM\Column(name: "reclamation_id")]
     private ?int $reclamationId = null;
 
@@ -65,4 +70,17 @@ class Reponses
 
         return $this;
     }
+
+    public function getReclamation(): ?Reclamations
+    {
+        return $this->reclamation;
+    }
+
+    public function setReclamation(?Reclamations $reclamation): static
+    {
+        $this->reclamation = $reclamation;
+
+        return $this;
+    }
+
 }

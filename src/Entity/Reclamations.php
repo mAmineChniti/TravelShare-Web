@@ -6,6 +6,7 @@ use App\Repository\ReclamationsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+
 #[ORM\Table(name: 'reclamations')]
 #[ORM\Index(name: 'fk_user_id', columns: ['user_id'])]
 #[ORM\Entity(repositoryClass: ReclamationsRepository::class)]
@@ -15,6 +16,11 @@ class Reclamations
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
     private ?int $reclamationId = null;
+
+    //
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "reclamations")]
+    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "user_id", nullable: false, onDelete: "CASCADE")]
+    private ?Users $user = null;
 
     #[ORM\Column(name: "user_id")]
     private ?int $userId = null;
@@ -95,4 +101,36 @@ class Reclamations
 
         return $this;
     }
+
+
+    public function getUser(): ?Users
+    {
+        return $this->user;
+    }
+
+    public function setUser(?Users $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+
+
+    public function getReponses(): Collection
+    {
+        return $this->reponses;
+    }
+
+    public function addReponse(Reponses $reponse): static
+    {
+        if (!$this->reponses->contains($reponse)) {
+            $this->reponses->add($reponse);
+            $reponse->setReclamation($this);
+        }
+
+        return $this;
+    }
+
+
 }
