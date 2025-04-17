@@ -38,9 +38,9 @@ final class FlightsController extends AbstractController
     }
 
     #[Route('/flights/{id}/reserve', name: 'app_reserve_flight', methods: ['POST'])]
-    public function reserve(int $id, Request $request, OffresVoyageRepository $voyageService, ReservationOffresVoyageRepository $reservationService): RedirectResponse
+    public function reserve(int $id, Request $request, OffresVoyageRepository $voyageRespository, ReservationOffresVoyageRepository $reservationService): RedirectResponse
     {
-        $voyage = $voyageService->find($id);
+        $voyage = $voyageRespository->find($id);
 
         if (!$voyage) {
             throw $this->createNotFoundException('The flight does not exist');
