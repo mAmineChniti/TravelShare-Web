@@ -22,6 +22,24 @@
             font-size: 13px;
             margin-top: 5px;
         }
+        /* Styles pour la validation */
+        .invalid-input {
+            border: 1px solid #ff3860 !important;
+        }
+        .error-message {
+            color: #ff3860;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        .form-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        /* Cache les bulles de validation HTML5 */
+        input:invalid {
+            box-shadow: none;
+        }
     </style>
 {% endblock %}
 
@@ -31,31 +49,45 @@
             <div class="image-holder">
                 <img src="{{ asset('images2/agence.png') }}" alt="Logo">
                 <div class="already-have-account">
-                    <a href="{{ path('app_logup') }}">You don't have account ?</a>
+                    <a href="{{ path('app_logup') }}">You don't have an account?</a>
                 </div>
             </div>
 
-            <!-- Formulaire de connexion -->
-            <form action="{{ path('app_login') }}" method="post">
+            <form action="{{ path('app_login') }}" method="post" id="loginForm" novalidate>
                 <h3>Log In</h3>
 
-                <!-- Affichage des erreurs de connexion -->
                 {% if error %}
                     <div class="text-danger">
                         {{ error.messageKey|trans(error.messageData, 'security') }}
                     </div>
                 {% endif %}
 
-                <!-- Champ pour l'email -->
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <!-- Email Field -->
                 <div class="form-wrapper">
-                    <input type="text" name="_email" placeholder="Email Address" class="form-control" required>
+                    <input type="email"
+                           name="_email"
+                           id="inputEmail"
+                           class="form-control"
+                           placeholder="Email Address"
+                           value="{{ last_username }}"
+                           required>
                     <i class="zmdi zmdi-email"></i>
+                    <div class="error-message" id="emailError">Email is required</div>
                 </div>
 
-                <!-- Champ pour le mot de passe -->
+                <!-- Password Field -->
                 <div class="form-wrapper">
-                    <input type="password" name="_password" placeholder="Password" class="form-control" required>
+                    <input type="password"
+                           name="_password"
+                           id="inputPassword"
+                           class="form-control"
+                           placeholder="Password"
+                           required
+                           minlength="6">
                     <i class="zmdi zmdi-lock"></i>
+                    <div class="error-message" id="passwordError">Password is required (min 6 characters)</div>
                 </div>
 
                 <div class="row button-row">
@@ -76,16 +108,80 @@
                     </div>
                 </div>
 
-                <!-- Bouton de soumission du formulaire -->
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" id="submitBtn">
                     Connect
                     <i class="zmdi zmdi-arrow-right"></i>
                 </button>
 
                 <div class="forgot-password">
-                    <a href="">Forget password ?</a>
+                    <a href="">Forgot password?</a>
                 </div>
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('loginForm');
+            const email = document.getElementById('inputEmail');
+            const password = document.getElementById('inputPassword');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+            let formSubmitted = false;
+
+            function validateEmail() {
+                if (formSubmitted && !email.value) {
+                    email.classList.add('invalid-input');
+                    emailError.style.display = 'block';
+                    return false;
+                }
+                email.classList.remove('invalid-input');
+                emailError.style.display = 'none';
+                return true;
+            }
+
+            function validatePassword() {
+                if (formSubmitted && !password.value) {
+                    passwordError.textContent = 'Password is required';
+                    password.classList.add('invalid-input');
+                    passwordError.style.display = 'block';
+                    return false;
+                } else if (formSubmitted && password.value.length < 6) {
+                    passwordError.textContent = 'Password must be at least 6 characters';
+                    password.classList.add('invalid-input');
+                    passwordError.style.display = 'block';
+                    return false;
+                }
+                password.classList.remove('invalid-input');
+                passwordError.style.display = 'none';
+                return true;
+            }
+
+            // Form submission validation
+            form.addEventListener('submit', function(event) {
+                formSubmitted = true;
+                const isEmailValid = validateEmail();
+                const isPasswordValid = validatePassword();
+
+                if (!isEmailValid || !isPasswordValid) {
+                    event.preventDefault();
+                    // Focus sur le premier champ invalide
+                    if (!isEmailValid) {
+                        email.focus();
+                    } else if (!isPasswordValid) {
+                        password.focus();
+                    }
+                }
+            });
+
+            // Validation en temps réel après première soumission
+            email.addEventListener('input', function() {
+                if (formSubmitted) validateEmail();
+            });
+
+            password.addEventListener('input', function() {
+                if (formSubmitted) validatePassword();
+            });
+        });
+    </script>
 {% endblock %}

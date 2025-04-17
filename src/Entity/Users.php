@@ -30,15 +30,15 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $lastName = null;
 
     #[ORM\Column(name: "email", length: 50)]
-    #[Assert\NotBlank(message: "L'email est obligatoire")]
-    #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide")]
-    #[Assert\Length(max: 50, maxMessage: "L'email ne peut pas dépasser {{ limit }} caractères")]
+    #[Assert\NotBlank(message: "Email is required")]
+    #[Assert\Email(message: "Please enter a valid email address")]
+    #[Assert\Length(max: 50, maxMessage: "Email cannot exceed {{ limit }} characters")]
     private ?string $email = null;
 
     #[ORM\Column(name: "password", length: 255)]
-    #[Assert\NotBlank(message: "Le mot de passe est obligatoire", groups: ["registration"])]
-    #[Assert\Length(min: 8, max: 255, minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères", maxMessage: "Le mot de passe ne peut pas dépasser {{ limit }} caractères", groups: ["registration"])]
-    #[Assert\Regex(pattern: "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/", message: "Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial", groups: ["registration"])]
+    #[Assert\NotBlank(message: "Password is required")]
+    #[Assert\Length(min: 8, max: 255, minMessage: "Password must be at least {{ limit }} characters", maxMessage: "Password cannot exceed {{ limit }} characters")]
+    #[Assert\Regex(pattern: "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/", message: "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character")]
     private ?string $password = null;
 
     #[ORM\Column(length: 15)]

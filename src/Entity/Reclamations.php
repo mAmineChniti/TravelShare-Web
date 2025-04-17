@@ -5,7 +5,7 @@ namespace App\Entity;
 use App\Repository\ReclamationsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'reclamations')]
 #[ORM\Index(name: 'fk_user_id', columns: ['user_id'])]
@@ -17,7 +17,6 @@ class Reclamations
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
     private ?int $reclamationId = null;
 
-    //
     #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "reclamations")]
     #[ORM\JoinColumn(name: "user_id", referencedColumnName: "user_id", nullable: false, onDelete: "CASCADE")]
     private ?Users $user = null;
@@ -26,12 +25,27 @@ class Reclamations
     private ?int $userId = null;
 
     #[ORM\Column(name: "title", length: 50)]
+    #[Assert\NotBlank(message: 'Please enter a subject for your complaint')]
+    #[Assert\Length(
+        min: 5,
+        minMessage: 'Subject must be at least {{ limit }} characters',
+        max: 100,
+        maxMessage: 'Subject cannot be longer than {{ limit }} characters'
+    )]
     private ?string $title = null;
 
     #[ORM\Column(name: "description", length: 255)]
+    #[Assert\NotBlank(message: 'Please enter a description')]
+    #[Assert\Length(
+        min: 10,
+        minMessage: 'Description must be at least {{ limit }} characters',
+        max: 2000,
+        maxMessage: 'Description cannot be longer than {{ limit }} characters'
+    )]
     private ?string $description = null;
 
     #[ORM\Column(name: "date_reclamation", type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: 'Please select a date')]
     private ?\DateTimeInterface $dateReclamation = null;
 
     #[ORM\Column(name: "etat", length: 20, nullable: true, options: ["default" => 'en cours'])]
@@ -102,7 +116,6 @@ class Reclamations
         return $this;
     }
 
-
     public function getUser(): ?Users
     {
         return $this->user;
@@ -114,8 +127,6 @@ class Reclamations
 
         return $this;
     }
-
-
 
     public function getReponses(): Collection
     {
@@ -131,6 +142,4 @@ class Reclamations
 
         return $this;
     }
-
-
 }

@@ -20,42 +20,37 @@ class LogupController extends AbstractController
         EntityManagerInterface $entityManager
     ): Response {
         $user = new Users();
-        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form = $this->createForm(RegistrationFormType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            if ($form->isValid()) {
-                // Hash password
-                $plainPassword = $form->get('plainPassword')->getData();
-                $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
-                $user->setPassword($hashedPassword);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Set user data
+            $user->setName($form->get('name')->getData());
+            $user->setLastName($form->get('last_name')->getData());
+            $user->setEmail($form->get('email')->getData());
+            $user->setPhoneNum($form->get('phone_num')->getData());
+            $user->setAddress($form->get('address')->getData());
 
-                // Set default values
-                $user->setRole(0); // Default role
-                $user->setCompte(0); // Inactive account
+            // Hash and set password
+            $user->setPassword(
+                $passwordHasher->hashPassword(
+                    $user,
+                    $form->get('password')->getData()
+                )
+            );
 
-                // Télécharger l'image par défaut et la convertir en BLOB
-                $defaultImageUrl = 'images2/9187604.png';
-                $defaultImageData = @file_get_contents($defaultImageUrl); // Le @ évite les warnings
+            // Set default values
+            $user->setRole(0);
+            $user->setCompte(0);
 
-                if ($defaultImageData !== false) {
-                    $user->setPhoto($defaultImageData); // Enregistrer en BLOB
-                } else {
-                    $this->addFlash('error', "Erreur lors du chargement de la photo par défaut.");
-                }
+            // Set default image
+            $defaultImage = file_get_contents($this->getParameter('kernel.project_dir').'/public/images2/9187604.png');
+            $user->setPhoto($defaultImage);
 
-                // Enregistrer l'utilisateur
-                $entityManager->persist($user);
-                $entityManager->flush();
+            $entityManager->persist($user);
+            $entityManager->flush();
 
-                //$this->addFlash('success', 'Inscription réussie ! Vous pouvez maintenant vous connecter.');
-                return $this->redirectToRoute('app_login');
-            }
-
-            // Afficher les erreurs du formulaire
-            foreach ($form->getErrors(true) as $error) {
-                $this->addFlash('error', $error->getMessage());
-            }
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render('logup/index.html.twig', [

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Réclamation{% endblock %}
+{% block title %}Reclamation{% endblock %}
 
 {% block css %}
     {{ parent() }}
@@ -24,8 +24,8 @@
                         <i class="fas fa-arrow-left fa-lg"></i>
                     </a>
                     <div class="text-center flex-grow-1">
-                        <h5 class="section-title">Réclamation</h5>
-                        <h1 class="mb-0">Besoin d'aide ? Écrivez-nous !</h1>
+                        <h5 class="section-title">Reclamation</h5>
+                        <h1 class="mb-0">Need help? Write to us!</h1>
                     </div>
                 </div>
             </div>
@@ -52,8 +52,8 @@
                 </div>
 
                 <div class="col-lg-8">
-                    <h3 class="mb-2">Envoyez-nous un message</h3>
-                    <p class="mb-4">Rédigez votre réclamation, nous vous répondrons dans les plus brefs délais.</p>
+                    <h3 class="mb-2">Send us a message</h3>
+                    <p class="mb-4">Write your complaint, we will respond to you as soon as possible.</p>
 
                     {{ form_start(form, {'attr': {'class': 'row g-3 needs-validation', 'novalidate': 'novalidate'}}) }}
 
@@ -62,7 +62,7 @@
                             {{ form_widget(form.title, {
                                 'attr': {
                                     'class': 'form-control ' ~ (form.title.vars.valid ? '' : 'is-invalid'),
-                                    'placeholder': 'Objet de la réclamation'
+                                    'placeholder': 'Subject of the complaint'
                                 }
                             }) }}
                             {{ form_label(form.title, null, {'label_attr': {'class': 'form-label'}}) }}
@@ -78,7 +78,7 @@
                                 'attr': {
                                     'class': 'form-control ' ~ (form.description.vars.valid ? '' : 'is-invalid'),
                                     'style': 'height: 160px',
-                                    'placeholder': 'Décrivez votre problème...'
+                                    'placeholder': 'Describe your problem...'
                                 }
                             }) }}
                             {{ form_label(form.description, null, {'label_attr': {'class': 'form-label'}}) }}
@@ -104,7 +104,7 @@
 
                     <div class="col-12">
                         <button class="btn btn-primary w-100 py-3" type="submit">
-                            <i class="fas fa-paper-plane me-2"></i> Envoyer Réclamation
+                            <i class="fas fa-paper-plane me-2"></i> Submit Reclamation
                         </button>
                     </div>
 
