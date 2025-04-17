@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\ReservationHotelRepository;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Validator\Constraints\Date;
 
 class ReservationHotelController extends AbstractController
 {
@@ -17,7 +18,7 @@ class ReservationHotelController extends AbstractController
     public function reserveRoom(int $roomId, Request $request, ChambresRepository $chambresRepository, ReservationHotelRepository $reservationHotelRepository): Response
     {
         $room = $chambresRepository->find($roomId);
-
+        $today = new Date();
         if (!$room) {
             throw $this->createNotFoundException('Room not found');
         }
@@ -27,6 +28,21 @@ class ReservationHotelController extends AbstractController
 
         if (!$startReservation || !$endReservation) {
             $this->addFlash('error', 'Please provide both start and end dates for the reservation.');
+            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
+        }
+
+        if (new \DateTime($startReservation) < $today) {
+            $this->addFlash('error', 'Start date cannot be in the past.');
+            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
+        }
+
+        if (new \DateTime($endReservation) < $today) {
+            $this->addFlash('error', 'End date cannot be in the past.');
+            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
+        }
+
+        if (new \DateTime($startReservation) >= new \DateTime($endReservation)) {
+            $this->addFlash('error', 'Start date must be before end date.');
             return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
         }
 

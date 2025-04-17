@@ -70,10 +70,7 @@ class HotelsController extends AbstractController
                 return $this->redirectToRoute('dashboard_hotels');
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
-
-                return $this->render('dashboard/hotels/add.html.twig', [
-                    'hotel' => $hotel,
-                ]);
+                return $this->redirectToRoute("dashboard_hotels_add");
             }
         }
 
@@ -110,8 +107,8 @@ class HotelsController extends AbstractController
                 return $this->redirectToRoute('dashboard_hotels');
             } catch (\Exception $e) {
                 $this->addFlash('error', $e->getMessage());
-                return $this->render('dashboard/hotels/edit.html.twig', [
-                    'hotel' => $hotel,
+                return $this->redirectToRoute("dashboard_hotels_edit", [
+                    'id'=>$id
                 ]);
             }
         }

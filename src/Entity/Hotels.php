@@ -80,6 +80,9 @@ class Hotels
         if ($adress !== null && strlen($adress) > 255) {
             throw new \InvalidArgumentException('The address cannot exceed 255 characters.');
         }
+        if(empty($adress)){
+            throw new \InvalidArgumentException('The address cannot be empty.');
+        }
 
         $this->adress = $adress;
         return $this;
