@@ -58,6 +58,14 @@ class Hotels
 
     public function setNom(string $nom): static
     {
+        if (empty($nom)) {
+            throw new \InvalidArgumentException('The name cannot be empty.');
+        }
+
+        if (strlen($nom) > 255) {
+            throw new \InvalidArgumentException('The name cannot exceed 255 characters.');
+        }
+
         $this->nom = $nom;
         return $this;
     }
@@ -69,6 +77,10 @@ class Hotels
 
     public function setAdress(?string $adress): static
     {
+        if ($adress !== null && strlen($adress) > 255) {
+            throw new \InvalidArgumentException('The address cannot exceed 255 characters.');
+        }
+
         $this->adress = $adress;
         return $this;
     }
@@ -80,6 +92,19 @@ class Hotels
 
     public function setTelephone(?string $telephone): static
     {
+        if ($telephone === '') {
+            throw new \InvalidArgumentException('The telephone number cannot be empty.');
+        }
+        if ($telephone !== null) {
+            if (strlen($telephone) > 255) {
+                throw new \InvalidArgumentException('The telephone number cannot exceed 255 characters.');
+            }
+
+            if (!preg_match('/^[0-9]+$/', $telephone)) {
+                throw new \InvalidArgumentException('Invalid phone number format. Only numbers are allowed.');
+            }
+        }
+
         $this->telephone = $telephone;
         return $this;
     }
@@ -91,6 +116,10 @@ class Hotels
 
     public function setCapaciteTotale(int $capaciteTotale): static
     {
+        if ($capaciteTotale <= 0) {
+            throw new \InvalidArgumentException('The total capacity must be more than 0.');
+        }
+
         $this->capaciteTotale = $capaciteTotale;
         return $this;
     }

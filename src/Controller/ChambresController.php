@@ -4,9 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Chambres;
 use App\Entity\Hotels;
-use App\Repository\HotelsRepository;  // Correction ici
+use App\Repository\HotelsRepository;
 use App\Repository\ChambresRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,91 +13,108 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ChambresController extends AbstractController
 {
-    #[Route('/hotel/{id}/chambres', name: 'chambres_by_hotel')]
-    public function chambresByHotel(int $id, HotelsRepository $hotelRepo, ChambresRepository $chambresRepo): Response
+    #[Route('/dashboard/rooms/{id}', name: 'dashboard_rooms')]
+    public function dashboardRooms(ChambresRepository $chambresRepository, int $id): Response
     {
-        $hotel = $hotelRepo->find($id);
-        if (!$hotel) {
-            throw $this->createNotFoundException('Hôtel non trouvé.');
-        }
+        $chambres = $chambresRepository->findBy(['hotel' => $id]);
 
-        $chambresDisponibles = $chambresRepo->findBy([
-            'hotel' => $hotel, 
-            'disponible' => true,
-        ]);
-
-        return $this->render('chambres/index.html.twig', [
-            'hotel' => $hotel,
-            'chambres' => $chambresDisponibles,
+        return $this->render('dashboard/rooms/index.html.twig', [
+            'hotelId' => $id,
+            'chambres' => $chambres,
         ]);
     }
 
-    #[Route('/chambre/add/{hotelId}', name: 'chambre_add')]
-    public function addChambre(int $hotelId, Request $request, EntityManagerInterface $em): Response
+    #[Route('/dashboard/rooms/add/{hotelId}', name: 'dashboard_rooms_add', methods: ['GET', 'POST'])]
+    public function addRoom(Request $request, ChambresRepository $chambresRepository, HotelsRepository $hotelsRepository, int $hotelId): Response
     {
-        $hotel = $em->getRepository(Hotels::class)->find($hotelId);
+        $room = new Chambres();
+        $hotel = $hotelsRepository->find($hotelId);
 
         if (!$hotel) {
-            throw $this->createNotFoundException('Hôtel non trouvé');
+            throw $this->createNotFoundException('Hotel not found');
         }
 
         if ($request->isMethod('POST')) {
-            $chambre = new Chambres();
-            $chambre->setHotel($hotel);
-            $chambre->setNumeroChambre($request->request->get('numero_chambre'));
-            $chambre->setTypeEnu($request->request->get('type_enu'));
-            $chambre->setPrixParNuit((float)$request->request->get('prix_par_nuit'));
-            $chambre->setDisponible($request->request->get('disponible') === '1');
+            try {
+                $room->setNumeroChambre($request->request->get('numeroChambre'));
+                $room->setTypeEnu($request->request->get('typeEnu'));
+                $room->setPrixParNuit((float)$request->request->get('prixParNuit'));
+                $room->setDisponible((bool)$request->request->get('disponible'));
+                $room->setHotel($hotel);
 
-            $em->persist($chambre);
-            $em->flush();
+                $chambresRepository->add($room);
+                $this->addFlash('success', sprintf('Room #%s has been successfully added to Hotel #%s.', $room->getNumeroChambre(), $hotel->getId()));
 
-            return $this->redirectToRoute('chambres_by_hotel', ['id' => $hotelId]);
+                return $this->redirectToRoute('dashboard_rooms', ['id' => $hotel->getId()]);
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('dashboard_rooms_add', ['hotelId' => $hotelId]);
+            }
         }
 
-        return $this->render('chambres/add.html.twig', [
-            'hotel' => $hotel
+        return $this->render('dashboard/rooms/add.html.twig', [
+            'room' => $room,
+            'hotelId' => $hotelId,
         ]);
     }
 
-    #[Route('/chambre/edit/{id}', name: 'chambre_edit')]
-    public function editChambre(int $id, Request $request, ChambresRepository $chambresRepo, EntityManagerInterface $em): Response
+    #[Route('/dashboard/rooms/edit/{id}', name: 'dashboard_rooms_edit', methods: ['GET', 'POST'])]
+    public function editRoom(int $id, Request $request, ChambresRepository $chambresRepository): Response
     {
-        $chambre = $chambresRepo->find($id);
-        if (!$chambre) {
-            throw $this->createNotFoundException('Chambre non trouvée.');
+        $room = $chambresRepository->find($id);
+        if (!$room) {
+            throw $this->createNotFoundException('Room not found');
         }
 
         if ($request->isMethod('POST')) {
-            $chambre->setNumeroChambre($request->request->get('numero_chambre'));
-            $chambre->setTypeEnu($request->request->get('type_enu'));
-            $chambre->setPrixParNuit((float)$request->request->get('prix_par_nuit'));
-            $chambre->setDisponible($request->request->get('disponible') === '1');
+            try {
+                $room->setNumeroChambre($request->request->get('numeroChambre'));
+                $room->setTypeEnu($request->request->get('typeEnu'));
+                $room->setPrixParNuit((float)$request->request->get('prixParNuit'));
+                $room->setDisponible((bool)$request->request->get('disponible'));
 
-            $chambresRepo->update($chambre);
+                $chambresRepository->update($room);
+                $this->addFlash('success', 'Room updated successfully!');
 
-            return $this->redirectToRoute('chambres_by_hotel', [
-                'id' => $chambre->getHotel()->getId()
-            ]);
+                return $this->redirectToRoute('dashboard_rooms', ['id' => $room->getHotel()->getId()]);
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->redirectToRoute('dashboard_rooms_edit', ['id' => $id]);
+            }
         }
 
-        return $this->render('chambres/edit.html.twig', [
-            'chambre' => $chambre
+        return $this->render('dashboard/rooms/edit.html.twig', [
+            'room' => $room,
         ]);
     }
 
-    #[Route('/chambre/delete/{id}', name: 'chambre_delete')]
-    public function deleteChambre(int $id, ChambresRepository $chambresRepo, EntityManagerInterface $em): Response
+    #[Route('/dashboard/rooms/delete/{id}', name: 'dashboard_rooms_delete')]
+    public function deleteRoom(int $id, ChambresRepository $chambresRepository): Response
     {
-        $chambre = $chambresRepo->find($id);
-        if (!$chambre) {
-            throw $this->createNotFoundException('Chambre non trouvée.');
+        $room = $chambresRepository->find($id);
+        if (!$room) {
+            throw $this->createNotFoundException('Room not found');
         }
 
-        $hotelId = $chambre->getHotel()->getId();
+        $hotelId = $room->getHotel()->getId();
+        $chambresRepository->delete($id);
 
-        $chambresRepo->delete($id);
+        $this->addFlash('success', sprintf('Room #%s has been successfully deleted from Hotel #%s.', $room->getNumeroChambre(), $hotelId));
 
-        return $this->redirectToRoute('chambres_by_hotel', ['id' => $hotelId]);
+        return $this->redirectToRoute('dashboard_rooms', ['id' => $hotelId]);
+    }
+
+    #[Route('/room/{roomId}', name: 'room_details')]
+    public function roomDetails(int $roomId, ChambresRepository $chambresRepository): Response
+    {
+        $room = $chambresRepository->find($roomId);
+
+        if (!$room) {
+            throw $this->createNotFoundException('Room not found');
+        }
+
+        return $this->render('rooms/details.html.twig', [
+            'room' => $room,
+        ]);
     }
 }

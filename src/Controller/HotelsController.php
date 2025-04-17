@@ -4,15 +4,16 @@ namespace App\Controller;
 
 use App\Repository\HotelsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Hotels;
+use App\Repository\ChambresRepository;
 
 class HotelsController extends AbstractController
 {
     #[Route('/hotels', name: 'app_hotels')]
-    public function listHotels(HotelsRepository $hotelsRepository): Response
+    public function index(HotelsRepository $hotelsRepository): Response
     {
         $hotels = $hotelsRepository->findAll();
         foreach ($hotels as $hotel) {
@@ -22,13 +23,14 @@ class HotelsController extends AbstractController
                 $hotel->base64Image = null;
             }
         }
+
         return $this->render('hotels/index.html.twig', [
             'hotels' => $hotels,
         ]);
     }
 
-    #[Route('/dashboard/hotels', name: 'app_dashboard_hotels')]
-    public function listHotelsA(HotelsRepository $hotelsRepository): Response
+    #[Route('/dashboard/hotels', name: 'dashboard_hotels')]
+    public function dashboardHotels(HotelsRepository $hotelsRepository): Response
     {
         $hotels = $hotelsRepository->findAll();
         foreach ($hotels as $hotel) {
@@ -38,63 +40,105 @@ class HotelsController extends AbstractController
                 $hotel->base64Image = null;
             }
         }
-        return $this->render('dashboard/hotels.html.twig', [
+
+        return $this->render('dashboard/hotels/index.html.twig', [
             'hotels' => $hotels,
         ]);
     }
 
-    #[Route('/dashboard/hotel/add', name: 'hotel_add')]
-    public function addHotel(Request $request, HotelsRepository $hotelsRepo): Response
+    #[Route('/dashboard/hotels/add', name: 'dashboard_hotels_add', methods: ['GET', 'POST'])]
+    public function addHotel(Request $request, HotelsRepository $hotelsRepository): Response
     {
+        $hotel = new Hotels();
 
         if ($request->isMethod('POST')) {
-            $hotel = new Hotels();
-            $hotel->setNom($request->request->get('nom'));
-            $hotel->setAdress($request->request->get('adress'));
-            $hotel->setTelephone($request->request->get('telephone'));
-            $hotel->setCapaciteTotale((int) $request->request->get('capacite_totale'));
-            $hotelsRepo->add($hotel);
-            return $this->redirectToRoute('app_hotels');
+            try {
+                $hotel->setNom($request->request->get('nom'));
+                $hotel->setAdress($request->request->get('adress'));
+                $hotel->setTelephone($request->request->get('telephone'));
+                $hotel->setCapaciteTotale((int)$request->request->get('capaciteTotale'));
+
+                $imageFile = $request->files->get('imageH');
+                if ($imageFile && $imageFile->isValid()) {
+                    $imageData = $imageFile->getContent();
+                    $hotel->setImageH($imageData);
+                }
+
+                $hotelsRepository->add($hotel);
+                $this->addFlash('success', 'Hotel added successfully!');
+
+                return $this->redirectToRoute('dashboard_hotels');
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+
+                return $this->render('dashboard/hotels/add.html.twig', [
+                    'hotel' => $hotel,
+                ]);
+            }
         }
 
-        return $this->render('dashboard/addhotel.html.twig');
-    }
-
-    #[Route('/hotel/edit/{id}', name: 'hotel_edit')]
-    public function editHotel(int $id, Request $request, HotelsRepository $hotelsRepo): Response
-    {
-        $hotel = $hotelsRepo->find($id);
-        if (!$hotel) {
-            throw $this->createNotFoundException('Hôtel non trouvé.');
-        }
-
-        if ($request->isMethod('POST')) {
-            $hotel->setNom($request->request->get('nom'));
-            $hotel->setAdress($request->request->get('adress'));
-            $hotel->setTelephone($request->request->get('telephone'));
-            $hotel->setCapaciteTotale((int)$request->request->get('capacite_totale'));
-
-            $hotelsRepo->update($hotel);
-
-            return $this->redirectToRoute('app_hotels');
-        }
-
-        return $this->render('hotels/edit.html.twig', [
+        return $this->render('dashboard/hotels/add.html.twig', [
             'hotel' => $hotel,
         ]);
     }
 
-    #[Route('/hotel/delete/{id}', name: 'hotel_delete')]
-    public function deleteHotel(int $id, HotelsRepository $hotelsRepo): Response
+    #[Route('/dashboard/hotels/edit/{id}', name: 'dashboard_hotels_edit', methods: ['GET', 'POST'])]
+    public function editHotel(int $id, Request $request, HotelsRepository $hotelsRepository): Response
     {
-        $hotel = $hotelsRepo->find($id);
+        $hotel = $hotelsRepository->find($id);
         if (!$hotel) {
-            throw $this->createNotFoundException('Hôtel non trouvé.');
+            throw $this->createNotFoundException('Hotel not found');
+        }
+        $hotel->base64Image = base64_encode(stream_get_contents($hotel->getImageH()));
+
+        if ($request->isMethod('POST')) {
+            try {
+                $hotel->setNom($request->request->get('nom'));
+                $hotel->setAdress($request->request->get('adress'));
+                $hotel->setTelephone($request->request->get('telephone'));
+                $hotel->setCapaciteTotale((int)$request->request->get('capaciteTotale'));
+
+                $imageFile = $request->files->get('imageH');
+                if ($imageFile && $imageFile->isValid()) {
+                    $imageData = $imageFile->getContent();
+                    $hotel->setImageH($imageData);
+                }
+
+                $hotelsRepository->update($hotel);
+                $this->addFlash('success', 'Hotel updated successfully!');
+
+                return $this->redirectToRoute('dashboard_hotels');
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
+                return $this->render('dashboard/hotels/edit.html.twig', [
+                    'hotel' => $hotel,
+                ]);
+            }
         }
 
-        $hotelsRepo->delete($id);
-
-        return $this->redirectToRoute('app_hotels');
+        return $this->render('dashboard/hotels/edit.html.twig', [
+            'hotel' => $hotel,
+        ]);
     }
-    
+
+    #[Route('/dashboard/hotels/delete/{id}', name: 'dashboard_hotels_delete')]
+    public function deleteHotel(int $id, HotelsRepository $hotelsRepository): Response
+    {
+        $hotelsRepository->delete($id);
+        return $this->redirectToRoute('dashboard_hotels');
+    }
+
+    #[Route('/hotels/{hotelId}/rooms', name: 'hotel_rooms')]
+    public function viewRooms(int $hotelId, HotelsRepository $hotelsRepository, ChambresRepository $chambresRepository): Response
+    {
+        $hotel = $hotelsRepository->find($hotelId);
+        if (!$hotel) {
+            throw $this->createNotFoundException('Hotel not found');
+        }
+        $rooms = $chambresRepository->findBy(['hotel' => $hotelId]);
+        return $this->render('hotels/rooms.html.twig', [
+            'hotel' => $hotel,
+            'rooms' => $rooms,
+        ]);
+    }
 }

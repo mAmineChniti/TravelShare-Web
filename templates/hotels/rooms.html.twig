@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Available Rooms{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-16">
+    <h1 class="text-2xl font-bold mb-6">Available Rooms in {{ hotel.nom }}</h1>
+
+    {% if rooms is empty %}
+        <p class="text-gray-600">No rooms available at the moment.</p>
+    {% else %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for room in rooms %}
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <div class="p-4">
+                        <h2 class="text-lg font-semibold text-gray-800">Room {{ room.numeroChambre }}</h2>
+                        <p class="text-sm text-gray-600 mt-2"><strong>Price:</strong> {{ room.prixParNuit }} per night</p>
+                        <p class="text-sm text-gray-600"><strong>Type:</strong> {{ room.typeEnu }}</p>
+                        <p class="text-sm text-gray-600"><strong>Available:</strong> {{ room.disponible == 1 ? 'Yes' : 'No' }}</p>
+                        <a href="{{ path('room_details', { roomId: room.chambreId }) }}" class="text-blue-500 hover:underline text-sm">View Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -13,99 +13,39 @@ use Psr\Log\LoggerInterface;
 
 class ReservationHotelController extends AbstractController
 {
-    private LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger)
+    #[Route('/room/reserve/{roomId}', name: 'room_reserve', methods: ['POST'])]
+    public function reserveRoom(int $roomId, Request $request, ChambresRepository $chambresRepository, ReservationHotelRepository $reservationHotelRepository): Response
     {
-        $this->logger = $logger;
-    }
+        $room = $chambresRepository->find($roomId);
 
-    #[Route('/hotel/{hotelId}/chambres/{chambreId}/reservation', name: 'app_reservation')]
-    public function reserver(
-        int $hotelId,
-        int $chambreId,
-        Request $request,
-        ReservationHotelRepository $reservationRepository,
-        ChambresRepository $chambresRepository
-    ): Response {
-        $chambre = $chambresRepository->find($chambreId);
-
-        if (!$chambre) {
-            throw $this->createNotFoundException('Chambre non trouvée.');
+        if (!$room) {
+            throw $this->createNotFoundException('Room not found');
         }
 
-        if ($request->isMethod('POST')) {
-            $dateDebut = new \DateTime($request->request->get('date_debut'));
-            $dateFin = new \DateTime($request->request->get('date_fin'));
-            $today = new \DateTime();
+        $startReservation = $request->request->get('startReservation');
+        $endReservation = $request->request->get('endReservation');
 
-            if ($dateDebut < $today) {
-                $this->addFlash('error', 'La date de début ne peut pas être antérieure à aujourd\'hui.');
-                return $this->redirectToRoute('app_reservation', ['hotelId' => $hotelId, 'chambreId' => $chambreId]);
-            }
+        if (!$startReservation || !$endReservation) {
+            $this->addFlash('error', 'Please provide both start and end dates for the reservation.');
+            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
+        }
 
-            if ($dateDebut >= $dateFin) {
-                $this->addFlash('error', 'La date de fin doit être postérieure à la date de début.');
-                return $this->redirectToRoute('app_reservation', ['hotelId' => $hotelId, 'chambreId' => $chambreId]);
-            }
-
+        try {
             $reservation = new ReservationHotel();
-            $reservation->setChambreId($chambre->getChambreId());
             $reservation->setClientId(1);
-            $reservation->setDateDebut($dateDebut);
-            $reservation->setDateFin($dateFin);
-            $reservation->setStatusEnu('en attente');
-            $reservation->setPrixTotale($chambre->getPrixParNuit() * $dateDebut->diff($dateFin)->days);
+            $reservation->setChambreId($roomId);
+            $reservation->setDateDebut(new \DateTime($startReservation));
+            $reservation->setDateFin(new \DateTime($endReservation));
+            $reservation->setStatusEnu('Pending');
+            $reservation->setPrixTotale($room->getPrixParNuit() * (new \DateTime($endReservation))->diff(new \DateTime($startReservation))->days);
 
-            $reservationRepository->add($reservation);
+            $reservationHotelRepository->add($reservation);
 
-            $this->addFlash('success', 'Réservation effectuée avec succès.');
-            return $this->redirectToRoute('app_reservation', ['hotelId' => $hotelId, 'chambreId' => $chambreId]);
+            $this->addFlash('success', 'Room reserved successfully!');
+            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'An error occurred while reserving the room: ' . $e->getMessage());
+            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
         }
-
-        $this->addFlash('info', 'Veuillez remplir le formulaire pour réserver.');
-
-        return $this->render('reservationchambre/index.html.twig', [
-            'chambre' => $chambre,
-            'hotelId' => $hotelId,
-            'chambreId' => $chambreId
-        ]);
-    }
-
-    #[Route('/reservation/edit/{id}', name: 'reservation_edit')]
-    public function editReservation(int $id, Request $request, ReservationHotelRepository $reservationRepo): Response
-    {
-        $reservation = $reservationRepo->find($id);
-        if (!$reservation) {
-            throw $this->createNotFoundException('Réservation non trouvée.');
-        }
-
-        if ($request->isMethod('POST')) {
-            $reservation->setDateDebut(new \DateTime($request->request->get('date_debut')));
-            $reservation->setDateFin(new \DateTime($request->request->get('date_fin')));
-            $reservation->setStatusEnu($request->request->get('status_enu'));
-            $reservation->setPrixTotale((int)$request->request->get('prix_totale'));
-
-            $reservationRepo->update($reservation);
-
-            return $this->redirectToRoute('app_reservation_list');
-        }
-
-        return $this->render('reservation/edit.html.twig', [
-            'reservation' => $reservation
-        ]);
-    }
-
-    #[Route('/reservation/delete/{id}', name: 'reservation_delete')]
-    public function deleteReservation(int $id, ReservationHotelRepository $reservationRepo): Response
-    {
-        $reservation = $reservationRepo->find($id);
-        if (!$reservation) {
-            throw $this->createNotFoundException('Réservation non trouvée.');
-        }
-
-        $reservationRepo->delete($id);
-
-        return $this->redirectToRoute('app_reservation_list');
     }
 }

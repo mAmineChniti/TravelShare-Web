@@ -46,7 +46,11 @@ class ChambresRepository extends ServiceEntityRepository
     public function delete(int $id): void
     {
         $entityManager = $this->getEntityManager();
-        $chambre = $entityManager->getReference(Chambres::class, $id);
+        $chambre = $this->find($id);
+        if (!$chambre) {
+            throw new \Exception('Chambre not found');
+        }
+        $chambre->setHotel(null);
         $entityManager->remove($chambre);
         $entityManager->flush();
     }
