@@ -9,20 +9,20 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Excursions;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Table(name: 'guides')]
 #[ORM\Entity(repositoryClass: GuidesRepository::class)]
+#[UniqueEntity(fields: ['email'], message: 'Un guide avec cette adresse email existe déjà.')]
 class Guides
 {
-
     #[ORM\OneToMany(mappedBy: "guide", targetEntity: Excursions::class, cascade: ["persist", "remove"], orphanRemoval: true)]
-private Collection $excursions;
+    private Collection $excursions;
 
-public function __construct()
-{
-    $this->excursions = new ArrayCollection();
-}
-
+    public function __construct()
+    {
+        $this->excursions = new ArrayCollection();
+    }
 
     #[ORM\Column(name: "guide_id")]
     #[ORM\Id]
@@ -39,7 +39,7 @@ public function __construct()
     #[Assert\Length(max: 50, maxMessage: "Le nom de famille ne peut pas dépasser 50 caractères.")]
     private ?string $lastName = null;
 
-    #[ORM\Column(name: "email", length: 50)]
+    #[ORM\Column(name: "email", length: 50, unique: true)]
     #[Assert\NotBlank(message: "L'email ne peut pas être vide.")]
     #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide.")]
     #[Assert\Length(max: 50, maxMessage: "L'email ne peut pas dépasser 50 caractères.")]
@@ -138,27 +138,27 @@ public function __construct()
     }
 
     public function getExcursions(): Collection
-{
-    return $this->excursions;
-}
-
-public function addExcursion(Excursions $excursion): self
-{
-    if (!$this->excursions->contains($excursion)) {
-        $this->excursions->add($excursion);
-        $excursion->setGuide($this);
+    {
+        return $this->excursions;
     }
-    return $this;
-}
 
-public function removeExcursion(Excursions $excursion): self
-{
-    if ($this->excursions->removeElement($excursion)) {
-        // set the owning side to null (unless already changed)
-        if ($excursion->getGuide() === $this) {
-            $excursion->setGuide(null);
+    public function addExcursion(Excursions $excursion): self
+    {
+        if (!$this->excursions->contains($excursion)) {
+            $this->excursions->add($excursion);
+            $excursion->setGuide($this);
         }
+        return $this;
     }
-    return $this;
-}
+
+    public function removeExcursion(Excursions $excursion): self
+    {
+        if ($this->excursions->removeElement($excursion)) {
+            // set the owning side to null (unless already changed)
+            if ($excursion->getGuide() === $this) {
+                $excursion->setGuide(null);
+            }
+        }
+        return $this;
+    }
 }
