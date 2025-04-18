@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Room Details{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-16">
+    <h1 class="text-3xl font-bold mb-8 text-center">Room {{ room.numeroChambre }} Details</h1>
+
+    <div class="bg-white shadow-md rounded-lg overflow-hidden max-w-4xl mx-auto">
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <p class="text-lg font-semibold text-gray-800">Price:</p>
+                    <p class="text-gray-600">{{ room.prixParNuit }} per night</p>
+                </div>
+                <div>
+                    <p class="text-lg font-semibold text-gray-800">Type:</p>
+                    <p class="text-gray-600">{{ room.typeEnu }}</p>
+                </div>
+                <div>
+                    <p class="text-lg font-semibold text-gray-800">Available:</p>
+                    <p class="text-gray-600">{{ room.disponible == 1 ? 'Yes' : 'No' }}</p>
+                </div>
+            </div>
+
+            <form method="POST" action="{{ path('room_reserve', {'roomId': room.chambreId }) }}">
+                <div class="mt-6">
+                    <p class="text-lg font-semibold text-gray-800">Start Reservation:</p>
+                    <input type="date" name="startReservation" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="mt-4">
+                    <p class="text-lg font-semibold text-gray-800">End Reservation:</p>
+                    <input type="date" name="endReservation" class="border border-gray-300 rounded p-2 w-full focus:ring-2 focus:ring-blue-500">
+                </div>
+            {% for message in app.flashes('success') %}
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6">
+                    {{ message }}
+                </div>
+            {% endfor %}
+                <div class="mt-6 text-center">
+                    <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">Reserve Now</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

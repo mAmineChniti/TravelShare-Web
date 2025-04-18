@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add Room{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-16">
+    <div class="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+        <h1 class="text-3xl font-semibold text-gray-800 mb-6">Add Room</h1>
+
+        <form method="POST" class="space-y-6">
+            <div>
+                <label for="numeroChambre" class="block text-sm font-medium text-gray-700">Room Number</label>
+                <input type="text" id="numeroChambre" name="numeroChambre" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="typeEnu" class="block text-sm font-medium text-gray-700">Room Type</label>
+                <select id="typeEnu" name="typeEnu" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="simple">Simple</option>
+                    <option value="double">Double</option>
+                    <option value="suite">Suite</option>
+                </select>
+            </div>
+            <div>
+                <label for="prixParNuit" class="block text-sm font-medium text-gray-700">Price per Night</label>
+                <input type="number" step="0.01" id="prixParNuit" name="prixParNuit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            </div>
+            <div>
+                <label for="disponible" class="block text-sm font-medium text-gray-700">Available</label>
+                <select id="disponible" name="disponible" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="1">Yes</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+        {% for message in app.flashes('success') %}
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6">
+            {{ message }}
+        </div>
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6">
+            {{ message }}
+        </div>
+        {% endfor %}
+            <button type="submit" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">Save</button>
+            <a href="{{ path('dashboard_rooms', {id: hotelId}) }}" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
