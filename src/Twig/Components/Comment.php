@@ -12,6 +12,6 @@ final class Comment
     public string $name;
     public string $lastName;
     public int $commenterId;
-    public ?\DateTimeImmutable $commentedAt = null;
-    public ?\DateTimeImmutable $updatedAt = null;
+    public ?\DateTimeInterface $commentedAt = null;
+    public ?\DateTimeInterface $updatedAt = null;
 }

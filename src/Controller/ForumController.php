@@ -2,17 +2,19 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Likes;
+use App\Entity\Posts;
+use App\Entity\Comments;
+use App\Repository\LikesRepository;
+use App\Repository\PostsRepository;
+use App\Repository\UsersRepository;
+use App\Repository\CommentsRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Repository\PostsRepository;
-use App\Repository\CommentsRepository;
-use App\Repository\LikesRepository;
-use App\Repository\UsersRepository;
-use Symfony\Component\HttpFoundation\Request;
-use App\Entity\Posts;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Entity\Comments;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 final class ForumController extends AbstractController
@@ -21,7 +23,7 @@ final class ForumController extends AbstractController
     public function index(
         PostsRepository $postsRepository,
         CommentsRepository $commentsRepository,
-        LikesRepository $likesRepository
+        LikesRepository $likesRepository,
     ): Response {
         $userId = 1;
         $posts = $postsRepository->fetchPosts(0, 10, $userId);
@@ -40,19 +42,27 @@ final class ForumController extends AbstractController
     public function post(
         Request $request,
         PostsRepository $postsRepository,
-        UsersRepository $userRepository
+        UsersRepository $userRepository,
+        ValidatorInterface $validator,
     ): Response {
         $postText = $request->request->get('postText');
         $userId = 1;
-        if (empty($postText) || strlen(trim($postText)) < 10) {
-            return new JsonResponse(['error' => 'Post must be at least 10 characters long.'], 400);
-        }
 
         $post = new Posts();
         $post->setTextContent($postText);
         $post->setOwnerId($userId);
-        $post->setCreatedAt(new \DateTimeImmutable());
-        $post->setUpdatedAt(new \DateTimeImmutable());
+        $post->setCreatedAt(new \DateTime());
+        $post->setUpdatedAt(new \DateTime());
+
+        $errors = $validator->validate($post);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+
+            return new JsonResponse(['error' => $errorMessages], 400);
+        }
 
         $postsRepository->add($post);
 
@@ -60,16 +70,16 @@ final class ForumController extends AbstractController
 
         $postData = [
             'postId' => $post->getPostId(),
-            'name' => $user ? $user->getName() : 'User',
-            'lastName' => $user ? $user->getLastName() : 'Name',
+            'name' => $user->getName(),
+            'lastName' => $user->getLastName(),
             'textContent' => $post->getTextContent(),
             'isLiked' => false,
             'likesCount' => 0,
-            'comments' => []
+            'comments' => [],
         ];
 
         return $this->render('components/Post.html.twig', [
-            'post' => $postData
+            'post' => $postData,
         ]);
     }
 
@@ -77,7 +87,8 @@ final class ForumController extends AbstractController
     public function edit(
         Request $request,
         PostsRepository $postsRepository,
-        int $id
+        ValidatorInterface $validator,
+        int $id,
     ): Response {
         $post = $postsRepository->find($id);
 
@@ -85,39 +96,44 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => 'Post not found.'], 404);
         }
 
-        if ($post->getOwnerId() !== 1) {
+        if (1 !== $post->getOwnerId()) {
             return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $postText = $request->request->get('editTextarea-' . $id);
+        $postText = $request->request->get('editTextarea-'.$id);
+        $post->setTextContent($postText);
+        $post->setUpdatedAt(new \DateTime());
 
-        if (empty($postText) || strlen(trim($postText)) < 10) {
-            return new JsonResponse(['error' => 'Post must be at least 10 characters long.'], 400);
+        $errors = $validator->validate($post);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+
+            return new JsonResponse(['error' => $errorMessages], 400);
         }
 
-        $post->setTextContent($postText);
-        $post->setUpdatedAt(new \DateTimeImmutable());
         $postsRepository->update($post);
 
         return $this->render('components/PostText.html.twig', [
             'postId' => $post->getPostId(),
-            'textContent' => $post->getTextContent()
+            'textContent' => $post->getTextContent(),
         ]);
     }
 
     #[Route('/forum/delete/{id}', name: 'app_forum_delete', methods: ['POST'])]
     public function delete(
-        Request $request,
         PostsRepository $postsRepository,
-        int $id
+        int $id,
     ): Response {
         $post = $postsRepository->find($id);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id ' . $id);
+            throw $this->createNotFoundException('No post found for id '.$id);
         }
 
-        if ($post->getOwnerId() !== 1) {
+        if (1 !== $post->getOwnerId()) {
             throw new AccessDeniedException('You are not allowed to delete this post.');
         }
 
@@ -130,7 +146,7 @@ final class ForumController extends AbstractController
     public function like(
         Request $request,
         LikesRepository $likesRepository,
-        PostsRepository $postsRepository
+        PostsRepository $postsRepository,
     ): Response {
         $postId = $request->request->get('postId');
         $userId = 1;
@@ -139,7 +155,7 @@ final class ForumController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Post ID is missing'], 400);
         }
 
-        $like = new \App\Entity\Likes();
+        $like = new Likes();
         $like->setPostId($postId);
         $like->setLikerId($userId);
 
@@ -148,7 +164,7 @@ final class ForumController extends AbstractController
         $post = $postsRepository->find($postId);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id ' . $postId);
+            throw $this->createNotFoundException('No post found for id '.$postId);
         }
 
         $isLiked = $likesRepository->isLikedByUser($userId, $postId);
@@ -165,54 +181,57 @@ final class ForumController extends AbstractController
     public function comment(
         Request $request,
         CommentsRepository $commentsRepository,
-        UsersRepository $userRepository
+        UsersRepository $userRepository,
+        ValidatorInterface $validator,
     ): Response {
         $postId = $request->request->get('postId');
         $commentText = $request->request->get('commentText');
         $userId = 1;
-        if (empty($commentText) || strlen(trim($commentText)) < 10 || strlen(trim($commentText)) > 255) {
-            return new JsonResponse(['error' => 'Comment must be between 10 and 255 characters.'], 400);
-        }
 
         $comment = new Comments();
         $comment->setPostId($postId);
         $comment->setCommenterId($userId);
         $comment->setComment($commentText);
-        $comment->setCommentedAt(new \DateTimeImmutable());
-        $comment->setUpdatedAt(new \DateTimeImmutable());
+        $comment->setCommentedAt(new \DateTime());
+        $comment->setUpdatedAt(new \DateTime());
+
+        $errors = $validator->validate($comment);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+
+            return new JsonResponse(['error' => $errorMessages], 400);
+        }
 
         $commentsRepository->add($comment);
 
         $user = $userRepository->find($userId);
 
-        $commentData = [
+        return $this->render('components/Comment.html.twig', [
             'commentId' => $comment->getCommentId(),
             'comment' => $comment->getComment(),
             'commentedAt' => $comment->getCommentedAt(),
             'updatedAt' => $comment->getUpdatedAt(),
             'name' => $user ? $user->getName() : 'User',
             'lastName' => $user ? $user->getLastName() : 'Name',
-            'commenterId' => $comment->getCommenterId()
-        ];
-
-        return $this->render('components/Comment.html.twig', [
-            'comment' => $commentData
+            'commenterId' => $comment->getCommenterId(),
         ]);
     }
 
     #[Route('/forum/delete/comment/{id}', name: 'comment_delete', methods: ['POST'])]
     public function deleteComment(
-        Request $request,
         CommentsRepository $commentsRepository,
-        int $id
+        int $id,
     ): Response {
         $comment = $commentsRepository->find($id);
 
         if (!$comment) {
-            throw $this->createNotFoundException('No comment found for id ' . $id);
+            throw $this->createNotFoundException('No comment found for id '.$id);
         }
 
-        if ($comment->getCommenterId() !== 1) {
+        if (1 !== $comment->getCommenterId()) {
             throw new AccessDeniedException('You are not allowed to delete this comment.');
         }
 
@@ -225,7 +244,8 @@ final class ForumController extends AbstractController
     public function editComment(
         Request $request,
         CommentsRepository $commentsRepository,
-        int $id
+        ValidatorInterface $validator,
+        int $id,
     ): Response {
         $comment = $commentsRepository->find($id);
 
@@ -233,23 +253,29 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => 'Comment not found.'], 404);
         }
 
-        if ($comment->getCommenterId() !== 1) {
+        if (1 !== $comment->getCommenterId()) {
             return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $commentText = $request->request->get('editTextarea-' . $id);
+        $commentText = $request->request->get('editTextarea-'.$id);
+        $comment->setComment($commentText);
+        $comment->setUpdatedAt(new \DateTime());
 
-        if (empty($commentText) || strlen(trim($commentText)) < 10 || strlen(trim($commentText)) > 255) {
-            return new JsonResponse(['error' => 'Comment must be between 10 and 255 characters.'], 400);
+        $errors = $validator->validate($comment);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+
+            return new JsonResponse(['error' => $errorMessages], 400);
         }
 
-        $comment->setComment($commentText);
-        $comment->setUpdatedAt(new \DateTimeImmutable());
         $commentsRepository->update($comment);
 
         return $this->render('components/CommentText.html.twig', [
             'commentId' => $comment->getCommentId(),
-            'comment' => $comment->getComment()
+            'comment' => $comment->getComment(),
         ]);
     }
 
@@ -257,22 +283,21 @@ final class ForumController extends AbstractController
     public function dashboard(
         PostsRepository $postsRepository,
         CommentsRepository $commentsRepository,
-        LikesRepository $likesRepository,
-        UsersRepository $usersRepository
+        UsersRepository $usersRepository,
     ): Response {
-        $posts = $postsRepository->fetchPosts(1,10, 1);
-        
+        $posts = $postsRepository->fetchPosts(1, 10, 1);
+
         foreach ($posts as &$post) {
             $user = $usersRepository->find($post['ownerId']);
-            $post['ownerName'] = $user ? $user->getName() . ' ' . $user->getLastName() : 'Unknown User';
-            
+            $post['ownerName'] = $user ? $user->getName().' '.$user->getLastName() : 'Unknown User';
+
             $comments = $commentsRepository->fetchById($post['postId']);
-            
+
             foreach ($comments as &$comment) {
                 $commenter = $usersRepository->find($comment['commenterId']);
-                $comment['commenterName'] = $commenter ? $commenter->getName() . ' ' . $commenter->getLastName() : 'Unknown User';
+                $comment['commenterName'] = $commenter ? $commenter->getName().' '.$commenter->getLastName() : 'Unknown User';
             }
-            
+
             $post['comments'] = $comments;
         }
 

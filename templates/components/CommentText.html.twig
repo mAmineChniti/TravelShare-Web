@@ -1,18 +1,27 @@
 <div id="commentText-{{ commentId }}">
-    <p class="text-gray-600 mt-2">{{ comment }}</p>
+	<p class="text-gray-600 mt-2">{{ comment }}</p>
 </div>
 
 <script>
-(function() {
-    const commentId = {{ commentId }};
-    const editCommentFormElement = document.getElementById("editCommentForm-" + commentId);
-    const editCommentButtonElement = document.getElementById("editCommentButton-" + commentId);
-    
-    if (editCommentFormElement) {
-        editCommentFormElement.style.display = "none";
-    }
-    if (editCommentButtonElement) {
-        editCommentButtonElement.style.display = "inline-flex";
-    }
-})();
+	document.addEventListener('DOMContentLoaded', () => {
+		const commentId = {{ commentId }};
+		const elements = {
+			editForm: document.getElementById(`editCommentForm-${commentId}`),
+			editButton: document.getElementById(`editCommentButton-${commentId}`)
+		};
+
+		if (elements.editForm) elements.editForm.style.display = "none";
+		if (elements.editButton) elements.editButton.style.display = "inline-flex";
+	});
+
+	(function() {
+		const commentId = {{ commentId }};
+		const elements = {
+			editForm: document.getElementById(`editCommentForm-${commentId}`),
+			editButton: document.getElementById(`editCommentButton-${commentId}`)
+		};
+
+		if (elements.editForm) elements.editForm.style.display = "none";
+		if (elements.editButton) elements.editButton.style.display = "inline-flex";
+	})();
 </script>

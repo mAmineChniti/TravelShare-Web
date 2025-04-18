@@ -1,97 +1,409 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Forum{% endblock %}
-
-{% block body %}
+{% extends 'base.html.twig' %} {% block title %}Forum{% endblock %} {% block body %}
 <div class="container mx-auto px-4 py-16">
-    <!-- Post Form -->
-    <form
-        hx-post="{{ path('app_forum_post') }}"
-        hx-target="#postsContainer"
-        hx-swap="afterbegin"
-        hx-on::after-request="if(event.detail.successful) this.reset()"
-        id="postForm"
-        onsubmit="return validatePostForm(this);"
-    >
-        <textarea
-            name="postText"
-            id="postText"
-            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            placeholder="Write a post..."
-        ></textarea>
-        <p id="postErrorMessage" class="text-red-500 text-sm mt-2"></p>
-        <div class="flex justify-end">
-            <button
-                type="submit"
-                class="mt-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow hover:bg-blue-700 transition-all cursor-pointer"
-            >
-                Post
-            </button>
-        </div>
-    </form>
+	<form id="postForm" class="htmx-form">
+		<div class="relative">
+			<textarea
+				name="postText"
+				id="postText"
+				class="w-full p-3 pb-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+				placeholder="Write a post…"
+				maxlength="255"
+			></textarea>
+			<span id="postLength" class="absolute bottom-2 left-3 text-sm text-gray-400 pointer-events-none">0/255</span>
+		</div>
+		<p id="postErrorMessage" class="text-red-500 text-sm mt-2"></p>
+		<div class="flex justify-end">
+			<button
+				type="button"
+				onclick="ForumApp.submitPostIfValid()"
+				class="mt-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow hover:bg-blue-700 transition-all cursor-pointer"
+			>
+				Post
+			</button>
+		</div>
+	</form>
 
-    <div id="postsContainer" class="mt-8">
-        {% for post in posts %}
-            <twig:Post post="{{ post }}" />
-        {% endfor %}
-    </div>
+	<div id="postsContainer" class="mt-8">
+		{% for post in posts %}
+		<twig:Post post="{{ post }}" />
+		{% endfor %}
+	</div>
 </div>
 
 <script>
-    function validatePostForm(form) {
-        const textarea = form.querySelector("textarea[name='postText']");
-        const errorMessage = form.querySelector("p#postErrorMessage");
+	const ForumApp = (() => {
+		const CONFIG = {
+			MAX_LENGTH: 255,
+			MIN_POST_LENGTH: 15,
+			MIN_COMMENT_LENGTH: 10
+		};
 
-        if (textarea.value.trim() === "") {
-            errorMessage.textContent = "Post cannot be empty.";
-            return false;
-        }
-        if(textarea.value.trim().length < 10 || textarea.value.trim().length > 255) {
-            errorMessage.textContent = "Post must be between 10 and 255 characters.";
-            return false;
-        }
+		const elements = {
+			postText: document.getElementById('postText'),
+			postLength: document.getElementById('postLength'),
+			postErrorMessage: document.getElementById('postErrorMessage'),
+			postForm: document.getElementById('postForm')
+		};
 
-        errorMessage.textContent = "";
-        return true;
-    }
+		const CharacterCounter = {
+			/**
+			 * Set up a character counter for a textarea
+			 * @param {HTMLElement} textarea - The textarea element
+			 * @param {HTMLElement} counter - The counter element
+			 */
+			setup(textarea, counter) {
+				if (!textarea || !counter) return;
 
-    function validateCommentForm(form) {
-        const textarea = form.querySelector("textarea[name='commentText']");
-        const errorMessage = form.querySelector("p[id^='commentErrorMessage']");
-        const commentText = textarea.value.trim();
+				counter.textContent = `${textarea.value.length}/${CONFIG.MAX_LENGTH}`;
 
-        if (commentText === "") {
-            errorMessage.textContent = "Comment cannot be empty.";
-            return false;
-        }
-        
-        if (commentText.length < 10 || commentText.length > 255) {
-            errorMessage.textContent = "Comment must be between 10 and 255 characters.";
-            return false;
-        }
+				textarea.addEventListener('input', () => {
+					if (textarea.value.length > CONFIG.MAX_LENGTH) {
+						textarea.value = textarea.value.slice(0, CONFIG.MAX_LENGTH);
+					}
+					counter.textContent = `${textarea.value.length}/${CONFIG.MAX_LENGTH}`;
+				});
+			},
 
-        errorMessage.textContent = "";
-        return true;
-    }
+			initAll() {
+				this.setup(elements.postText, elements.postLength);
 
-    function editPost(postId) {
-        const postTextElement = document.getElementById("postText-" + postId);
-        const editPostFormElement = document.getElementById("editPostForm-" + postId);
-        const editButtonElement = document.getElementById("editButton-" + postId);
+				document.querySelectorAll("textarea[id^='editTextarea-']").forEach(textarea => {
+					const id = textarea.id.split("editTextarea-")[1];
+					const counter = document.getElementById(`editPostLength-${id}`) ||
+								   document.getElementById(`commentLength-${id}`);
 
-        postTextElement.style.display = "none";
-        editPostFormElement.style.display = "block";
-        editButtonElement.style.display = "none";
-    }
+					if (counter) {
+						this.setup(textarea, counter);
+					}
+				});
 
-    function editComment(commentId) {
-        const commentTextElement = document.getElementById("commentText-" + commentId);
-        const editCommentFormElement = document.getElementById("editCommentForm-" + commentId);
-        const editCommentButtonElement = document.getElementById("editCommentButton-" + commentId);
+				document.querySelectorAll("textarea[name='commentText']").forEach(textarea => {
+					const postId = textarea.closest("form").querySelector("input[name='postId']")?.value;
+					if (postId) {
+						const counter = document.getElementById(`newCommentLength-${postId}`);
+						if (counter) {
+							this.setup(textarea, counter);
+						}
+					}
+				});
+			}
+		};
 
-        commentTextElement.style.display = "none";
-        editCommentFormElement.style.display = "block";
-        editCommentButtonElement.style.display = "none";
-    }
+		const Validator = {
+			/**
+			 * Validate the main post form
+			 * @returns {boolean} - Whether the form is valid
+			 */
+			validatePost() {
+				const text = elements.postText.value.trim();
+
+				if (text === '') {
+					elements.postErrorMessage.textContent = 'Post cannot be empty.';
+					return false;
+				}
+
+				if (text.length < CONFIG.MIN_POST_LENGTH) {
+					elements.postErrorMessage.textContent = `Post must be at least ${CONFIG.MIN_POST_LENGTH} characters.`;
+					return false;
+				}
+
+				elements.postErrorMessage.textContent = '';
+				return true;
+			},
+
+			/**
+			 * Validate a comment form
+			 * @param {HTMLFormElement} form - The comment form
+			 * @returns {boolean} - Whether the form is valid
+			 */
+			validateComment(form) {
+				const textarea = form.querySelector("textarea[name='commentText']");
+				if (!textarea) return false;
+
+				const postId = form.querySelector("input[name='postId']")?.value;
+				if (!postId) return false;
+
+				const errorMessage = document.getElementById(`commentErrorMessage-${postId}`);
+				if (!errorMessage) return false;
+
+				const text = textarea.value.trim();
+
+				if (text === '') {
+					errorMessage.textContent = 'Comment cannot be empty.';
+					return false;
+				}
+
+				if (text.length < CONFIG.MIN_COMMENT_LENGTH) {
+					errorMessage.textContent = `Comment must be at least ${CONFIG.MIN_COMMENT_LENGTH} characters.`;
+					return false;
+				}
+
+				errorMessage.textContent = '';
+				return true;
+			},
+
+			/**
+			 * Validate an edited post form
+			 * @param {HTMLFormElement} form - The edit post form
+			 * @param {string} postId - The post ID
+			 * @returns {boolean} - Whether the form is valid
+			 */
+			validateEditPost(form, postId) {
+				const textarea = form.querySelector(`#editTextarea-${postId}`);
+				if (!textarea) return false;
+
+				const errorMessage = document.getElementById(`editPostErrorMessage-${postId}`);
+				if (!errorMessage) return false;
+
+				const text = textarea.value.trim();
+
+				if (text === '') {
+					errorMessage.textContent = 'Post cannot be empty.';
+					return false;
+				}
+
+				if (text.length < CONFIG.MIN_POST_LENGTH) {
+					errorMessage.textContent = `Post must be at least ${CONFIG.MIN_POST_LENGTH} characters.`;
+					return false;
+				}
+
+				errorMessage.textContent = '';
+				return true;
+			},
+
+			/**
+			 * Validate an edited comment form
+			 * @param {HTMLFormElement} form - The edit comment form
+			 * @param {string} commentId - The comment ID
+			 * @returns {boolean} - Whether the form is valid
+			 */
+			validateEditComment(form, commentId) {
+				const textarea = form.querySelector(`#editTextarea-${commentId}`);
+				if (!textarea) return false;
+
+				const errorMessage = document.getElementById(`editCommentErrorMessage-${commentId}`);
+				if (!errorMessage) return false;
+
+				const text = textarea.value.trim();
+
+				if (text === '') {
+					errorMessage.textContent = 'Comment cannot be empty.';
+					return false;
+				}
+
+				if (text.length < CONFIG.MIN_COMMENT_LENGTH) {
+					errorMessage.textContent = `Comment must be at least ${CONFIG.MIN_COMMENT_LENGTH} characters.`;
+					return false;
+				}
+
+				errorMessage.textContent = '';
+				return true;
+			}
+		};
+
+		const FormHandler = {
+			submitPost() {
+				if (!Validator.validatePost()) return;
+
+				htmx.ajax('POST', '{{ path('app_forum_post') }}', {
+					source: elements.postForm,
+					target: '#postsContainer',
+					swap: 'afterbegin',
+					values: {
+						postText: elements.postText.value
+					}
+				}).then(() => {
+					elements.postForm.reset();
+					elements.postLength.textContent = `0/${CONFIG.MAX_LENGTH}`;
+				});
+			},
+
+			/**
+			 * Submit an edited post if valid
+			 * @param {HTMLFormElement} form - The edit post form
+			 * @param {string} postId - The post ID
+			 */
+			submitEditPost(form, postId) {
+				if (!Validator.validateEditPost(form, postId)) return false;
+
+				const formData = new FormData(form);
+				const url = form.getAttribute('action') ||
+							`{{ path('app_forum_edit', {'id': '0'}) }}`.replace('0', postId);
+
+				htmx.ajax('POST', url, {
+					source: form,
+					target: `#postText-${postId}`,
+					swap: 'outerHTML',
+					values: Object.fromEntries(formData)
+				});
+
+				return false;
+			},
+
+			/**
+			 * Submit an edited comment if valid
+			 * @param {HTMLFormElement} form - The edit comment form
+			 * @param {string} commentId - The comment ID
+			 */
+			submitEditComment(form, commentId) {
+				if (!Validator.validateEditComment(form, commentId)) return false;
+
+				const formData = new FormData(form);
+				const url = form.getAttribute('action') ||
+							`{{ path('comment_edit', {'id': '0'}) }}`.replace('0', commentId);
+
+				htmx.ajax('POST', url, {
+					source: form,
+					target: `#commentText-${commentId}`,
+					swap: 'outerHTML',
+					values: Object.fromEntries(formData)
+				});
+
+				return false;
+			},
+
+			setupCommentForms() {
+				document.querySelectorAll("form[hx-post*='app_forum_comment']").forEach(form => {
+					const postUrl = form.getAttribute('hx-post');
+					const target = form.getAttribute('hx-target');
+					const swap = form.getAttribute('hx-swap');
+
+					form.removeAttribute('hx-post');
+					form.removeAttribute('hx-target');
+					form.removeAttribute('hx-swap');
+					form.removeAttribute('hx-on::after-request');
+
+					const submitBtn = form.querySelector('button[type="submit"]');
+					if (!submitBtn) return;
+
+					submitBtn.type = 'button';
+					submitBtn.addEventListener('click', () => {
+						if (!Validator.validateComment(form)) return;
+
+						const formData = new FormData(form);
+						htmx.ajax('POST', postUrl, {
+							source: form,
+							target: target,
+							swap: swap,
+							values: Object.fromEntries(formData)
+						}).then(() => {
+							form.reset();
+
+							const textarea = form.querySelector('textarea[name="commentText"]');
+							const postId = form.querySelector("input[name='postId']")?.value;
+							if (textarea && postId) {
+								const counter = document.getElementById(`newCommentLength-${postId}`);
+								if (counter) counter.textContent = `0/${CONFIG.MAX_LENGTH}`;
+							}
+						});
+					});
+				});
+			}
+		};
+
+		const UIHandler = {
+			/**
+			 * Toggle post editing UI
+			 * @param {string} postId - The post ID
+			 */
+			togglePostEdit(postId) {
+				const postText = document.getElementById(`postText-${postId}`);
+				const editForm = document.getElementById(`editPostForm-${postId}`);
+				const editButton = document.getElementById(`editButton-${postId}`);
+
+				if (postText) postText.style.display = 'none';
+				if (editForm) editForm.style.display = 'block';
+				if (editButton) editButton.style.display = 'none';
+			},
+
+			/**
+			 * Toggle comment editing UI
+			 * @param {string} commentId - The comment ID
+			 */
+			toggleCommentEdit(commentId) {
+				const commentText = document.getElementById(`commentText-${commentId}`);
+				const editForm = document.getElementById(`editCommentForm-${commentId}`);
+				const editButton = document.getElementById(`editCommentButton-${commentId}`);
+
+				if (commentText) commentText.style.display = 'none';
+				if (editForm) editForm.style.display = 'block';
+				if (editButton) editButton.style.display = 'none';
+			}
+		};
+
+		const ErrorHandler = {
+			handleErrors(event) {
+				try {
+					const response = JSON.parse(event.detail.xhr.responseText);
+					console.error('HTMX error response:', response);
+
+					if (!response.error) return;
+
+					const targetId = event.detail.target.id;
+					let errorElement;
+
+					if (targetId.startsWith('postText-')) {
+						const postId = targetId.split('-')[1];
+						errorElement = document.getElementById(`editPostErrorMessage-${postId}`);
+					} else if (targetId === 'postsContainer') {
+						errorElement = elements.postErrorMessage;
+					} else if (targetId.startsWith('commentText-')) {
+						const commentId = targetId.split('-')[1];
+						errorElement = document.getElementById(`editCommentErrorMessage-${commentId}`);
+					} else if (targetId.startsWith('commentsContainer-')) {
+						const postId = targetId.split('-')[1];
+						errorElement = document.getElementById(`commentErrorMessage-${postId}`);
+					}
+
+					if (errorElement) {
+						const errorMsg = Array.isArray(response.error)
+							? response.error.join(', ')
+							: response.error;
+						errorElement.textContent = errorMsg;
+					}
+				} catch (e) {
+					console.error('Failed to parse error response:', e);
+					console.error('Raw response:', event.detail.xhr.responseText);
+				}
+			}
+		};
+
+		const init = () => {
+			CharacterCounter.initAll();
+
+			FormHandler.setupCommentForms();
+
+			document.addEventListener('htmx:responseError', ErrorHandler.handleErrors);
+
+			document.addEventListener('htmx:afterSwap', () => {
+				CharacterCounter.initAll();
+				FormHandler.setupCommentForms();
+			});
+		};
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', init);
+		} else {
+			init();
+		}
+
+		return {
+			submitPostIfValid: FormHandler.submitPost,
+			submitEditPostIfValid: FormHandler.submitEditPost,
+			submitEditCommentIfValid: FormHandler.submitEditComment,
+			editPost: UIHandler.togglePostEdit,
+			editComment: UIHandler.toggleCommentEdit,
+			validateComment: Validator.validateComment  // Expose this for inline validation
+		};
+	})();
+
+	/**
+	 * Global function to validate comment form (called from inline onsubmit)
+	 * @param {HTMLFormElement} form - The comment form
+	 * @returns {boolean} - Whether the form is valid
+	 */
+	function validateCommentForm(form) {
+		return ForumApp.validateComment(form);
+	}
 </script>
 {% endblock %}
