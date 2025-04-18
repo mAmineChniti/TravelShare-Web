@@ -99,8 +99,8 @@ class Hotels
             throw new \InvalidArgumentException('The telephone number cannot be empty.');
         }
         if ($telephone !== null) {
-            if (strlen($telephone) > 255) {
-                throw new \InvalidArgumentException('The telephone number cannot exceed 255 characters.');
+            if (strlen($telephone) != 8) {
+                throw new \InvalidArgumentException('The telephone number must be 8 characters.');
             }
 
             if (!preg_match('/^[0-9]+$/', $telephone)) {
