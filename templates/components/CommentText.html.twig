@@ -1,0 +1,18 @@
+<div id="commentText-{{ commentId }}">
+    <p class="text-gray-600 mt-2">{{ comment }}</p>
+</div>
+
+<script>
+(function() {
+    const commentId = {{ commentId }};
+    const editCommentFormElement = document.getElementById("editCommentForm-" + commentId);
+    const editCommentButtonElement = document.getElementById("editCommentButton-" + commentId);
+    
+    if (editCommentFormElement) {
+        editCommentFormElement.style.display = "none";
+    }
+    if (editCommentButtonElement) {
+        editCommentButtonElement.style.display = "inline-flex";
+    }
+})();
+</script>

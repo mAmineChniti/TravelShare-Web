@@ -1,89 +1,57 @@
-<div class="bg-gray-100 p-4 rounded-lg">
-	<span class="font-semibold text-gray-800">{{ commenter }}</span>
-	<div id="commentText-{{ commentId }}">
-		<p class="text-gray-600 mt-2">{{ text }}</p>
-	</div>
-	<div id="editCommentForm-{{ commentId }}" style="display: none">
-		<textarea
-			id="editTextarea-{{ commentId }}"
-			class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-		>{{ text }}</textarea>
-	</div>
-	<div class="flex justify-end items-center space-x-2">
-		{% if commenterId == 1 %}
-		<button
-			id="editButton-{{ commentId }}"
-			class="mt-2 px-4 py-2 bg-green-500 hover:bg-green-700 text-white font-semibold rounded-md shadow transition-all cursor-pointer"
-			onclick="editComment('{{ commentId }}')"
-		>
-			<i class="fa fa-edit"></i>
-		</button>
-		<button
-			id="saveButton-{{ commentId }}"
-			class="mt-2 px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-semibold rounded-md shadow transition-all cursor-pointer"
-			style="display: none"
-			hx-post="{{ path('comment_edit', {'id': commentId}) }}"
-			hx-vals='js:{"editTextarea-{{ commentId }}": document.getElementById("editTextarea-{{ commentId }}").value}'
-			hx-swap="innerHTML"
-			hx-target="#commentText-{{ commentId }}"
-			hx-on::before-request="checkCommentText('{{ commentId }}')"
-			hx-on::after-request="hideEditCommentForm('{{ commentId }}')"
-			hx-select="#commentText-{{ commentId }} > *"
-		>
-			<i class="fa fa-save"></i>
-		</button>
-		<form
-			method="post"
-			action="{{ path('comment_delete', {'id': commentId}) }}"
-			onsubmit="return confirm('Are you sure you want to delete this comment?');"
-			class="inline-block"
-		>
-			<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commentId) }}" />
-			<button
-				class="mt-2 px-4 py-2 bg-red-500 hover:bg-red-700 text-white font-semibold rounded-md shadow transition-all cursor-pointer"
-			>
-				<i class="fa fa-trash"></i>
-			</button>
-		</form>
-		{% endif %}
-	</div>
+<div id="comment-{{ comment.commentId }}" class="mb-2 bg-gray-100 p-4 rounded-lg">
+    <span class="font-semibold text-gray-800">{{ comment.name ~ ' ' ~ comment.lastName }}</span>
+    <twig:CommentText
+        commentId="{{ comment.commentId }}"
+        comment="{{ comment.comment }}"
+    />
+    
+    <form
+        hx-post="{{ path('comment_edit', {'id': comment.commentId}) }}"
+        hx-target="#commentText-{{ comment.commentId }}"
+        hx-swap="outerHTML"
+        id="editCommentForm-{{ comment.commentId }}"
+        style="display: none"
+        class="mt-2"
+    >
+        <textarea
+            name="editTextarea-{{ comment.commentId }}"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+        >{{ comment.comment }}</textarea>
+        <div class="flex justify-end mt-2">
+            <button
+                type="submit"
+                class="p-2 w-10 h-10 bg-blue-600 text-white rounded-full shadow hover:bg-blue-700 transition-all cursor-pointer flex items-center justify-center"
+                title="Save changes"
+            >
+                <i class="fa fa-check"></i>
+            </button>
+        </div>
+    </form>
+    
+    <div class="flex justify-end items-center space-x-3 mt-2">
+        <button
+            id="editCommentButton-{{ comment.commentId }}"
+            class="p-2 w-10 h-10 bg-green-500 hover:bg-green-700 text-white rounded-full shadow transition-all cursor-pointer flex items-center justify-center"
+            onclick="editComment('{{ comment.commentId }}')"
+            title="Edit comment"
+        >
+            <i class="fa fa-edit"></i>
+        </button>
+        
+        <form
+            hx-post="{{ path('comment_delete', {'id': comment.commentId}) }}"
+            hx-target="#comment-{{ comment.commentId }}"
+            hx-swap="outerHTML"
+            onsubmit="return confirm('Are you sure you want to delete this comment?');"
+            class="inline-block"
+        >
+            <button
+                type="submit"
+                class="p-2 w-10 h-10 bg-red-500 hover:bg-red-700 text-white rounded-full shadow transition-all cursor-pointer flex items-center justify-center"
+                title="Delete comment"
+            >
+                <i class="fa fa-trash"></i>
+            </button>
+        </form>
+    </div>
 </div>
-<script>
-function editComment(commentId) {
-    const commentTextElement = document.getElementById("commentText-" + commentId);
-    const editTextareaElement = document.getElementById("editTextarea-" + commentId);
-    const editButtonElement = document.getElementById("editButton-" + commentId);
-    const saveButtonElement = document.getElementById("saveButton-" + commentId);
-    const editCommentFormElement = document.getElementById("editCommentForm-" + commentId);
-
-    commentTextElement.style.display = "none";
-    editCommentFormElement.style.display = "block";
-    editTextareaElement.style.display = "block";
-    editButtonElement.style.display = "none";
-    saveButtonElement.style.display = "inline-block";
-}
-
-function checkCommentText(commentId) {
-    const editTextareaElement = document.getElementById("editTextarea-" + commentId);
-    const commentTextElement = document.getElementById("commentText-" + commentId);
-
-    if (editTextareaElement.value.trim() === commentTextElement.textContent.trim()) {
-        return false;
-    }
-    return true;
-}
-
-function hideEditCommentForm(commentId) {
-    const commentTextElement = document.getElementById("commentText-" + commentId);
-    const editTextareaElement = document.getElementById("editTextarea-" + commentId);
-    const editButtonElement = document.getElementById("editButton-" + commentId);
-    const saveButtonElement = document.getElementById("saveButton-" + commentId);
-    const editCommentFormElement = document.getElementById("editCommentForm-" + commentId);
-
-    commentTextElement.style.display = "block";
-    editCommentFormElement.style.display = "none";
-    editTextareaElement.style.display = "none";
-    editButtonElement.style.display = "block";
-    saveButtonElement.style.display = "none";
-}
-</script>

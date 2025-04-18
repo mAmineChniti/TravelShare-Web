@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\PostsRepository;
 use App\Repository\CommentsRepository;
 use App\Repository\LikesRepository;
+use App\Repository\UsersRepository;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Posts;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -31,7 +32,6 @@ final class ForumController extends AbstractController
         }
 
         return $this->render('forum/index.html.twig', [
-            'controller_name' => 'ForumController',
             'posts' => $posts,
         ]);
     }
@@ -39,23 +39,38 @@ final class ForumController extends AbstractController
     #[Route('/forum/post', name: 'app_forum_post', methods: ['POST'])]
     public function post(
         Request $request,
-        PostsRepository $postsRepository
+        PostsRepository $postsRepository,
+        UsersRepository $userRepository
     ): Response {
         $postText = $request->request->get('postText');
-
-        if (empty($postText)) {
-            return $this->redirectToRoute('app_forum');
+        $userId = 1;
+        if (empty($postText) || strlen(trim($postText)) < 10) {
+            return new JsonResponse(['error' => 'Post must be at least 10 characters long.'], 400);
         }
 
         $post = new Posts();
         $post->setTextContent($postText);
-        $post->setOwnerId(1);
-        $post->setCreatedAt(new \DateTimeImmutable(date('Y-m-d H:i:s')));
-        $post->setUpdatedAt(new \DateTimeImmutable(date('Y-m-d H:i:s')));
+        $post->setOwnerId($userId);
+        $post->setCreatedAt(new \DateTimeImmutable());
+        $post->setUpdatedAt(new \DateTimeImmutable());
 
         $postsRepository->add($post);
 
-        return $this->redirectToRoute('app_forum');
+        $user = $userRepository->find($userId);
+
+        $postData = [
+            'postId' => $post->getPostId(),
+            'name' => $user ? $user->getName() : 'User',
+            'lastName' => $user ? $user->getLastName() : 'Name',
+            'textContent' => $post->getTextContent(),
+            'isLiked' => false,
+            'likesCount' => 0,
+            'comments' => []
+        ];
+
+        return $this->render('components/Post.html.twig', [
+            'post' => $postData
+        ]);
     }
 
     #[Route('/forum/edit/{id}', name: 'app_forum_edit', methods: ['POST'])]
@@ -65,34 +80,29 @@ final class ForumController extends AbstractController
         int $id
     ): Response {
         $post = $postsRepository->find($id);
+
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id ' . $id);
+            return new JsonResponse(['error' => 'Post not found.'], 404);
         }
 
         if ($post->getOwnerId() !== 1) {
-            throw new AccessDeniedException('You are not allowed to edit this post.');
+            return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
         $postText = $request->request->get('editTextarea-' . $id);
 
-        if ($postText === null || empty(trim($postText))) {
-            $html = sprintf(
-                '<div id="postText-%s"><p class="text-gray-600 mt-2">%s</p></div>',
-                $id,
-                htmlspecialchars($postText)
-            );
-            return new Response($html);
+        if (empty($postText) || strlen(trim($postText)) < 10) {
+            return new JsonResponse(['error' => 'Post must be at least 10 characters long.'], 400);
         }
 
         $post->setTextContent($postText);
         $post->setUpdatedAt(new \DateTimeImmutable());
         $postsRepository->update($post);
-        $html = sprintf(
-            '<div id="postText-%s"><p class="text-gray-600 mt-2">%s</p></div>',
-            $id,
-            htmlspecialchars($postText)
-        );
-        return new Response($html);
+
+        return $this->render('components/PostText.html.twig', [
+            'postId' => $post->getPostId(),
+            'textContent' => $post->getTextContent()
+        ]);
     }
 
     #[Route('/forum/delete/{id}', name: 'app_forum_delete', methods: ['POST'])]
@@ -111,11 +121,9 @@ final class ForumController extends AbstractController
             throw new AccessDeniedException('You are not allowed to delete this post.');
         }
 
-        if ($this->isCsrfTokenValid('delete' . $post->getPostId(), $request->request->get('_token'))) {
-            $postsRepository->delete($id);
-        }
+        $postsRepository->delete($id);
 
-        return $this->redirectToRoute('app_forum');
+        return new Response('', Response::HTTP_OK);
     }
 
     #[Route('/forum/like', name: 'app_forum_like', methods: ['POST'])]
@@ -157,25 +165,39 @@ final class ForumController extends AbstractController
     public function comment(
         Request $request,
         CommentsRepository $commentsRepository,
+        UsersRepository $userRepository
     ): Response {
         $postId = $request->request->get('postId');
         $commentText = $request->request->get('commentText');
         $userId = 1;
-
-        if (empty($postId) || empty($commentText)) {
-            return new JsonResponse(['success' => false, 'message' => 'Post ID or comment text is missing'], 400);
+        if (empty($commentText) || strlen(trim($commentText)) < 10 || strlen(trim($commentText)) > 255) {
+            return new JsonResponse(['error' => 'Comment must be between 10 and 255 characters.'], 400);
         }
 
         $comment = new Comments();
         $comment->setPostId($postId);
         $comment->setCommenterId($userId);
         $comment->setComment($commentText);
-        $comment->setCommentedAt(new \DateTimeImmutable(date('Y-m-d H:i:s')));
-        $comment->setUpdatedAt(new \DateTimeImmutable(date('Y-m-d H:i:s')));
+        $comment->setCommentedAt(new \DateTimeImmutable());
+        $comment->setUpdatedAt(new \DateTimeImmutable());
 
         $commentsRepository->add($comment);
 
-        return $this->redirectToRoute('app_forum');
+        $user = $userRepository->find($userId);
+
+        $commentData = [
+            'commentId' => $comment->getCommentId(),
+            'comment' => $comment->getComment(),
+            'commentedAt' => $comment->getCommentedAt(),
+            'updatedAt' => $comment->getUpdatedAt(),
+            'name' => $user ? $user->getName() : 'User',
+            'lastName' => $user ? $user->getLastName() : 'Name',
+            'commenterId' => $comment->getCommenterId()
+        ];
+
+        return $this->render('components/Comment.html.twig', [
+            'comment' => $commentData
+        ]);
     }
 
     #[Route('/forum/delete/comment/{id}', name: 'comment_delete', methods: ['POST'])]
@@ -194,11 +216,9 @@ final class ForumController extends AbstractController
             throw new AccessDeniedException('You are not allowed to delete this comment.');
         }
 
-        if ($this->isCsrfTokenValid('delete' . $comment->getCommentId(), $request->request->get('_token'))) {
-            $commentsRepository->delete($id);
-        }
+        $commentsRepository->delete($id);
 
-        return $this->redirectToRoute('app_forum');
+        return new Response('', Response::HTTP_OK);
     }
 
     #[Route('/forum/edit/comment/{id}', name: 'comment_edit', methods: ['POST'])]
@@ -208,33 +228,56 @@ final class ForumController extends AbstractController
         int $id
     ): Response {
         $comment = $commentsRepository->find($id);
+
         if (!$comment) {
-            throw $this->createNotFoundException('No comment found for id ' . $id);
+            return new JsonResponse(['error' => 'Comment not found.'], 404);
         }
 
         if ($comment->getCommenterId() !== 1) {
-            throw new AccessDeniedException('You are not allowed to edit this comment.');
+            return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
         $commentText = $request->request->get('editTextarea-' . $id);
 
-        if ($commentText === null || empty(trim($commentText))) {
-            $html = sprintf(
-                '<div id="commentText-%s"><p class="text-gray-600 mt-2">%s</p></div>',
-                $id,
-                htmlspecialchars($commentText)
-            );
-            return new Response($html);
+        if (empty($commentText) || strlen(trim($commentText)) < 10 || strlen(trim($commentText)) > 255) {
+            return new JsonResponse(['error' => 'Comment must be between 10 and 255 characters.'], 400);
         }
 
         $comment->setComment($commentText);
         $comment->setUpdatedAt(new \DateTimeImmutable());
         $commentsRepository->update($comment);
-        $html = sprintf(
-            '<div id="commentText-%s"><p class="text-gray-600 mt-2">%s</p></div>',
-            $id,
-            htmlspecialchars($commentText)
-        );
-        return new Response($html);
+
+        return $this->render('components/CommentText.html.twig', [
+            'commentId' => $comment->getCommentId(),
+            'comment' => $comment->getComment()
+        ]);
+    }
+
+    #[Route('/dashboard/forum', name: 'app_dashboard_forum')]
+    public function dashboard(
+        PostsRepository $postsRepository,
+        CommentsRepository $commentsRepository,
+        LikesRepository $likesRepository,
+        UsersRepository $usersRepository
+    ): Response {
+        $posts = $postsRepository->fetchPosts(1,10, 1);
+        
+        foreach ($posts as &$post) {
+            $user = $usersRepository->find($post['ownerId']);
+            $post['ownerName'] = $user ? $user->getName() . ' ' . $user->getLastName() : 'Unknown User';
+            
+            $comments = $commentsRepository->fetchById($post['postId']);
+            
+            foreach ($comments as &$comment) {
+                $commenter = $usersRepository->find($comment['commenterId']);
+                $comment['commenterName'] = $commenter ? $commenter->getName() . ' ' . $commenter->getLastName() : 'Unknown User';
+            }
+            
+            $post['comments'] = $comments;
+        }
+
+        return $this->render('dashboard/forum/index.html.twig', [
+            'posts' => $posts,
+        ]);
     }
 }

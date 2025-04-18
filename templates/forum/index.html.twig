@@ -1,17 +1,97 @@
-{% extends 'base.html.twig' %} {% block title %} Forum {% endblock %} {% block body %}
+{% extends 'base.html.twig' %}
+
+{% block title %}Forum{% endblock %}
+
+{% block body %}
 <div class="container mx-auto px-4 py-16">
-	{% include 'components/PostForm.html.twig' %} {% for post in posts %}
-	<div class="mb-10">
-		<twig:Post
-			postId="{{ post.postId }}"
-			posterName="{{ post.name ~ ' ' ~ post.lastName }}"
-			text="{{ post.textContent }}"
-			comments="{{ post.comments }}"
-			likesCount="{{ post.likesCount }}"
-			isLiked="{{ post.isLiked }}"
-			ownerId="{{ post.ownerId }}"
-		/>
-	</div>
-	{% endfor %}
+    <!-- Post Form -->
+    <form
+        hx-post="{{ path('app_forum_post') }}"
+        hx-target="#postsContainer"
+        hx-swap="afterbegin"
+        hx-on::after-request="if(event.detail.successful) this.reset()"
+        id="postForm"
+        onsubmit="return validatePostForm(this);"
+    >
+        <textarea
+            name="postText"
+            id="postText"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            placeholder="Write a post..."
+        ></textarea>
+        <p id="postErrorMessage" class="text-red-500 text-sm mt-2"></p>
+        <div class="flex justify-end">
+            <button
+                type="submit"
+                class="mt-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow hover:bg-blue-700 transition-all cursor-pointer"
+            >
+                Post
+            </button>
+        </div>
+    </form>
+
+    <div id="postsContainer" class="mt-8">
+        {% for post in posts %}
+            <twig:Post post="{{ post }}" />
+        {% endfor %}
+    </div>
 </div>
+
+<script>
+    function validatePostForm(form) {
+        const textarea = form.querySelector("textarea[name='postText']");
+        const errorMessage = form.querySelector("p#postErrorMessage");
+
+        if (textarea.value.trim() === "") {
+            errorMessage.textContent = "Post cannot be empty.";
+            return false;
+        }
+        if(textarea.value.trim().length < 10 || textarea.value.trim().length > 255) {
+            errorMessage.textContent = "Post must be between 10 and 255 characters.";
+            return false;
+        }
+
+        errorMessage.textContent = "";
+        return true;
+    }
+
+    function validateCommentForm(form) {
+        const textarea = form.querySelector("textarea[name='commentText']");
+        const errorMessage = form.querySelector("p[id^='commentErrorMessage']");
+        const commentText = textarea.value.trim();
+
+        if (commentText === "") {
+            errorMessage.textContent = "Comment cannot be empty.";
+            return false;
+        }
+        
+        if (commentText.length < 10 || commentText.length > 255) {
+            errorMessage.textContent = "Comment must be between 10 and 255 characters.";
+            return false;
+        }
+
+        errorMessage.textContent = "";
+        return true;
+    }
+
+    function editPost(postId) {
+        const postTextElement = document.getElementById("postText-" + postId);
+        const editPostFormElement = document.getElementById("editPostForm-" + postId);
+        const editButtonElement = document.getElementById("editButton-" + postId);
+
+        postTextElement.style.display = "none";
+        editPostFormElement.style.display = "block";
+        editButtonElement.style.display = "none";
+    }
+
+    function editComment(commentId) {
+        const commentTextElement = document.getElementById("commentText-" + commentId);
+        const editCommentFormElement = document.getElementById("editCommentForm-" + commentId);
+        const editCommentButtonElement = document.getElementById("editCommentButton-" + commentId);
+
+        commentTextElement.style.display = "none";
+        editCommentFormElement.style.display = "block";
+        editCommentButtonElement.style.display = "none";
+    }
+</script>
 {% endblock %}
