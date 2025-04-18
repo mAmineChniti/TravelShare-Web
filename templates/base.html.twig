@@ -1,23 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="description" content="TravelShare - Your one-stop destination for travel planning.">
-        <meta name="keywords" content="travel, flights, hotels, excursions, forums">
-        <title>{% block title %}Welcome!{% endblock title %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
-        {% endblock stylesheets %}
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-        {% endblock javascripts %}
-    </head>
-    <body class="min-h-screen">
-        {% include "components/navbar.html.twig" %}
-        <main class="pt-25 pb-10 w-full bg-background text-primary-foreground">
-            {% block body %}{% endblock body %}
-        </main>
-        {% include "components/footer.html.twig" %}
-    </body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="TravelShare - Your one-stop destination for travel planning." />
+		<meta name="keywords" content="travel, flights, hotels, excursions, forums" />
+		<title>{% block title %} Welcome! {% endblock %}</title>
+		<link
+			rel="icon"
+			href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>"
+		/>
+		<script
+			src="https://unpkg.com/htmx.org@2.0.4"
+			integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
+			crossorigin="anonymous"
+		></script>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+			integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+		{% block stylesheets %} {{ encore_entry_link_tags('app') }} {% endblock %} {% block javascripts %} {{
+		encore_entry_script_tags('app') }} {% endblock %}
+	</head>
+	<body class="min-h-screen">
+		{% include 'components/Navbar.html.twig' %}
+		<main class="pt-25 pb-10 w-full bg-background text-primary-foreground">{% block body %} {% endblock %}</main>
+		{% include 'components/Footer.html.twig' %}
+	</body>
 </html>
