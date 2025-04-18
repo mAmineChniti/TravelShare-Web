@@ -9,59 +9,74 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\ReservationHotelRepository;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Validator\Constraints\Date;
 
 class ReservationHotelController extends AbstractController
 {
     #[Route('/room/reserve/{roomId}', name: 'room_reserve', methods: ['POST'])]
-    public function reserveRoom(int $roomId, Request $request, ChambresRepository $chambresRepository, ReservationHotelRepository $reservationHotelRepository): Response
-    {
+    public function reserveRoom(
+        int $roomId,
+        Request $request,
+        ChambresRepository $chambresRepository,
+        ReservationHotelRepository $reservationHotelRepository
+    ): Response {
         $room = $chambresRepository->find($roomId);
-        $today = new Date();
         if (!$room) {
             throw $this->createNotFoundException('Room not found');
         }
 
-        $startReservation = $request->request->get('startReservation');
-        $endReservation = $request->request->get('endReservation');
+        $today = new \DateTime('today');
 
-        if (!$startReservation || !$endReservation) {
+        $startStr = $request->request->get('startReservation');
+        $endStr   = $request->request->get('endReservation');
+
+        if (!$startStr || !$endStr) {
             $this->addFlash('error', 'Please provide both start and end dates for the reservation.');
             return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
         }
 
-        if (new \DateTime($startReservation) < $today) {
+        try {
+            $start = new \DateTime($startStr);
+            $end   = new \DateTime($endStr);
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Invalid date format.');
+            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
+        }
+
+        // 1) Start date cannot be in the past
+        if ($start < $today) {
             $this->addFlash('error', 'Start date cannot be in the past.');
             return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
         }
 
-        if (new \DateTime($endReservation) < $today) {
+        // 2) End date cannot be in the past
+        if ($end < $today) {
             $this->addFlash('error', 'End date cannot be in the past.');
             return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
         }
 
-        if (new \DateTime($startReservation) >= new \DateTime($endReservation)) {
+        // 3) Start must be before end
+        if ($start >= $end) {
             $this->addFlash('error', 'Start date must be before end date.');
             return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
         }
 
         try {
+            $duration = $end->diff($start)->days;
             $reservation = new ReservationHotel();
             $reservation->setClientId(1);
             $reservation->setChambreId($roomId);
-            $reservation->setDateDebut(new \DateTime($startReservation));
-            $reservation->setDateFin(new \DateTime($endReservation));
+            $reservation->setDateDebut($start);
+            $reservation->setDateFin($end);
             $reservation->setStatusEnu('Pending');
-            $reservation->setPrixTotale($room->getPrixParNuit() * (new \DateTime($endReservation))->diff(new \DateTime($startReservation))->days);
+            $reservation->setPrixTotale($room->getPrixParNuit() * $duration);
 
             $reservationHotelRepository->add($reservation);
 
             $this->addFlash('success', 'Room reserved successfully!');
-            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
         } catch (\Exception $e) {
             $this->addFlash('error', 'An error occurred while reserving the room: ' . $e->getMessage());
-            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
         }
+
+        return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
     }
 }
