@@ -2,44 +2,44 @@
 
 namespace App\Entity;
 
-use App\Repository\UsersRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UsersRepository;
 
 #[ORM\Table(name: 'users')]
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
 class Users
 {
-    #[ORM\Column(name: "user_id")]
+    #[ORM\Column(name: 'user_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $userId = null;
 
-    #[ORM\Column(name: "name", length: 50)]
+    #[ORM\Column(name: 'name', length: 50)]
     private ?string $name = null;
 
-    #[ORM\Column(name: "last_name", length: 50)]
+    #[ORM\Column(name: 'last_name', length: 50)]
     private ?string $lastName = null;
 
-    #[ORM\Column(name: "email", length: 50)]
+    #[ORM\Column(name: 'email', length: 50)]
     private ?string $email = null;
 
-    #[ORM\Column(name: "password", length: 255)]
+    #[ORM\Column(name: 'password', length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(name: "phone_num")]
+    #[ORM\Column(name: 'phone_num')]
     private ?int $phoneNum = null;
 
-    #[ORM\Column(name: "address", length: 150)]
+    #[ORM\Column(name: 'address', length: 150)]
     private ?string $address = null;
 
-    #[ORM\Column(name: "role", nullable: true, options: ["default" => 0])]
+    #[ORM\Column(name: 'role', nullable: true, options: ['default' => 0])]
     private ?int $role = 0;
 
-    #[ORM\Column(name: "photo", type: Types::BLOB, nullable: true)]
-    private $photo = null;
+    #[ORM\Column(name: 'photo', type: Types::BLOB, nullable: true)]
+    private $photo;
 
-    #[ORM\Column(name: "compte", nullable: true, options: ["default" => 0])]
+    #[ORM\Column(name: 'compte', nullable: true, options: ['default' => 0])]
     private ?int $compte = 0;
 
     public function getUserId(): ?int

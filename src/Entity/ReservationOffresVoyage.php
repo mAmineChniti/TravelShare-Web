@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\ReservationOffresVoyageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ReservationOffresVoyageRepository;
 
 #[ORM\Table(name: 'reservation_offres_voyage')]
 #[ORM\Index(name: 'fk_client', columns: ['client_id'])]
@@ -12,27 +12,27 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ReservationOffresVoyageRepository::class)]
 class ReservationOffresVoyage
 {
-    #[ORM\Column(name: "reservation_id")]
+    #[ORM\Column(name: 'reservation_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $reservationId = null;
 
-    #[ORM\Column(name: "client_id")]
+    #[ORM\Column(name: 'client_id')]
     private ?int $clientId = null;
 
-    #[ORM\Column(name: "offre_id")]
+    #[ORM\Column(name: 'offre_id')]
     private ?int $offreId = null;
 
-    #[ORM\Column(name: "date_reserved", type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'date_reserved', type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateReserved = null;
 
-    #[ORM\Column(name: "status")]
+    #[ORM\Column(name: 'status')]
     private ?int $status = null;
 
-    #[ORM\Column(name: "nbr_place")]
+    #[ORM\Column(name: 'nbr_place')]
     private ?int $nbrPlace = null;
 
-    #[ORM\Column(name: "prix")]
+    #[ORM\Column(name: 'prix')]
     private ?float $prix = null;
 
     public function getReservationId(): ?int

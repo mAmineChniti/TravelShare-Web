@@ -2,39 +2,39 @@
 
 namespace App\Entity;
 
-use App\Repository\ExcursionsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ExcursionsRepository;
 
 #[ORM\Table(name: 'excursions')]
 #[ORM\Index(name: 'fk_id_guide', columns: ['guide_id'])]
 #[ORM\Entity(repositoryClass: ExcursionsRepository::class)]
 class Excursions
 {
-    #[ORM\Column(name: "excursion_id")]
+    #[ORM\Column(name: 'excursion_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $excursionId = null;
 
-    #[ORM\Column(name: "guide_id")]
+    #[ORM\Column(name: 'guide_id')]
     private ?int $guideId = null;
 
-    #[ORM\Column(name: "title", length: 50)]
+    #[ORM\Column(name: 'title', length: 50)]
     private ?string $title = null;
 
-    #[ORM\Column(name: "description", length: 255)]
+    #[ORM\Column(name: 'description', length: 255)]
     private ?string $description = null;
 
-    #[ORM\Column(name: "date_excursion", type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'date_excursion', type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateExcursion = null;
 
-    #[ORM\Column(name: "date_fin", type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'date_fin', type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateFin = null;
 
-    #[ORM\Column(name: "image", type: Types::BLOB)]
-    private $image = null;
+    #[ORM\Column(name: 'image', type: Types::BLOB)]
+    private $image;
 
-    #[ORM\Column(name: "prix")]
+    #[ORM\Column(name: 'prix')]
     private ?float $prix = null;
 
     public function getExcursionId(): ?int

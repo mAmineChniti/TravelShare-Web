@@ -2,35 +2,34 @@
 
 namespace App\Entity;
 
-use App\Repository\GuidesRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\GuidesRepository;
 
 #[ORM\Table(name: 'guides')]
 #[ORM\Entity(repositoryClass: GuidesRepository::class)]
 class Guides
 {
-    #[ORM\Column(name: "guide_id")]
+    #[ORM\Column(name: 'guide_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $guideId = null;
 
-    #[ORM\Column(name: "name", length: 50)]
+    #[ORM\Column(name: 'name', length: 50)]
     private ?string $name = null;
 
-    #[ORM\Column(name: "last_name", length: 50)]
+    #[ORM\Column(name: 'last_name', length: 50)]
     private ?string $lastName = null;
 
-    #[ORM\Column(name: "email", length: 50)]
+    #[ORM\Column(name: 'email', length: 50)]
     private ?string $email = null;
 
-    #[ORM\Column(name: "phone_num", length: 50)]
+    #[ORM\Column(name: 'phone_num', length: 50)]
     private ?string $phoneNum = null;
 
-    #[ORM\Column(name: "language", length: 50)]
+    #[ORM\Column(name: 'language', length: 50)]
     private ?string $language = null;
 
-    #[ORM\Column(name: "experience")]
+    #[ORM\Column(name: 'experience')]
     private ?int $experience = null;
 
     public function getGuideId(): ?int

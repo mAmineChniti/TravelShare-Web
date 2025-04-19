@@ -3,8 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Posts;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 class PostsRepository extends ServiceEntityRepository
 {
@@ -37,7 +37,7 @@ class PostsRepository extends ServiceEntityRepository
             throw new \Exception('Post not found');
         }
         $existingPost->setTextContent($post->getTextContent());
-        $existingPost->setUpdatedAt(new \DateTimeImmutable(date('Y-m-d H:i:s')));
+        $existingPost->setUpdatedAt(new \DateTime());
         $entityManager->persist($existingPost);
         $entityManager->flush();
     }

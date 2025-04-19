@@ -25,8 +25,8 @@
 		encore_entry_script_tags('app') }} {% endblock %}
 	</head>
 	<body class="min-h-screen">
-		{% include 'components/Navbar.html.twig' %}
-		<main class="pt-25 pb-10 w-full bg-background text-primary-foreground">{% block body %} {% endblock %}</main>
-		{% include 'components/Footer.html.twig' %}
+		<twig:Navbar />
+		<main class="pt-20 pb-10 w-full bg-background text-primary-foreground">{% block body %} {% endblock %}</main>
+		<twig:Footer />
 	</body>
 </html>
