@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
+use App\Repository\HotelsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\HotelsRepository;
+use App\Entity\Chambres;
 
 #[ORM\Table(name: 'hotels')]
 #[ORM\Entity(repositoryClass: HotelsRepository::class)]
@@ -30,6 +33,19 @@ class Hotels
     #[ORM\Column(name: 'image_h', type: Types::BLOB)]
     private $imageH;
 
+    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: Chambres::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    private Collection $chambres;
+
+    public function __construct()
+    {
+        $this->chambres = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->hotelId;
+    }
+
     public function getHotelId(): ?int
     {
         return $this->hotelId;
@@ -42,8 +58,15 @@ class Hotels
 
     public function setNom(string $nom): static
     {
-        $this->nom = $nom;
+        if (empty($nom)) {
+            throw new \InvalidArgumentException('The name cannot be empty.');
+        }
 
+        if (strlen($nom) > 255) {
+            throw new \InvalidArgumentException('The name cannot exceed 255 characters.');
+        }
+
+        $this->nom = $nom;
         return $this;
     }
 
@@ -54,8 +77,14 @@ class Hotels
 
     public function setAdress(?string $adress): static
     {
-        $this->adress = $adress;
+        if ($adress !== null && strlen($adress) > 255) {
+            throw new \InvalidArgumentException('The address cannot exceed 255 characters.');
+        }
+        if(empty($adress)){
+            throw new \InvalidArgumentException('The address cannot be empty.');
+        }
 
+        $this->adress = $adress;
         return $this;
     }
 
@@ -66,8 +95,20 @@ class Hotels
 
     public function setTelephone(?string $telephone): static
     {
-        $this->telephone = $telephone;
+        if ($telephone === '') {
+            throw new \InvalidArgumentException('The telephone number cannot be empty.');
+        }
+        if ($telephone !== null) {
+            if (strlen($telephone) != 8) {
+                throw new \InvalidArgumentException('The telephone number must be 8 characters.');
+            }
 
+            if (!preg_match('/^[0-9]+$/', $telephone)) {
+                throw new \InvalidArgumentException('Invalid phone number format. Only numbers are allowed.');
+            }
+        }
+
+        $this->telephone = $telephone;
         return $this;
     }
 
@@ -78,8 +119,11 @@ class Hotels
 
     public function setCapaciteTotale(int $capaciteTotale): static
     {
-        $this->capaciteTotale = $capaciteTotale;
+        if ($capaciteTotale <= 0) {
+            throw new \InvalidArgumentException('The total capacity must be more than 0.');
+        }
 
+        $this->capaciteTotale = $capaciteTotale;
         return $this;
     }
 
@@ -91,6 +135,31 @@ class Hotels
     public function setImageH($imageH): static
     {
         $this->imageH = $imageH;
+        return $this;
+    }
+
+    public function getChambres(): Collection
+    {
+        return $this->chambres;
+    }
+
+    public function addChambre(Chambres $chambre): static
+    {
+        if (!$this->chambres->contains($chambre)) {
+            $this->chambres[] = $chambre;
+            $chambre->setHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChambre(Chambres $chambre): static
+    {
+        if ($this->chambres->removeElement($chambre)) {
+            if ($chambre->getHotel() === $this) {
+                $chambre->setHotel(null);
+            }
+        }
 
         return $this;
     }

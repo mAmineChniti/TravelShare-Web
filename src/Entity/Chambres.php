@@ -15,9 +15,10 @@ class Chambres
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $chambreId = null;
-
-    #[ORM\Column(name: 'hotel_id')]
-    private ?int $hotelId = null;
+  
+    #[ORM\ManyToOne(targetEntity: Hotels::class)]
+    #[ORM\JoinColumn(name: "hotel_id", referencedColumnName: "hotel_id", nullable: false)]
+    private ?Hotels $hotel = null;
 
     #[ORM\Column(name: 'numero_chambre', length: 255)]
     private ?string $numeroChambre = null;
@@ -36,15 +37,14 @@ class Chambres
         return $this->chambreId;
     }
 
-    public function getHotelId(): ?int
+    public function getHotel(): ?Hotels
     {
-        return $this->hotelId;
+        return $this->hotel;
     }
 
-    public function setHotelId(int $hotelId): static
+    public function setHotel(?Hotels $hotel): static
     {
-        $this->hotelId = $hotelId;
-
+        $this->hotel = $hotel;
         return $this;
     }
 
@@ -55,8 +55,10 @@ class Chambres
 
     public function setNumeroChambre(string $numeroChambre): static
     {
+        if (empty($numeroChambre)) {
+            throw new \InvalidArgumentException('Room number cannot be empty.');
+        }
         $this->numeroChambre = $numeroChambre;
-
         return $this;
     }
 
@@ -67,8 +69,10 @@ class Chambres
 
     public function setTypeEnu(string $typeEnu): static
     {
+        if (empty($typeEnu)) {
+            throw new \InvalidArgumentException('Room type cannot be empty.');
+        }
         $this->typeEnu = $typeEnu;
-
         return $this;
     }
 
@@ -79,8 +83,10 @@ class Chambres
 
     public function setPrixParNuit(string $prixParNuit): static
     {
+        if (!is_numeric($prixParNuit) || $prixParNuit <= 0) {
+            throw new \InvalidArgumentException('Price per night must be a positive number.');
+        }
         $this->prixParNuit = $prixParNuit;
-
         return $this;
     }
 
@@ -91,8 +97,10 @@ class Chambres
 
     public function setDisponible(int $disponible): static
     {
+        if (!in_array($disponible, [0, 1], true)) {
+            throw new \InvalidArgumentException('Availability must be either 0 (No) or 1 (Yes).');
+        }
         $this->disponible = $disponible;
-
         return $this;
     }
 }
