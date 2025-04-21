@@ -2,33 +2,33 @@
 
 namespace App\Entity;
 
-use App\Repository\HotelsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\HotelsRepository;
 
 #[ORM\Table(name: 'hotels')]
 #[ORM\Entity(repositoryClass: HotelsRepository::class)]
 class Hotels
 {
-    #[ORM\Column(name: "hotel_id")]
+    #[ORM\Column(name: 'hotel_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $hotelId = null;
 
-    #[ORM\Column(name: "nom", length: 255)]
+    #[ORM\Column(name: 'nom', length: 255)]
     private ?string $nom = null;
 
-    #[ORM\Column(name: "adress", type: Types::TEXT, nullable: true)]
+    #[ORM\Column(name: 'adress', type: Types::TEXT, nullable: true)]
     private ?string $adress = null;
 
-    #[ORM\Column(name: "telephone", length: 255, nullable: true)]
+    #[ORM\Column(name: 'telephone', length: 255, nullable: true)]
     private ?string $telephone = null;
 
-    #[ORM\Column(name: "capacite_totale")]
+    #[ORM\Column(name: 'capacite_totale')]
     private ?int $capaciteTotale = null;
 
-    #[ORM\Column(name: "image_h", type: Types::BLOB)]
-    private $imageH = null;
+    #[ORM\Column(name: 'image_h', type: Types::BLOB)]
+    private $imageH;
 
     public function getHotelId(): ?int
     {

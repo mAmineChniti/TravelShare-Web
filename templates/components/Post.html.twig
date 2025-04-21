@@ -1,183 +1,145 @@
-<div class="bg-white shadow rounded-lg p-6">
+<div id="post-{{ post.postId }}" class="mb-10 bg-white shadow rounded-lg p-6">
 	<div class="mb-4">
-		<span class="font-semibold text-gray-800 text-lg">{{ posterName }}</span>
-		<div id="postText-{{ postId }}">
-			<p class="text-gray-600 mt-2">{{ text }}</p>
-		</div>
-		<div id="editPostForm-{{ postId }}" style="display: none">
-			<textarea
-				id="editTextarea-{{ postId }}"
-				class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+		<span class="font-semibold text-gray-800 text-lg">{{ post.name ~ ' ' ~ post.lastName }}</span>
+		<twig:PostText postId="{{ post.postId }}" textContent="{{ post.textContent }}" />
+		<form
+			id="editPostForm-{{ post.postId }}"
+			style="display: none"
+			class="mt-2"
+			action="{{ path('app_forum_edit', {'id': post.postId}) }}"
+			onsubmit="return false;"
+		>
+			<div class="relative">
+				<textarea
+					name="editTextarea-{{ post.postId }}"
+					id="editTextarea-{{ post.postId }}"
+					class="w-full p-3 pb-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+					maxlength="255"
+				>
+{{ post.textContent }}</textarea
+				>
+				<span
+					id="editPostLength-{{ post.postId }}"
+					class="absolute bottom-2 left-3 text-sm text-gray-400 pointer-events-none"
+					>{{ post.textContent|length }}/255</span
+				>
+			</div>
+			<p id="editPostErrorMessage-{{ post.postId }}" class="text-red-500 text-sm mt-2"></p>
+			<div class="flex justify-end mt-2">
+				<button
+					type="button"
+					onclick="ForumApp.submitEditPostIfValid(this.form, {{ post.postId }})"
+					class="p-2 w-10 h-10 bg-blue-600 text-white rounded-full shadow hover:bg-blue-700 transition-all cursor-pointer flex items-center justify-center"
+					title="Save changes"
+				>
+					<i class="fa fa-check"></i>
+				</button>
+			</div>
+		</form>
+
+		<div class="flex justify-end items-center space-x-3 mt-2">
+			<button
+				id="editButton-{{ post.postId }}"
+				class="p-2 w-10 h-10 bg-green-500 hover:bg-green-700 text-white rounded-full shadow transition-all cursor-pointer flex items-center justify-center"
+				onclick="ForumApp.editPost('{{ post.postId }}')"
+				title="Edit post"
 			>
-{{ text }}</textarea
+				<i class="fa fa-edit"></i>
+			</button>
+
+			<form
+				hx-post="{{ path('app_forum_delete', {'id': post.postId}) }}"
+				hx-target="#post-{{ post.postId }}"
+				hx-swap="outerHTML"
+				onsubmit="return confirm('Are you sure you want to delete this post?');"
+				class="inline-block"
 			>
-		</div>
-		<div class="flex justify-end items-center space-x-2">
-			<div id="likeContainer-{{ postId }}">
-				<button
-					id="likeButton-{{ postId }}"
-					class="mt-2 px-4 py-2 {% if isLiked %}bg-red-600 hover:bg-red-700{% else %}bg-blue-600 hover:bg-blue-700{% endif %} text-white font-semibold rounded-md shadow transition-all cursor-pointer"
-					hx-post="/forum/like"
-					hx-target="#likeContainer-{{ postId }}"
-					hx-swap="outerHTML"
-					hx-vals='{"postId": "{{ postId }}"}'
-				>
-					<span id="likesCounter-{{ postId }}"
-						>{{ likesCount }} <i class="fa fa-{% if isLiked %}thumbs-down{% else %}thumbs-up{% endif %}"></i
-					></span>
-				</button>
-			</div>
-			{% if ownerId == 1 %}
-			<div class="flex space-x-2">
-				<button
-					id="editButton-{{ postId }}"
-					class="mt-2 px-4 py-2 bg-green-500 hover:bg-green-700 text-white font-semibold rounded-md shadow transition-all cursor-pointer"
-					onclick="editPost('{{ postId }}')"
-				>
-					<i class="fa fa-edit"></i>
-				</button>
-				<button
-					id="saveButton-{{ postId }}"
-					class="mt-2 px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white font-semibold rounded-md shadow transition-all cursor-pointer"
-					style="display: none"
-					hx-post="{{ path('app_forum_edit', {'id': postId}) }}"
-					hx-vals='js:{"editTextarea-{{ postId }}": document.getElementById("editTextarea-{{ postId }}").value}'
-					hx-swap="innerHTML"
-					hx-target="#postText-{{ postId }}"
-					hx-on::before-request="checkPostText('{{ postId }}')"
-					hx-on::after-request="hideEditForm('{{ postId }}')"
-					hx-select="#postText-{{ postId }} > *"
-				>
-					<i class="fa fa-save"></i>
-				</button>
-				<form
-					method="post"
-					action="{{ path('app_forum_delete', {'id': postId}) }}"
-					onsubmit="return confirm('Are you sure you want to delete this post?');"
-					class="inline-block"
-				>
-					<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ postId) }}" />
-					<button
-						class="mt-2 px-4 py-2 bg-red-500 hover:bg-red-700 text-white font-semibold rounded-md shadow transition-all cursor-pointer"
-					>
-						<i class="fa fa-trash"></i>
-					</button>
-				</form>
-			</div>
-			{% endif %}
-		</div>
-	</div>
-	<div class="mt-6">
-		<form action="{{ path('app_forum_comment') }}" method="post">
-			<input type="hidden" name="postId" value="{{ postId }}" />
-			<input
-				type="text"
-				id="commentText"
-				name="commentText"
-				class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-				placeholder="Write a comment..."
-				maxlength="255"
-				required
-			/>
-			<div class="flex justify-end items-center mt-2">
-				<span id="commentCharCount" class="text-sm text-gray-500">0/255</span>
-			</div>
-			<div class="flex justify-end">
-				<span id="commentErrorMessage" class="text-sm text-red-500 mr-auto"></span>
 				<button
 					type="submit"
-					id="commentButton"
-					class="mt-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow hover:bg-blue-700 transition-all cursor-pointer"
+					class="p-2 w-10 h-10 bg-red-500 hover:bg-red-700 text-white rounded-full shadow transition-all cursor-pointer flex items-center justify-center"
+					title="Delete post"
 				>
-					Comment
+					<i class="fa fa-trash"></i>
+				</button>
+			</form>
+
+			<twig:LikeButton postId="{{ post.postId }}" isLiked="{{ post.isLiked }}" likesCount="{{ post.likesCount }}" />
+		</div>
+	</div>
+
+	<div class="mt-6">
+		<form
+			hx-post="{{ path('app_forum_comment') }}"
+			hx-target="#commentsContainer-{{ post.postId }}"
+			hx-swap="beforeend"
+			hx-on::after-request="if(event.detail.successful) this.reset()"
+			onsubmit="return validateCommentForm(this);"
+		>
+			<input type="hidden" name="postId" value="{{ post.postId }}" />
+			<div class="relative">
+				<textarea
+					name="commentText"
+					class="w-full p-3 pb-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+					placeholder="Write a comment..."
+					maxlength="255"
+				></textarea>
+				<span
+					id="newCommentLength-{{ post.postId }}"
+					class="absolute bottom-2 left-3 text-sm text-gray-400 pointer-events-none"
+					>0/255</span
+				>
+			</div>
+			<p id="commentErrorMessage-{{ post.postId }}" class="text-red-500 text-sm mt-2"></p>
+			<div class="flex justify-end">
+				<button
+					type="button"
+					class="mt-2 p-2 w-10 h-10 bg-blue-600 text-white rounded-full shadow hover:bg-blue-700 transition-all cursor-pointer flex items-center justify-center"
+					title="Add comment"
+					onclick="if(validateCommentForm(this.form)) { htmx.trigger(this.form, 'submit'); }"
+				>
+					<i class="fa fa-comment"></i>
 				</button>
 			</div>
 		</form>
 	</div>
-	<div class="mt-4">
-		{% for comment in comments %}
-		<div class="mb-2">
-			<twig:Comment
-				commentId="{{comment.commentId}}"
-				commenter="{{ comment.name ~ ' ' ~ comment.lastName }}"
-				text="{{ comment.comment }}"
-				commenterId="{{comment.commenterId}}"
-			/>
-		</div>
-		{% endfor %}
+
+	<div id="commentsContainer-{{ post.postId }}" class="mt-4">
+		{% if post.comments is defined %} {% for comment in post.comments %}
+		<twig:Comment
+			commentId="{{ comment.commentId }}"
+			comment="{{ comment.comment }}"
+			name="{{ comment.name }}"
+			lastName="{{ comment.lastName }}"
+			commenterId="{{ comment.commenterId }}"
+			commentedAt="{{ comment.commentedAt }}"
+			updatedAt="{{ comment.updatedAt }}"
+		/>
+		{% endfor %} {% endif %}
 	</div>
 </div>
 
 <script>
-	function editPost(postId) {
-		const postTextElement = document.getElementById("postText-" + postId);
-		const editTextareaElement = document.getElementById("editTextarea-" + postId);
-		const editButtonElement = document.getElementById("editButton-" + postId);
-		const saveButtonElement = document.getElementById("saveButton-" + postId);
-		const editPostFormElement = document.getElementById("editPostForm-" + postId);
-
-		postTextElement.style.display = "none";
-		editPostFormElement.style.display = "block";
-		editTextareaElement.style.display = "block";
-		editButtonElement.style.display = "none";
-		saveButtonElement.style.display = "inline-block";
-	}
-
-	function checkPostText(postId) {
-		const editTextareaElement = document.getElementById("editTextarea-" + postId);
-		const saveButtonElement = document.getElementById("saveButton-" + postId);
-		const postTextElement = document.getElementById("postText-" + postId);
-		const editPostFormElement = document.getElementById("editPostForm-" + postId);
-		const editButtonElement = document.getElementById("editButton-" + postId);
-		if (editTextareaElement.value.trim() === postTextElement.textContent.trim()) {
-			saveButtonElement.setAttribute("hx-disable", "true");
-			postTextElement.style.display = "block";
-			editPostFormElement.style.display = "none";
-			editTextareaElement.style.display = "none";
-			editButtonElement.style.display = "block";
-			saveButtonElement.style.display = "none";
-
-			return false;
+	(function () {
+		const textarea = document.getElementById("editTextarea-{{ post.postId }}");
+		if (textarea) {
+			const counter = document.getElementById("editPostLength-{{ post.postId }}");
+			textarea.addEventListener("input", () => {
+				if (textarea.value.length > 255) {
+					textarea.value = textarea.value.slice(0, 255);
+				}
+				counter.textContent = `${textarea.value.length}/255`;
+			});
 		}
-		return true;
-	}
 
-	function hideEditForm(postId) {
-		const editTextareaElement = document.getElementById("editTextarea-" + postId);
-		const saveButtonElement = document.getElementById("saveButton-" + postId);
-		const postTextElement = document.getElementById("postText-" + postId);
-		const editPostFormElement = document.getElementById("editPostForm-" + postId);
-		const editButtonElement = document.getElementById("editButton-" + postId);
-		postTextElement.style.display = "block";
-		editPostFormElement.style.display = "none";
-		editTextareaElement.style.display = "none";
-		editButtonElement.style.display = "block";
-		saveButtonElement.style.display = "none";
-	}
-
-	document.addEventListener("DOMContentLoaded", function () {
-		const commentText = document.getElementById("commentText");
-		const commentButton = document.getElementById("commentButton");
-		const commentErrorMessage = document.getElementById("commentErrorMessage");
-		const commentCharCount = document.getElementById("commentCharCount");
-
-		commentText.value = "";
-		commentCharCount.textContent = "0/255";
-
-		commentText.addEventListener("input", () => {
-			commentCharCount.textContent = `${commentText.value.length}/255`;
-		});
-
-		commentButton.addEventListener("click", (event) => {
-			if (commentText.value.length < 10) {
-				event.preventDefault();
-				commentErrorMessage.textContent = "Comment must be at least 10 characters long.";
-			} else if (commentText.value.length > 255) {
-				event.preventDefault();
-				commentErrorMessage.textContent = "Comment must be less than 255 characters long.";
-			} else {
-				commentErrorMessage.textContent = "";
-			}
-		});
-	});
+		const commentTextarea = document.querySelector('textarea[name="commentText"]');
+		if (commentTextarea) {
+			const commentCounter = document.getElementById("newCommentLength-{{ post.postId }}");
+			commentTextarea.addEventListener("input", () => {
+				if (commentTextarea.value.length > 255) {
+					commentTextarea.value = commentTextarea.value.slice(0, 255);
+				}
+				commentCounter.textContent = `${commentTextarea.value.length}/255`;
+			});
+		}
+	})();
 </script>

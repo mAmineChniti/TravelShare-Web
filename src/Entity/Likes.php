@@ -2,23 +2,22 @@
 
 namespace App\Entity;
 
-use App\Repository\LikesRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\LikesRepository;
 
 #[ORM\Table(name: 'likes')]
 #[ORM\Index(name: 'liker_id', columns: ['liker_id'])]
 #[ORM\Entity(repositoryClass: LikesRepository::class)]
 class Likes
 {
-    #[ORM\Column(name: "post_id")]
+    #[ORM\Column(name: 'post_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "NONE")]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
     private ?int $postId = null;
 
-    #[ORM\Column(name: "liker_id")]
+    #[ORM\Column(name: 'liker_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "NONE")]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
     private ?int $likerId = null;
 
     public function getPostId(): ?int

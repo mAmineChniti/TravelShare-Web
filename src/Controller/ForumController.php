@@ -2,16 +2,19 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Likes;
+use App\Entity\Posts;
+use App\Entity\Comments;
+use App\Repository\LikesRepository;
+use App\Repository\PostsRepository;
+use App\Repository\UsersRepository;
+use App\Repository\CommentsRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Repository\PostsRepository;
-use App\Repository\CommentsRepository;
-use App\Repository\LikesRepository;
-use Symfony\Component\HttpFoundation\Request;
-use App\Entity\Posts;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Entity\Comments;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 final class ForumController extends AbstractController
@@ -20,7 +23,7 @@ final class ForumController extends AbstractController
     public function index(
         PostsRepository $postsRepository,
         CommentsRepository $commentsRepository,
-        LikesRepository $likesRepository
+        LikesRepository $likesRepository,
     ): Response {
         $userId = 1;
         $posts = $postsRepository->fetchPosts(0, 10, $userId);
@@ -31,7 +34,6 @@ final class ForumController extends AbstractController
         }
 
         return $this->render('forum/index.html.twig', [
-            'controller_name' => 'ForumController',
             'posts' => $posts,
         ]);
     }
@@ -39,90 +41,112 @@ final class ForumController extends AbstractController
     #[Route('/forum/post', name: 'app_forum_post', methods: ['POST'])]
     public function post(
         Request $request,
-        PostsRepository $postsRepository
+        PostsRepository $postsRepository,
+        UsersRepository $userRepository,
+        ValidatorInterface $validator,
     ): Response {
         $postText = $request->request->get('postText');
-
-        if (empty($postText)) {
-            return $this->redirectToRoute('app_forum');
-        }
+        $userId = 1;
 
         $post = new Posts();
         $post->setTextContent($postText);
-        $post->setOwnerId(1);
-        $post->setCreatedAt(new \DateTimeImmutable(date('Y-m-d H:i:s')));
-        $post->setUpdatedAt(new \DateTimeImmutable(date('Y-m-d H:i:s')));
+        $post->setOwnerId($userId);
+        $post->setCreatedAt(new \DateTime());
+        $post->setUpdatedAt(new \DateTime());
+
+        $errors = $validator->validate($post);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+
+            return new JsonResponse(['error' => $errorMessages], 400);
+        }
 
         $postsRepository->add($post);
 
-        return $this->redirectToRoute('app_forum');
+        $user = $userRepository->find($userId);
+
+        $postData = [
+            'postId' => $post->getPostId(),
+            'name' => $user->getName(),
+            'lastName' => $user->getLastName(),
+            'textContent' => $post->getTextContent(),
+            'isLiked' => false,
+            'likesCount' => 0,
+            'comments' => [],
+        ];
+
+        return $this->render('components/Post.html.twig', [
+            'post' => $postData,
+        ]);
     }
 
     #[Route('/forum/edit/{id}', name: 'app_forum_edit', methods: ['POST'])]
     public function edit(
         Request $request,
         PostsRepository $postsRepository,
-        int $id
+        ValidatorInterface $validator,
+        int $id,
     ): Response {
         $post = $postsRepository->find($id);
+
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id ' . $id);
+            return new JsonResponse(['error' => 'Post not found.'], 404);
         }
 
-        if ($post->getOwnerId() !== 1) {
-            throw new AccessDeniedException('You are not allowed to edit this post.');
+        if (1 !== $post->getOwnerId()) {
+            return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $postText = $request->request->get('editTextarea-' . $id);
-
-        if ($postText === null || empty(trim($postText))) {
-            $html = sprintf(
-                '<div id="postText-%s"><p class="text-gray-600 mt-2">%s</p></div>',
-                $id,
-                htmlspecialchars($postText)
-            );
-            return new Response($html);
-        }
-
+        $postText = $request->request->get('editTextarea-'.$id);
         $post->setTextContent($postText);
-        $post->setUpdatedAt(new \DateTimeImmutable());
+        $post->setUpdatedAt(new \DateTime());
+
+        $errors = $validator->validate($post);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+
+            return new JsonResponse(['error' => $errorMessages], 400);
+        }
+
         $postsRepository->update($post);
-        $html = sprintf(
-            '<div id="postText-%s"><p class="text-gray-600 mt-2">%s</p></div>',
-            $id,
-            htmlspecialchars($postText)
-        );
-        return new Response($html);
+
+        return $this->render('components/PostText.html.twig', [
+            'postId' => $post->getPostId(),
+            'textContent' => $post->getTextContent(),
+        ]);
     }
 
     #[Route('/forum/delete/{id}', name: 'app_forum_delete', methods: ['POST'])]
     public function delete(
-        Request $request,
         PostsRepository $postsRepository,
-        int $id
+        int $id,
     ): Response {
         $post = $postsRepository->find($id);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id ' . $id);
+            throw $this->createNotFoundException('No post found for id '.$id);
         }
 
-        if ($post->getOwnerId() !== 1) {
+        if (1 !== $post->getOwnerId()) {
             throw new AccessDeniedException('You are not allowed to delete this post.');
         }
 
-        if ($this->isCsrfTokenValid('delete' . $post->getPostId(), $request->request->get('_token'))) {
-            $postsRepository->delete($id);
-        }
+        $postsRepository->delete($id);
 
-        return $this->redirectToRoute('app_forum');
+        return new Response('', Response::HTTP_OK);
     }
 
     #[Route('/forum/like', name: 'app_forum_like', methods: ['POST'])]
     public function like(
         Request $request,
         LikesRepository $likesRepository,
-        PostsRepository $postsRepository
+        PostsRepository $postsRepository,
     ): Response {
         $postId = $request->request->get('postId');
         $userId = 1;
@@ -131,7 +155,7 @@ final class ForumController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Post ID is missing'], 400);
         }
 
-        $like = new \App\Entity\Likes();
+        $like = new Likes();
         $like->setPostId($postId);
         $like->setLikerId($userId);
 
@@ -140,7 +164,7 @@ final class ForumController extends AbstractController
         $post = $postsRepository->find($postId);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id ' . $postId);
+            throw $this->createNotFoundException('No post found for id '.$postId);
         }
 
         $isLiked = $likesRepository->isLikedByUser($userId, $postId);
@@ -157,84 +181,128 @@ final class ForumController extends AbstractController
     public function comment(
         Request $request,
         CommentsRepository $commentsRepository,
+        UsersRepository $userRepository,
+        ValidatorInterface $validator,
     ): Response {
         $postId = $request->request->get('postId');
         $commentText = $request->request->get('commentText');
         $userId = 1;
 
-        if (empty($postId) || empty($commentText)) {
-            return new JsonResponse(['success' => false, 'message' => 'Post ID or comment text is missing'], 400);
-        }
-
         $comment = new Comments();
         $comment->setPostId($postId);
         $comment->setCommenterId($userId);
         $comment->setComment($commentText);
-        $comment->setCommentedAt(new \DateTimeImmutable(date('Y-m-d H:i:s')));
-        $comment->setUpdatedAt(new \DateTimeImmutable(date('Y-m-d H:i:s')));
+        $comment->setCommentedAt(new \DateTime());
+        $comment->setUpdatedAt(new \DateTime());
+
+        $errors = $validator->validate($comment);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+
+            return new JsonResponse(['error' => $errorMessages], 400);
+        }
 
         $commentsRepository->add($comment);
 
-        return $this->redirectToRoute('app_forum');
+        $user = $userRepository->find($userId);
+
+        return $this->render('components/Comment.html.twig', [
+            'commentId' => $comment->getCommentId(),
+            'comment' => $comment->getComment(),
+            'commentedAt' => $comment->getCommentedAt(),
+            'updatedAt' => $comment->getUpdatedAt(),
+            'name' => $user ? $user->getName() : 'User',
+            'lastName' => $user ? $user->getLastName() : 'Name',
+            'commenterId' => $comment->getCommenterId(),
+        ]);
     }
 
     #[Route('/forum/delete/comment/{id}', name: 'comment_delete', methods: ['POST'])]
     public function deleteComment(
-        Request $request,
         CommentsRepository $commentsRepository,
-        int $id
+        int $id,
     ): Response {
         $comment = $commentsRepository->find($id);
 
         if (!$comment) {
-            throw $this->createNotFoundException('No comment found for id ' . $id);
+            throw $this->createNotFoundException('No comment found for id '.$id);
         }
 
-        if ($comment->getCommenterId() !== 1) {
+        if (1 !== $comment->getCommenterId()) {
             throw new AccessDeniedException('You are not allowed to delete this comment.');
         }
 
-        if ($this->isCsrfTokenValid('delete' . $comment->getCommentId(), $request->request->get('_token'))) {
-            $commentsRepository->delete($id);
-        }
+        $commentsRepository->delete($id);
 
-        return $this->redirectToRoute('app_forum');
+        return new Response('', Response::HTTP_OK);
     }
 
     #[Route('/forum/edit/comment/{id}', name: 'comment_edit', methods: ['POST'])]
     public function editComment(
         Request $request,
         CommentsRepository $commentsRepository,
-        int $id
+        ValidatorInterface $validator,
+        int $id,
     ): Response {
         $comment = $commentsRepository->find($id);
+
         if (!$comment) {
-            throw $this->createNotFoundException('No comment found for id ' . $id);
+            return new JsonResponse(['error' => 'Comment not found.'], 404);
         }
 
-        if ($comment->getCommenterId() !== 1) {
-            throw new AccessDeniedException('You are not allowed to edit this comment.');
+        if (1 !== $comment->getCommenterId()) {
+            return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $commentText = $request->request->get('editTextarea-' . $id);
-
-        if ($commentText === null || empty(trim($commentText))) {
-            $html = sprintf(
-                '<div id="commentText-%s"><p class="text-gray-600 mt-2">%s</p></div>',
-                $id,
-                htmlspecialchars($commentText)
-            );
-            return new Response($html);
-        }
-
+        $commentText = $request->request->get('editTextarea-'.$id);
         $comment->setComment($commentText);
-        $comment->setUpdatedAt(new \DateTimeImmutable());
+        $comment->setUpdatedAt(new \DateTime());
+
+        $errors = $validator->validate($comment);
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getMessage();
+            }
+
+            return new JsonResponse(['error' => $errorMessages], 400);
+        }
+
         $commentsRepository->update($comment);
-        $html = sprintf(
-            '<div id="commentText-%s"><p class="text-gray-600 mt-2">%s</p></div>',
-            $id,
-            htmlspecialchars($commentText)
-        );
-        return new Response($html);
+
+        return $this->render('components/CommentText.html.twig', [
+            'commentId' => $comment->getCommentId(),
+            'comment' => $comment->getComment(),
+        ]);
+    }
+
+    #[Route('/dashboard/forum', name: 'app_dashboard_forum')]
+    public function dashboard(
+        PostsRepository $postsRepository,
+        CommentsRepository $commentsRepository,
+        UsersRepository $usersRepository,
+    ): Response {
+        $posts = $postsRepository->fetchPosts(1, 10, 1);
+
+        foreach ($posts as &$post) {
+            $user = $usersRepository->find($post['ownerId']);
+            $post['ownerName'] = $user ? $user->getName().' '.$user->getLastName() : 'Unknown User';
+
+            $comments = $commentsRepository->fetchById($post['postId']);
+
+            foreach ($comments as &$comment) {
+                $commenter = $usersRepository->find($comment['commenterId']);
+                $comment['commenterName'] = $commenter ? $commenter->getName().' '.$commenter->getLastName() : 'Unknown User';
+            }
+
+            $post['comments'] = $comments;
+        }
+
+        return $this->render('dashboard/forum/index.html.twig', [
+            'posts' => $posts,
+        ]);
     }
 }
