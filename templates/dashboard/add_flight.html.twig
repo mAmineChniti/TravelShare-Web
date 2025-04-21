@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add New Flight{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-16">
+    <h1 class="text-4xl font-extrabold text-gray-800 mb-6">Add New Flight</h1>
+    
+    {% for message in app.flashes('success') %}
+        <div class="mb-4 p-4 bg-green-100 text-green-800 rounded-lg">
+            {{ message }}
+        </div>
+    {% endfor %}
+    
+    {% for message in app.flashes('error') %}
+        <div class="mb-4 p-4 bg-red-100 text-red-800 rounded-lg">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <form method="post" action="{{ path('app_add_flight') }}" class="bg-white shadow-lg rounded-lg p-6 space-y-4">
+        <div>
+            <label for="titre" class="block text-lg font-medium text-gray-700">Title</label>
+            <input type="text" id="titre" name="titre" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+        </div>
+        <div>
+            <label for="destination" class="block text-lg font-medium text-gray-700">Destination</label>
+            <input type="text" id="destination" name="destination" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+        </div>
+        <div>
+            <label for="description" class="block text-lg font-medium text-gray-700">Description</label>
+            <textarea id="description" name="description" rows="4" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"></textarea>
+        </div>
+        <div>
+            <label for="prix" class="block text-lg font-medium text-gray-700">Price (€)</label>
+            <input type="number" id="prix" name="prix" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+        </div>
+        <div>
+            <label for="placesDisponibles" class="block text-lg font-medium text-gray-700">Available Places</label>
+            <input type="number" id="placesDisponibles" name="placesDisponibles" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+        </div>
+        <div>
+            <label for="dateDepart" class="block text-lg font-medium text-gray-700">Departure Date</label>
+            <input type="date" id="dateDepart" name="dateDepart" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+        </div>
+        <div>
+            <label for="dateRetour" class="block text-lg font-medium text-gray-700">Return Date</label>
+            <input type="date" id="dateRetour" name="dateRetour" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+        </div>
+        <div class="flex space-x-4">
+            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 cursor-pointer">Add Flight</button>
+            <a href="{{ path('app_dashboard_flights') }}" class="bg-gray-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-700 transition duration-300">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

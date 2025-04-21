@@ -1,32 +1,35 @@
-{% extends 'base.html.twig' %} {% block title %} Hello FlightsController! {% endblock %} {% block body %}
+{% extends 'base.html.twig' %}
+
+{% block title %}Flights{% endblock %}
+
+{% block body %}
 <div class="container mx-auto px-4 py-16">
-	<h1 class="text-2xl font-bold mb-4">Flights</h1>
-	<p class="mb-6">Find and book flights for your next trip with ease and convenience.</p>
-	<div class="bg-white shadow-md rounded-lg p-6">
-		<h2 class="text-lg font-semibold mb-4">Search Flights</h2>
-		<form>
-			<div class="mb-4">
-				<label for="departure" class="block text-sm font-medium text-gray-700">Departure</label>
-				<input type="text" id="departure" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" />
-			</div>
-			<div class="mb-4">
-				<label for="destination" class="block text-sm font-medium text-gray-700">Destination</label>
-				<input type="text" id="destination" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" />
-			</div>
-			<div class="mb-4">
-				<label for="date" class="block text-sm font-medium text-gray-700">Date</label>
-				<input type="date" id="date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" />
-			</div>
-			<button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
-		</form>
-	</div>
-	<div class="mt-8">
-		<h2 class="text-lg font-semibold mb-4">Popular Destinations</h2>
-		<ul class="list-disc pl-6">
-			<li class="text-sm text-gray-600">New York to London</li>
-			<li class="text-sm text-gray-600">Paris to Tokyo</li>
-			<li class="text-sm text-gray-600">Sydney to Los Angeles</li>
-		</ul>
-	</div>
+    <h1 class="text-3xl font-bold mb-8">Available Flights</h1>
+
+    {% if voyages is not empty %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% if voyages|length == 0 or voyages|filter(v => v.placesDisponibles == 0)|length > 0 %}
+                <div class="col-span-1 md:col-span-2 lg:col-span-3">
+                    <p class="text-gray-500">No flights available at the moment.</p>
+                </div>
+            {% else %}
+            {% for voyage in voyages %}
+                {% if voyage.placesDisponibles > 0 %}
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <div class="p-6">
+                        <h2 class="text-xl font-semibold mb-2">{{ voyage.titre }}</h2>
+                        <p class="text-gray-600 mb-2">Destination: <span class="font-medium">{{ voyage.destination }}</span></p>
+                        <p class="text-gray-600 mb-2">Price: <span class="font-medium">{{ voyage.prix }} €</span></p>
+                        <p class="text-gray-600 mb-2">Available Places: <span class="font-medium">{{ voyage.placesDisponibles }}</span></p>
+                        <a href="{{ path('app_flight_details', {id: voyage.offresVoyageId}) }}" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">View Details</a>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+            {% endif %}
+        </div>
+    {% else %}
+        <p class="text-gray-500">No flights available at the moment.</p>
+    {% endif %}
 </div>
 {% endblock %}

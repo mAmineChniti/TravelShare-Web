@@ -4,45 +4,72 @@ namespace App\Repository;
 
 use App\Entity\ReservationOffresVoyage;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\OffresVoyage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
-/**
- * @extends ServiceEntityRepository<ReservationOffresVoyage>
- *
- * @method ReservationOffresVoyage|null find($id, $lockMode = null, $lockVersion = null)
- * @method ReservationOffresVoyage|null findOneBy(array $criteria, array $orderBy = null)
- * @method ReservationOffresVoyage[]    findAll()
- * @method ReservationOffresVoyage[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
 class ReservationOffresVoyageRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $entityManager;
+
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, ReservationOffresVoyage::class);
+        $this->entityManager = $entityManager;
     }
 
-    //    /**
-    //     * @return ReservationOffresVoyage[] Returns an array of ReservationOffresVoyage objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function add(ReservationOffresVoyage $reservation): void
+    {
+        $offre = $this->entityManager->getRepository(OffresVoyage::class)->find($reservation->getOffreId());
 
-    //    public function findOneBySomeField($value): ?ReservationOffresVoyage
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($offre->getPlacesDisponibles() < $reservation->getNbrPlace()) {
+            throw new \Exception("Not enough available places for this reservation.");
+        }
+
+        $totalPrix = $offre->getPrix() * $reservation->getNbrPlace();
+        $reservation->setPrix($totalPrix);
+
+        $offre->setPlacesDisponibles($offre->getPlacesDisponibles() - $reservation->getNbrPlace());
+        $reservation->setDateReserved(new \DateTime());
+        $reservation->setStatus(1);
+        $this->entityManager->persist($reservation);
+        $this->entityManager->persist($offre);
+        $this->entityManager->flush();
+    }
+
+    public function update(ReservationOffresVoyage $reservation): void
+    {
+        $existingReservation = $this->find($reservation->getReservationId());
+        if (!$existingReservation) {
+            throw new \Exception("Reservation not found.");
+        }
+        $offre = $this->entityManager->getRepository(OffresVoyage::class)->find($reservation->getOffreId());
+
+        $placesDifference = $reservation->getNbrPlace() - $existingReservation->getNbrPlace();
+
+        if ($offre->getPlacesDisponibles() < $placesDifference) {
+            throw new \Exception("Not enough available places for this reservation.");
+        }
+
+        $totalPrix = $offre->getPrix() * $reservation->getNbrPlace();
+        $reservation->setPrix($totalPrix);
+
+        $offre->setPlacesDisponibles($offre->getPlacesDisponibles() - $placesDifference);
+
+        $this->entityManager->flush();
+    }
+
+    public function delete(ReservationOffresVoyage $reservation): void
+    {
+        $offre = $this->entityManager->getRepository(OffresVoyage::class)->find($reservation->getOffreId());
+        $offre->setPlacesDisponibles($offre->getPlacesDisponibles() + $reservation->getNbrPlace());
+
+        $this->entityManager->remove($reservation);
+        $this->entityManager->flush();
+    }
+
+    public function findAllReservations(): array
+    {
+        return $this->findAll();
+    }
 }
