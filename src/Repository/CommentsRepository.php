@@ -3,8 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Comments;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Comments>
@@ -36,7 +36,7 @@ class CommentsRepository extends ServiceEntityRepository
             throw new \Exception('Comment not found');
         }
         $existingComment->setComment($comment->getComment());
-        $existingComment->setUpdatedAt(new \DateTimeImmutable(date('Y-m-d H:i:s')));
+        $existingComment->setUpdatedAt(new \DateTime());
         $entityManager->flush();
     }
 

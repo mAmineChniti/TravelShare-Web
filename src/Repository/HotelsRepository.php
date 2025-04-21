@@ -3,8 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Hotels;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 class HotelsRepository extends ServiceEntityRepository
 {

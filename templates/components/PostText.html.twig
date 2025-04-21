@@ -1,0 +1,27 @@
+<div id="postText-{{ postId }}">
+	<p class="text-gray-600 mt-2">{{ textContent }}</p>
+</div>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const postId = {{ postId }};
+		const elements = {
+			editForm: document.getElementById(`editPostForm-${postId}`),
+			editButton: document.getElementById(`editButton-${postId}`)
+		};
+
+		if (elements.editForm) elements.editForm.style.display = "none";
+		if (elements.editButton) elements.editButton.style.display = "inline-flex";
+	});
+
+	(function() {
+		const postId = {{ postId }};
+		const elements = {
+			editForm: document.getElementById(`editPostForm-${postId}`),
+			editButton: document.getElementById(`editButton-${postId}`)
+		};
+
+		if (elements.editForm) elements.editForm.style.display = "none";
+		if (elements.editButton) elements.editButton.style.display = "inline-flex";
+	})();
+</script>
