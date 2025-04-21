@@ -3,10 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\ReservationOffresVoyage;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\OffresVoyage;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 class ReservationOffresVoyageRepository extends ServiceEntityRepository
 {

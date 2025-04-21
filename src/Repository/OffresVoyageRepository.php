@@ -3,9 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\OffresVoyage;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 class OffresVoyageRepository extends ServiceEntityRepository
 {

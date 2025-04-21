@@ -2,39 +2,39 @@
 
 namespace App\Entity;
 
-use App\Repository\OffresVoyageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
+use App\Repository\OffresVoyageRepository;
 
 #[ORM\Table(name: 'offres_voyage')]
 #[ORM\Entity(repositoryClass: OffresVoyageRepository::class)]
 class OffresVoyage
 {
-    #[ORM\Column(name: "offres_voyage_id")]
+    #[ORM\Column(name: 'offres_voyage_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $offresVoyageId = null;
 
-    #[ORM\Column(name: "titre", length: 255)]
+    #[ORM\Column(name: 'titre', length: 255)]
     private ?string $titre = null;
 
-    #[ORM\Column(name: "destination", length: 255)]
+    #[ORM\Column(name: 'destination', length: 255)]
     private ?string $destination = null;
 
-    #[ORM\Column(name: "description", type: Types::TEXT, nullable: true)]
+    #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(name: "date_depart", type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'date_depart', type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateDepart = null;
 
-    #[ORM\Column(name: "date_retour", type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'date_retour', type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateRetour = null;
 
-    #[ORM\Column(name: "prix", type: Types::DECIMAL, precision: 10, scale: 0)]
+    #[ORM\Column(name: 'prix', type: Types::DECIMAL, precision: 10, scale: 0)]
     private ?string $prix = null;
 
-    #[ORM\Column(name: "places_disponibles")]
+    #[ORM\Column(name: 'places_disponibles')]
     private ?int $placesDisponibles = null;
 
     public function getOffresVoyageId(): ?int

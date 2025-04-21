@@ -1,7 +1,6 @@
 <?php
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\OffresVoyageRepository;
@@ -10,6 +9,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Entity\ReservationOffresVoyage;
 use App\Repository\ReservationOffresVoyageRepository;
 use App\Entity\OffresVoyage;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class FlightsController extends AbstractController
 {

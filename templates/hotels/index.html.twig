@@ -1,26 +1,30 @@
-{% extends 'base.html.twig' %} {% block title %} Hello HotelsController! {% endblock %} {% block body %}
+{% extends 'base.html.twig' %}
+
+{% block title %}Hotels{% endblock %}
+
+{% block body %}
 <div class="container mx-auto px-4 py-16">
-	<h1 class="text-2xl font-bold mb-4">Hotels</h1>
-	<p class="mb-6">
-		Explore our curated list of hotels to find the perfect stay for your next trip. Whether you're looking for luxury or
-		budget-friendly options, we have something for everyone.
-	</p>
-	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-		<div class="bg-white shadow-md rounded-lg p-4">
-			<h2 class="text-lg font-semibold">Hotel Paradise</h2>
-			<p class="text-sm text-gray-600">Located in the heart of the city, offering premium amenities and services.</p>
-			<button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">View Details</button>
-		</div>
-		<div class="bg-white shadow-md rounded-lg p-4">
-			<h2 class="text-lg font-semibold">Cozy Inn</h2>
-			<p class="text-sm text-gray-600">A budget-friendly option with comfortable rooms and great service.</p>
-			<button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">View Details</button>
-		</div>
-		<div class="bg-white shadow-md rounded-lg p-4">
-			<h2 class="text-lg font-semibold">Seaside Resort</h2>
-			<p class="text-sm text-gray-600">Enjoy breathtaking ocean views and luxurious accommodations.</p>
-			<button class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">View Details</button>
-		</div>
-	</div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for hotel in hotels %}
+            <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="h-48 w-full bg-gray-200 flex items-center justify-center">
+                    {% if hotel.imageH %}
+                        <img src="data:image/jpeg;base64,{{ hotel.base64Image }}" alt="{{ hotel.nom }}" class="h-full w-auto object-cover">
+                    {% else %}
+                        <span class="text-gray-500">No Image Available</span>
+                    {% endif %}
+                </div>
+                <div class="p-4">
+                    <h2 class="text-lg font-semibold text-gray-800">{{ hotel.nom }}</h2>
+                    <p class="text-sm text-gray-600 mt-2"><strong>Address:</strong> {{ hotel.adress }}</p>
+                    <p class="text-sm text-gray-600"><strong>Phone:</strong> {{ hotel.telephone }}</p>
+                    <p class="text-sm text-gray-600"><strong>Capacity:</strong> {{ hotel.capaciteTotale }} guests</p>
+                </div>
+                <div class="p-4 border-t border-gray-200">
+                    <a href="{{ path('hotel_rooms', { hotelId: hotel.id }) }}" class="text-blue-500 hover:underline text-sm">View Available Rooms</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
