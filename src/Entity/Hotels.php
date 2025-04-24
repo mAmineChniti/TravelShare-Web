@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\HotelsRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Chambres;
+use App\Repository\HotelsRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'hotels')]
 #[ORM\Entity(repositoryClass: HotelsRepository::class)]
@@ -19,15 +19,23 @@ class Hotels
     private ?int $hotelId = null;
 
     #[ORM\Column(name: 'nom', length: 255)]
+    #[Assert\NotBlank(message: 'The name cannot be empty.')]
+    #[Assert\Length(max: 255, maxMessage: 'The name cannot exceed 255 characters.')]
     private ?string $nom = null;
 
     #[ORM\Column(name: 'adress', type: Types::TEXT, nullable: true)]
+    #[Assert\NotBlank(message: 'The address cannot be empty.')]
+    #[Assert\Length(max: 255, maxMessage: 'The address cannot exceed 255 characters.')]
     private ?string $adress = null;
 
     #[ORM\Column(name: 'telephone', length: 255, nullable: true)]
+    #[Assert\NotBlank(message: 'The telephone number cannot be empty.')]
+    #[Assert\Length(min: 8, max: 8, exactMessage: 'The telephone number must be exactly 8 digits.')]
+    #[Assert\Regex(pattern: '/^[0-9]+$/', message: 'Invalid phone number format. Only numbers are allowed.')]
     private ?string $telephone = null;
 
     #[ORM\Column(name: 'capacite_totale')]
+    #[Assert\Positive(message: 'The total capacity must be more than 0.')]
     private ?int $capaciteTotale = null;
 
     #[ORM\Column(name: 'image_h', type: Types::BLOB)]
@@ -58,15 +66,8 @@ class Hotels
 
     public function setNom(string $nom): static
     {
-        if (empty($nom)) {
-            throw new \InvalidArgumentException('The name cannot be empty.');
-        }
-
-        if (strlen($nom) > 255) {
-            throw new \InvalidArgumentException('The name cannot exceed 255 characters.');
-        }
-
         $this->nom = $nom;
+
         return $this;
     }
 
@@ -77,14 +78,8 @@ class Hotels
 
     public function setAdress(?string $adress): static
     {
-        if ($adress !== null && strlen($adress) > 255) {
-            throw new \InvalidArgumentException('The address cannot exceed 255 characters.');
-        }
-        if(empty($adress)){
-            throw new \InvalidArgumentException('The address cannot be empty.');
-        }
-
         $this->adress = $adress;
+
         return $this;
     }
 
@@ -95,20 +90,8 @@ class Hotels
 
     public function setTelephone(?string $telephone): static
     {
-        if ($telephone === '') {
-            throw new \InvalidArgumentException('The telephone number cannot be empty.');
-        }
-        if ($telephone !== null) {
-            if (strlen($telephone) != 8) {
-                throw new \InvalidArgumentException('The telephone number must be 8 characters.');
-            }
-
-            if (!preg_match('/^[0-9]+$/', $telephone)) {
-                throw new \InvalidArgumentException('Invalid phone number format. Only numbers are allowed.');
-            }
-        }
-
         $this->telephone = $telephone;
+
         return $this;
     }
 
@@ -119,11 +102,8 @@ class Hotels
 
     public function setCapaciteTotale(int $capaciteTotale): static
     {
-        if ($capaciteTotale <= 0) {
-            throw new \InvalidArgumentException('The total capacity must be more than 0.');
-        }
-
         $this->capaciteTotale = $capaciteTotale;
+
         return $this;
     }
 
@@ -135,6 +115,7 @@ class Hotels
     public function setImageH($imageH): static
     {
         $this->imageH = $imageH;
+
         return $this;
     }
 

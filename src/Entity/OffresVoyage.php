@@ -4,8 +4,8 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use InvalidArgumentException;
 use App\Repository\OffresVoyageRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'offres_voyage')]
 #[ORM\Entity(repositoryClass: OffresVoyageRepository::class)]
@@ -17,24 +17,37 @@ class OffresVoyage
     private ?int $offresVoyageId = null;
 
     #[ORM\Column(name: 'titre', length: 255)]
+    #[Assert\NotBlank(message: 'Title cannot be empty.')]
+    #[Assert\Length(max: 255, maxMessage: 'Title cannot exceed 255 characters.')]
     private ?string $titre = null;
 
     #[ORM\Column(name: 'destination', length: 255)]
+    #[Assert\NotBlank(message: 'Destination cannot be empty.')]
+    #[Assert\Length(max: 255, maxMessage: 'Destination cannot exceed 255 characters.')]
     private ?string $destination = null;
 
     #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
+    #[Assert\NotBlank(message: 'Description cannot be empty.')]
+    #[Assert\Length(min: 10, max: 255, minMessage: 'Description must be at least 10 characters long.', maxMessage: 'Description cannot exceed 255 characters.')]
     private ?string $description = null;
 
     #[ORM\Column(name: 'date_depart', type: Types::DATE_MUTABLE)]
+    #[Assert\GreaterThanOrEqual('today', message: 'Departure date cannot be in the past.')]
     private ?\DateTimeInterface $dateDepart = null;
 
     #[ORM\Column(name: 'date_retour', type: Types::DATE_MUTABLE)]
+    #[Assert\Expression(
+        'this.getDateDepart() === null || value >= this.getDateDepart()',
+        message: 'Return date cannot be before departure date.'
+    )]
     private ?\DateTimeInterface $dateRetour = null;
 
     #[ORM\Column(name: 'prix', type: Types::DECIMAL, precision: 10, scale: 0)]
+    #[Assert\GreaterThanOrEqual(0, message: 'Price must be a non-negative number.')]
     private ?string $prix = null;
 
     #[ORM\Column(name: 'places_disponibles')]
+    #[Assert\GreaterThanOrEqual(0, message: 'Available places cannot be negative.')]
     private ?int $placesDisponibles = null;
 
     public function getOffresVoyageId(): ?int
@@ -49,14 +62,6 @@ class OffresVoyage
 
     public function setTitre(string $titre): static
     {
-        if (empty(trim($titre))) {
-            throw new InvalidArgumentException('Title cannot be empty');
-        }
-        
-        if (strlen($titre) > 255) {
-            throw new InvalidArgumentException('Title cannot exceed 255 characters');
-        }
-        
         $this->titre = $titre;
 
         return $this;
@@ -69,14 +74,6 @@ class OffresVoyage
 
     public function setDestination(string $destination): static
     {
-        if (empty(trim($destination))) {
-            throw new InvalidArgumentException('Destination cannot be empty');
-        }
-        
-        if (strlen($destination) > 255) {
-            throw new InvalidArgumentException('Destination cannot exceed 255 characters');
-        }
-        
         $this->destination = $destination;
 
         return $this;
@@ -89,18 +86,6 @@ class OffresVoyage
 
     public function setDescription(?string $description): static
     {
-        if($description === null) {
-            throw new InvalidArgumentException('Description cannot be null');
-        }
-        if (empty(trim($description))) {
-            throw new InvalidArgumentException('Description cannot be empty');
-        }
-        if (strlen($description) > 255) {
-            throw new InvalidArgumentException('Description cannot exceed 255 characters');
-        }
-        if (strlen($description) < 10) {
-            throw new InvalidArgumentException('Description must be at least 10 characters long');
-        }
         $this->description = $description;
 
         return $this;
@@ -113,12 +98,6 @@ class OffresVoyage
 
     public function setDateDepart(\DateTimeInterface $dateDepart): static
     {
-        $today = new \DateTime('today');
-        
-        if ($dateDepart < $today) {
-            throw new InvalidArgumentException('Departure date cannot be in the past');
-        }
-        
         $this->dateDepart = $dateDepart;
 
         return $this;
@@ -131,10 +110,6 @@ class OffresVoyage
 
     public function setDateRetour(\DateTimeInterface $dateRetour): static
     {
-        if ($this->dateDepart !== null && $dateRetour < $this->dateDepart) {
-            throw new InvalidArgumentException('Return date cannot be before departure date');
-        }
-        
         $this->dateRetour = $dateRetour;
 
         return $this;
@@ -147,10 +122,6 @@ class OffresVoyage
 
     public function setPrix(string $prix): static
     {
-        if (!is_numeric($prix) || (float)$prix < 0) {
-            throw new InvalidArgumentException('Price must be a non-negative number');
-        }
-        
         $this->prix = $prix;
 
         return $this;
@@ -163,10 +134,6 @@ class OffresVoyage
 
     public function setPlacesDisponibles(int $placesDisponibles): static
     {
-        if ($placesDisponibles < 0) {
-            throw new InvalidArgumentException('Available places cannot be negative');
-        }
-        
         $this->placesDisponibles = $placesDisponibles;
 
         return $this;

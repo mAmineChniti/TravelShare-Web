@@ -1,7 +1,9 @@
 <nav
 	class="w-full h-16 fixed top-0 left-0 bg-white border-b border-gray-200 shadow-sm flex items-center justify-between px-10 z-50"
 >
-	<a href="/" class="text-2xl font-semibold text-gray-800 hover:text-gray-900 flex-shrink-0">TravelShare</a>
+	<a href="/" class="text-2xl font-semibold text-gray-800 hover:text-gray-900 flex-shrink-0">
+		<img src="{{ asset('images/TravelShare-Logo.png') }}" alt="Logo" class="h-25 mr-2" />
+	</a>
 	<ul class="flex justify-center space-x-16 absolute left-1/2 transform -translate-x-1/2">
 		<li>
 			<a href="{{ path('app_flights') }}" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">

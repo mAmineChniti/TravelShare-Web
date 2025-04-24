@@ -2,10 +2,10 @@
 
 namespace App\Repository;
 
-use App\Entity\ReservationOffresVoyage;
-use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\OffresVoyage;
+use App\Entity\ReservationOffresVoyage;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 class ReservationOffresVoyageRepository extends ServiceEntityRepository
@@ -23,7 +23,7 @@ class ReservationOffresVoyageRepository extends ServiceEntityRepository
         $offre = $this->entityManager->getRepository(OffresVoyage::class)->find($reservation->getOffreId());
 
         if ($offre->getPlacesDisponibles() < $reservation->getNbrPlace()) {
-            throw new \Exception("Not enough available places for this reservation.");
+            throw new \Exception('Not enough available places for this reservation.');
         }
 
         $totalPrix = $offre->getPrix() * $reservation->getNbrPlace();
@@ -41,14 +41,14 @@ class ReservationOffresVoyageRepository extends ServiceEntityRepository
     {
         $existingReservation = $this->find($reservation->getReservationId());
         if (!$existingReservation) {
-            throw new \Exception("Reservation not found.");
+            throw new \Exception('Reservation not found.');
         }
         $offre = $this->entityManager->getRepository(OffresVoyage::class)->find($reservation->getOffreId());
 
         $placesDifference = $reservation->getNbrPlace() - $existingReservation->getNbrPlace();
 
         if ($offre->getPlacesDisponibles() < $placesDifference) {
-            throw new \Exception("Not enough available places for this reservation.");
+            throw new \Exception('Not enough available places for this reservation.');
         }
 
         $totalPrix = $offre->getPrix() * $reservation->getNbrPlace();

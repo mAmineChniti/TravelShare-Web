@@ -1,43 +1,116 @@
-{% extends 'base.html.twig' %} {% block title %} Welcome to TravelShare {% endblock %} {% block body %}
-<div class="flex flex-col flex-1 w-full bg-background text-foreground">
-	<div class="flex-grow flex items-center justify-center">
-		<div class="container mx-auto px-4 py-16 text-center">
-			<h1 class="text-5xl font-extrabold text-gray-800 mb-6">
-				Welcome to <span class="text-blue-600">TravelShare</span>
-			</h1>
-			<p class="text-lg text-gray-600 mb-8">
-				Your one-stop destination for flights, hotels, forums, and excursions. Plan your next adventure with ease!
-			</p>
-			<div class="flex justify-center space-x-4">
-				<a href="/flights" class="px-6 py-3 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition-all">
-					Explore Flights
-				</a>
-				<a
-					href="/hotels"
-					class="px-6 py-3 bg-gray-200 text-gray-800 rounded-md shadow hover:bg-gray-300 transition-all"
-				>
-					Browse Hotels
-				</a>
+{% extends 'base.html.twig' %} {% block title %}Welcome to TravelShare{% endblock %} {% block body %}
+<div class="absolute top-16 bottom-10 w-full" data-carousel="static">
+	<div class="relative h-full overflow-hidden rounded-lg">
+		{% for slide in slides %}
+		<div class="hidden duration-700 ease-in-out" data-carousel-item="{{ loop.first ? 'active' : '' }}">
+			<img src="{{ asset(slide.image) }}" alt="{{ slide.alt }}" class="absolute block w-full h-full object-cover" />
+			<div class="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-opacity-50">
+				<h2 class="text-4xl font-bold">{{ slide.title }}</h2>
+				<p class="mt-2 text-lg">{{ slide.description }}</p>
 			</div>
 		</div>
+		{% endfor %}
 	</div>
-	<div class="container mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-		<div class="bg-white shadow rounded-lg p-6 text-center">
-			<h2 class="text-xl font-semibold text-gray-800 mb-4">Flights</h2>
-			<p class="text-gray-600">Find the best deals on flights to your favorite destinations.</p>
-		</div>
-		<div class="bg-white shadow rounded-lg p-6 text-center">
-			<h2 class="text-xl font-semibold text-gray-800 mb-4">Hotels</h2>
-			<p class="text-gray-600">Discover comfortable and affordable accommodations worldwide.</p>
-		</div>
-		<div class="bg-white shadow rounded-lg p-6 text-center">
-			<h2 class="text-xl font-semibold text-gray-800 mb-4">Forum</h2>
-			<p class="text-gray-600">Connect with fellow travelers and share your experiences.</p>
-		</div>
-		<div class="bg-white shadow rounded-lg p-6 text-center">
-			<h2 class="text-xl font-semibold text-gray-800 mb-4">Excursions</h2>
-			<p class="text-gray-600">Book exciting excursions and tours for your next trip.</p>
-		</div>
+	<div class="absolute z-30 flex -translate-x-1/2 space-x-3 rtl:space-x-reverse bottom-5 left-1/2">
+		{% for slide in slides %}
+		<button
+			type="button"
+			class="w-3 h-3 rounded-full bg-gray-400 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 focus:outline-none"
+			aria-current="{{ loop.first ? 'true' : 'false' }}"
+			aria-label="Slide {{ loop.index }}"
+			data-carousel-slide-to="{{ loop.index0 }}"
+		></button>
+		{% endfor %}
 	</div>
+	<button
+		type="button"
+		class="absolute top-0 left-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+		data-carousel-prev
+	>
+		<span
+			class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-400 hover:bg-gray-600 group-focus:ring-4 group-focus:ring-gray-300 group-focus:outline-none"
+		>
+			<svg
+				aria-hidden="true"
+				class="w-6 h-6 text-white"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+			</svg>
+			<span class="sr-only">Previous</span>
+		</span>
+	</button>
+	<button
+		type="button"
+		class="absolute top-0 right-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group focus:outline-none"
+		data-carousel-next
+	>
+		<span
+			class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-400 hover:bg-gray-600 group-focus:ring-4 group-focus:ring-gray-300 group-focus:outline-none"
+		>
+			<svg
+				aria-hidden="true"
+				class="w-6 h-6 text-white"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+			</svg>
+			<span class="sr-only">Next</span>
+		</span>
+	</button>
 </div>
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		const carousel = document.querySelector('[data-carousel="static"]');
+		if (carousel) {
+			let currentIndex = 0;
+			const items = carousel.querySelectorAll("[data-carousel-item]");
+			const prevButton = carousel.querySelector("[data-carousel-prev]");
+			const nextButton = carousel.querySelector("[data-carousel-next]");
+			const indicators = carousel.querySelectorAll("[data-carousel-slide-to]");
+			const totalItems = items.length;
+
+			const updateCarousel = () => {
+				items.forEach((item, index) => {
+					item.classList.toggle("hidden", index !== currentIndex);
+				});
+				indicators.forEach((indicator, index) => {
+					indicator.classList.toggle("bg-gray-600", index === currentIndex);
+					indicator.classList.toggle("bg-gray-400", index !== currentIndex);
+				});
+			};
+
+			const moveToNext = () => {
+				currentIndex = (currentIndex + 1) % totalItems;
+				updateCarousel();
+			};
+
+			const moveToPrev = () => {
+				currentIndex = (currentIndex - 1 + totalItems) % totalItems;
+				updateCarousel();
+			};
+
+			const moveToIndex = (index) => {
+				currentIndex = index;
+				updateCarousel();
+			};
+
+			prevButton?.addEventListener("click", moveToPrev);
+			nextButton?.addEventListener("click", moveToNext);
+			indicators.forEach((indicator, index) => {
+				indicator.addEventListener("click", () => moveToIndex(index));
+			});
+
+			setInterval(moveToNext, 3000);
+
+			updateCarousel();
+		}
+	});
+</script>
 {% endblock %}

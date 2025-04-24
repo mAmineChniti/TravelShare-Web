@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ReservationHotelRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'reservation_hotel')]
 #[ORM\Index(name: 'fk_client_id', columns: ['client_id'])]
@@ -24,15 +25,25 @@ class ReservationHotel
     private ?int $chambreId = null;
 
     #[ORM\Column(name: 'date_debut', type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: 'Start date cannot be blank.')]
+    #[Assert\GreaterThanOrEqual('today', message: 'Start date cannot be in the past.')]
     private ?\DateTimeInterface $dateDebut = null;
 
     #[ORM\Column(name: 'date_fin', type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: 'End date cannot be blank.')]
+    #[Assert\Expression(
+        'this.getDateDebut() === null || value >= this.getDateDebut()',
+        message: 'End date cannot be before start date.'
+    )]
     private ?\DateTimeInterface $dateFin = null;
 
-    #[ORM\Column(name: 'status_enu', type: Types::STRING)]
+    #[ORM\Column(name: 'status_enu', type: Types::STRING, length: 255)]
+    #[Assert\NotBlank(message: 'Status cannot be blank.')]
+    #[Assert\Choice(choices: ['confirmer', 'annuler', 'en attente', ''], message: 'Invalid status. Allowed values are: confirmer, annuler, en attente, or empty.')]
     private ?string $statusEnu = null;
 
     #[ORM\Column(name: 'prix_totale')]
+    #[Assert\Positive(message: 'Total price must be a positive number.')]
     private ?int $prixTotale = null;
 
     public function getReservationHotelId(): ?int
