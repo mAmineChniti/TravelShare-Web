@@ -192,9 +192,8 @@
                 <div class="bg-primary rounded p-4 mb-4">
                     <h4 class="text-white mb-4">Réserver</h4>
                     <p class="text-white">Would you like to participate in this excursion?</p>
-                    <a href="" class="btn btn-light w-100 py-2">Book now</a>
+                    <a href="{{ path('app_book_excursions', {'id': excursion.excursionId}) }}" class="btn btn-light w-100 py-2">Book now</a>
                 </div>
-                
                 <div class="bg-light rounded p-4 mb-4">
                     <h4 class="mb-4">Statut</h4>
                     <div class="d-flex justify-content-between mb-3">

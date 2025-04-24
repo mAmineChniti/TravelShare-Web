@@ -138,4 +138,11 @@ private ?Guides $guide = null;
 
         return $this;
     }
+
+
+    public function isPast(): bool
+    {
+        $now = new \DateTime('today'); // Utilisez 'today' pour être cohérent
+        return $this->getDateExcursion() < $now;
+    }
 }

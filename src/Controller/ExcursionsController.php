@@ -1,17 +1,19 @@
 <?php
-
+// src/Controller/ExcursionsController.php
 namespace App\Controller;
 
 use App\Entity\Excursions;
 use App\Form\ExcursionsType;
 use App\Repository\ExcursionsRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-final class ExcursionsController extends AbstractController
+class ExcursionsController extends AbstractController
 {
     #[Route('/excursions', name: 'app_excursions')]
     public function index(): Response
@@ -20,43 +22,56 @@ final class ExcursionsController extends AbstractController
     }
 
     #[Route('/excursions/read', name: 'app_excursions_read')]
-    public function read(ExcursionsRepository $excursionsRepository): Response
+    public function read(ExcursionsRepository $excursionsRepository, NotificationService $notificationService): Response
     {
-        $excursions = $excursionsRepository->findAllWithGuides();
-
+        // Récupère les excursions passées
+        $pastExcursions = $notificationService->checkPastExcursions();
+        
+        // Crée les notifications formatées
+        $notifications = [];
+        foreach ($pastExcursions as $excursion) {
+            $notifications[] = [
+                'type' => 'warning',
+                'icon' => 'exclamation-triangle',
+                'message' => sprintf('Excursion "%s" est terminée depuis le %s', 
+                    $excursion->getTitle(),
+                    $excursion->getDateExcursion()->format('d/m/Y')
+                ),
+                'createdAt' => $excursion->getDateExcursion()
+            ];
+        }
+    
         return $this->render('excursions/readExcursion.html.twig', [
-            'excursions' => $excursions,
+            'excursions' => $excursionsRepository->findAllWithGuides(),
+            'notifications' => $notifications // On passe les notifications au template
+        ]);
+    }
+    #[Route('/excursions/new', name: 'app_excursions_new')]
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $excursion = new Excursions();
+        $form = $this->createForm(ExcursionsType::class, $excursion);
+        
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $entityManager->persist($excursion);
+                $entityManager->flush();
+                
+                $this->addFlash('success', 'Excursion créée avec succès');
+                return $this->redirectToRoute('app_excursions_read');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Erreur lors de la création: '.$e->getMessage());
+            }
+        }
+        
+        return $this->render('excursions/addExcursion.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 
-    // src/Controller/ExcursionsController.php
-
-    #[Route('/excursions/new', name: 'app_excursions_new')]
-public function new(Request $request, EntityManagerInterface $entityManager): Response
-{
-    $excursion = new Excursions();
-    $form = $this->createForm(ExcursionsType::class, $excursion);
-    
-    $form->handleRequest($request);
-    
-    if ($form->isSubmitted() && $form->isValid()) {
-        try {
-            $entityManager->persist($excursion);
-            $entityManager->flush();
-            
-            $this->addFlash('success', 'Excursion créée avec succès');
-            return $this->redirectToRoute('app_excursions_read');
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'Erreur lors de la création: '.$e->getMessage());
-        }
-    }
-    
-    return $this->render('excursions/addExcursion.html.twig', [
-        'form' => $form->createView(),
-    ]);
-}
-
-#[Route('/excursions/edit/{id}', name: 'app_excursions_edit', methods: ['GET', 'POST'])]
+    #[Route('/excursions/edit/{id}', name: 'app_excursions_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Excursions $excursion, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ExcursionsType::class, $excursion);
@@ -75,20 +90,18 @@ public function new(Request $request, EntityManagerInterface $entityManager): Re
         ]);
     }
 
-#[Route('/excursions/delete/{id}', name: 'app_excursions_delete', methods: ['POST'])]
-public function delete(Request $request, Excursions $excursion, EntityManagerInterface $entityManager): Response
-{
-    // Vérification du token CSRF pour la sécurité
-    if ($this->isCsrfTokenValid('delete'.$excursion->getExcursionId(), $request->request->get('_token'))) {
-        $entityManager->remove($excursion);
-        $entityManager->flush();
-        
-        $this->addFlash('success', 'L\'excursion a été supprimée avec succès.');
-    } else {
-        $this->addFlash('error', 'Token CSRF invalide, suppression annulée.');
+    #[Route('/excursions/delete/{id}', name: 'app_excursions_delete', methods: ['POST'])]
+    public function delete(Request $request, Excursions $excursion, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$excursion->getExcursionId(), $request->request->get('_token'))) {
+            $entityManager->remove($excursion);
+            $entityManager->flush();
+            
+            $this->addFlash('success', 'L\'excursion a été supprimée avec succès.');
+        } else {
+            $this->addFlash('error', 'Token CSRF invalide, suppression annulée.');
+        }
+
+        return $this->redirectToRoute('app_excursions_read');
     }
-
-    return $this->redirectToRoute('app_excursions_read');
-}
-
 }

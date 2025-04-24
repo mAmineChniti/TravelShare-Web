@@ -131,9 +131,6 @@
 </div>
 <!-- Header End -->
 
-
-
-
 <!-- Explore Tour Start -->
 <div class="container-fluid excursion-section py-5">
     <div class="container">
@@ -141,6 +138,43 @@
             <h2 class="section-title">Our Excursions</h2>
             <p class="section-subtitle">Discover unique experiences</p>
             <div class="divider mx-auto"></div>
+        </div>
+
+        <!-- Search Form -->
+        <div class="row mb-5">
+            <div class="col-md-10 mx-auto">
+                <form action="{{ path('app_excursions_client') }}" method="get" class="search-form">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input type="text" 
+                                   name="title" 
+                                   class="form-control" 
+                                   placeholder="Search by title..." 
+                                   value="{{ searchTitle ?? '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <input type="number" 
+                                   name="max_price" 
+                                   class="form-control" 
+                                   placeholder="Max price (DT)" 
+                                   value="{{ maxPrice ?? '' }}"
+                                   min="0" step="0.01">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Search
+                            </button>
+                        </div>
+                    </div>
+                    {% if searchTitle or maxPrice %}
+                    <div class="mt-3 text-center">
+                        <a href="{{ path('app_excursions_client') }}" class="text-muted">
+                            <i class="fas fa-times me-1"></i>Clear filters
+                        </a>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
         </div>
 
         <div class="row g-4">
@@ -158,8 +192,8 @@
                             {{ date(excursion.dateExcursion) < date() ? 'Finished' : 'Available' }}
                         </div>
                         <button class="excursion-favorite-btn">
-        <i class="far fa-heart"></i> <!-- Cœur vide (change en fas fa-heart pour cœur plein) -->
-    </button>
+                            <i class="far fa-heart"></i>
+                        </button>
                     </div>
                     
                     <div class="excursion-body">
@@ -198,8 +232,19 @@
             <div class="col-12">
                 <div class="no-excursions text-center py-5">
                     <i class="fas fa-umbrella-beach fa-4x text-muted mb-4"></i>
-                    <h4 class="text-muted">No excursions currently availablet</h4>
-                    <p>Come back later to discover our new offers</p>
+                    {% if searchTitle or maxPrice %}
+                        <h4 class="text-muted">No excursions found</h4>
+                        <p class="text-muted">
+                            {% if searchTitle %}Title: "{{ searchTitle }}"{% endif %}
+                            {% if maxPrice %} | Max price: {{ maxPrice }} DT{% endif %}
+                        </p>
+                        <a href="{{ path('app_excursions_client') }}" class="btn btn-outline-primary mt-3">
+                            Show all excursions
+                        </a>
+                    {% else %}
+                        <h4 class="text-muted">No excursions currently available</h4>
+                        <p>Come back later to discover our new offers</p>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -207,7 +252,6 @@
     </div>
 </div>
 <!-- Explore Tour End -->
-
 
 <!-- Subscribe Start -->
 <div class="container-fluid subscribe py-5">
@@ -322,8 +366,8 @@
                 <i class="fas fa-copyright me-2"></i><a class="text-white" href="#">Your Site Name</a>, All right reserved.
             </div>
             <div class="col-md-6 text-center text-md-start">
-                <!--/*** This template is free as long as you keep the below author’s credit link/attribution link/backlink. ***/-->
-                <!--/*** If you'd like to use the template without the below author’s credit link/attribution link/backlink, ***/-->
+                <!--/*** This template is free as long as you keep the below author's credit link/attribution link/backlink. ***/-->
+                <!--/*** If you'd like to use the template without the below author's credit link/attribution link/backlink, ***/-->
                 <!--/*** you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". ***/-->
                 Designed By <a class="text-white" href="https://htmlcodex.com">HTML Codex</a> Distributed By <a href="https://themewagon.com">ThemeWagon</a>
             </div>
@@ -352,13 +396,13 @@
     justify-content: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    color: #ccc; /* Couleur par défaut */
+    color: #ccc;
     z-index: 1;
 }
 
 .excursion-favorite-btn:hover {
     background: rgba(255, 255, 255, 0.9);
-    color: #ff4757; /* Couleur au survol */
+    color: #ff4757;
 }
 
 .excursion-favorite-btn i {
@@ -369,131 +413,150 @@
     transform: scale(1.2);
     transition: transform 0.3s ease;
 }
-    .excursion-section {
-        background-color: #f8f9fa;
-    }
-    
-    .section-header {
-        position: relative;
-        padding-bottom: 15px;
-    }
-    
-    .section-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 10px;
-    }
-    
-    .section-subtitle {
-        color: #7f8c8d;
-        font-size: 1.1rem;
-    }
-    
-    .divider {
-        width: 80px;
-        height: 3px;
-        background: #3498db;
-        margin-top: 20px;
-    }
-    
-    .excursion-card {
-        background: white;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        transition: all 0.3s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .excursion-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-    }
-    
-    .excursion-media {
-        position: relative;
-    }
-    
-    .excursion-image {
-        width: 100%;
-        height: 220px;
-        object-fit: cover;
-    }
-    
-    .excursion-badge {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        padding: 5px 15px;
-        border-radius: 20px;
-        color: white;
-        font-size: 0.8rem;
-        font-weight: 600;
-    }
-    
-    .excursion-body {
-        padding: 20px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .excursion-meta {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 15px;
-        font-size: 0.9rem;
-    }
-    
-    .excursion-date {
-        color: #7f8c8d;
-    }
-    
-    .excursion-price {
-        color: #27ae60;
-        font-weight: 600;
-    }
-    
-    .excursion-title {
-        font-size: 1.4rem;
-        margin-bottom: 15px;
-        color: #2c3e50;
-    }
-    
-    .excursion-description {
-        color: #7f8c8d;
-        margin-bottom: 20px;
-        flex-grow: 1;
-    }
-    
-    .excursion-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .guide-info {
-        font-size: 0.9rem;
-    }
-    
-    .guide-info small {
-        color: #7f8c8d;
-    }
-    
-    .guide-info span {
-        font-weight: 600;
-        color: #3498db;
-    }
-    
-    .no-excursions {
-        background: white;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    }
+
+.excursion-section {
+    background-color: #f8f9fa;
+}
+
+.section-header {
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.section-subtitle {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+}
+
+.divider {
+    width: 80px;
+    height: 3px;
+    background: #3498db;
+    margin-top: 20px;
+}
+
+.excursion-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.excursion-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.excursion-media {
+    position: relative;
+}
+
+.excursion-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.excursion-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 15px;
+    border-radius: 20px;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.excursion-body {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.excursion-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+.excursion-date {
+    color: #7f8c8d;
+}
+
+.excursion-price {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.excursion-title {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.excursion-description {
+    color: #7f8c8d;
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+
+.excursion-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.guide-info {
+    font-size: 0.9rem;
+}
+
+.guide-info small {
+    color: #7f8c8d;
+}
+
+.guide-info span {
+    font-weight: 600;
+    color: #3498db;
+}
+
+.no-excursions {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.search-form {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.search-form .form-control {
+    border: 1px solid #eee;
+    padding: 10px 15px;
+    height: auto;
+}
+
+.search-form .form-control:focus {
+    border-color: #3498db;
+    box-shadow: none;
+}
 </style>
 
 {% block js%}
@@ -504,7 +567,6 @@
     <script src="lib/waypoints/waypoints.min.js"></script>
     <script src="lib/owlcarousel/owl.carousel.min.js"></script>
     <script src="lib/lightbox/js/lightbox.min.js"></script>
-
 
     <!-- Template Javascript -->
     <script src="{{ asset('js/main.js') }}"></script>
