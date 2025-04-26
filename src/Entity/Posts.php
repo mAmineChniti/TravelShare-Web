@@ -42,6 +42,9 @@ class Posts
     )]
     private ?string $textContent = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $postTitle = null;
+
     public function getPostId(): ?int
     {
         return $this->postId;
@@ -91,6 +94,18 @@ class Posts
     public function setTextContent(string $textContent): static
     {
         $this->textContent = $textContent;
+
+        return $this;
+    }
+
+    public function getPostTitle(): ?string
+    {
+        return $this->postTitle;
+    }
+
+    public function setPostTitle(string $postTitle): static
+    {
+        $this->postTitle = $postTitle;
 
         return $this;
     }
