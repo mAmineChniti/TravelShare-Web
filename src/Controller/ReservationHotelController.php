@@ -2,13 +2,14 @@
 
 namespace App\Controller;
 
-use App\Repository\ChambresRepository;
 use App\Entity\ReservationHotel;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\ChambresRepository;
 use Symfony\Component\HttpFoundation\Request;
+use App\Repository\ReservationHotelRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\ReservationHotelRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ReservationHotelController extends AbstractController
 {
@@ -17,47 +18,34 @@ class ReservationHotelController extends AbstractController
         int $roomId,
         Request $request,
         ChambresRepository $chambresRepository,
-        ReservationHotelRepository $reservationHotelRepository
+        ReservationHotelRepository $reservationHotelRepository,
     ): Response {
         $room = $chambresRepository->find($roomId);
         if (!$room) {
-            throw $this->createNotFoundException('Room not found');
+            return new JsonResponse(['error' => 'Room not found'], Response::HTTP_NOT_FOUND);
         }
 
         $today = new \DateTime('today');
 
         $startStr = $request->request->get('startReservation');
-        $endStr   = $request->request->get('endReservation');
+        $endStr = $request->request->get('endReservation');
 
         if (!$startStr || !$endStr) {
-            $this->addFlash('error', 'Please provide both start and end dates for the reservation.');
-            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
+            return new JsonResponse(['error' => 'Both start and end dates are required.'], Response::HTTP_BAD_REQUEST);
         }
 
         try {
             $start = new \DateTime($startStr);
-            $end   = new \DateTime($endStr);
+            $end = new \DateTime($endStr);
         } catch (\Exception $e) {
-            $this->addFlash('error', 'Invalid date format.');
-            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
+            return new JsonResponse(['error' => 'Invalid date format.'], Response::HTTP_BAD_REQUEST);
         }
-
-        // 1) Start date cannot be in the past
         if ($start < $today) {
-            $this->addFlash('error', 'Start date cannot be in the past.');
-            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
+            return new JsonResponse(['error' => 'Start date cannot be in the past.'], Response::HTTP_BAD_REQUEST);
         }
 
-        // 2) End date cannot be in the past
-        if ($end < $today) {
-            $this->addFlash('error', 'End date cannot be in the past.');
-            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
-        }
-
-        // 3) Start must be before end
-        if ($start >= $end) {
-            $this->addFlash('error', 'Start date must be before end date.');
-            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
+        if ($end <= $start) {
+            return new JsonResponse(['error' => 'End date must be after the start date.'], Response::HTTP_BAD_REQUEST);
         }
 
         try {
@@ -67,16 +55,16 @@ class ReservationHotelController extends AbstractController
             $reservation->setChambreId($roomId);
             $reservation->setDateDebut($start);
             $reservation->setDateFin($end);
-            $reservation->setStatusEnu('Pending');
+            $reservation->setStatusEnu('');
             $reservation->setPrixTotale($room->getPrixParNuit() * $duration);
 
             $reservationHotelRepository->add($reservation);
 
             $this->addFlash('success', 'Room reserved successfully!');
-        } catch (\Exception $e) {
-            $this->addFlash('error', 'An error occurred while reserving the room: ' . $e->getMessage());
-        }
 
-        return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
+            return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => 'An error occurred while reserving the room: '.$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

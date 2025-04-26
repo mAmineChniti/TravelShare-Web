@@ -1,32 +1,31 @@
-{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %} {% block title %}Available Rooms{% endblock %} {% block body %}
+<div class="container mx-auto px-4 mt-8 space-y-6">
+	<h1 class="text-5xl font-bold mb-6">Available Rooms at {{ hotel.nom }}</h1>
 
-{% block title %}Available Rooms{% endblock %}
-
-{% block body %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8 text-center">Available Rooms at {{ hotel.nom }}</h1>
-
-    {# Filter available rooms #}
-    {% set availableRooms = rooms|filter(r => r.disponible != 0) %}
-
-    {% if availableRooms is empty %}
-        <div class="text-center text-gray-500 mt-12">No rooms available at the moment.</div>
-    {% else %}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {% for room in availableRooms %}
-                <div class="ml-10 bg-white rounded-2xl shadow-lg overflow-hidden transform hover:scale-105 transition duration-300">
-                    <div class="p-6">
-                        <h2 class="text-xl font-semibold mb-2">Room {{ room.numeroChambre }}</h2>
-                        <p class="text-gray-600"><span class="font-medium">Type:</span> {{ room.typeEnu }}</p>
-                        <p class="text-gray-600 mt-1"><span class="font-medium">Price:</span> {{ room.prixParNuit }} TND / night</p>
-                        <div class="mt-4 flex items-center justify-between">
-                            <a href="{{ path('room_details', { roomId: room.chambreId }) }}" 
-                               class="text-blue-500 hover:underline font-medium">View Details</a>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+	{% set availableRooms = rooms|filter(r => r.disponible != 0) %} {% if availableRooms is empty %}
+	<div class="text-center text-gray-700">No rooms available at the moment.</div>
+	{% else %}
+	<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+		{% for room in availableRooms %}
+		<div class="bg-white rounded-lg shadow-md p-6">
+			<div class="space-y-2">
+				<h2 class="text-3xl font-semibold">Room {{ room.numeroChambre }}</h2>
+				<p class="text-base text-gray-700"><span class="font-medium">Type:</span> {{ room.typeEnu }}</p>
+				<p class="text-base text-gray-700">
+					<span class="font-medium">Price:</span> {{ room.prixParNuit }} TND / night
+				</p>
+			</div>
+			<div class="mt-4">
+				<a
+					href="{{ path('room_details', { roomId: room.chambreId }) }}"
+					class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow block text-center"
+				>
+					View Details
+				</a>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+	{% endif %}
 </div>
 {% endblock %}

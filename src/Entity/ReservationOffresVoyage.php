@@ -4,8 +4,8 @@ namespace App\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use InvalidArgumentException;
 use App\Repository\ReservationOffresVoyageRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'reservation_offres_voyage')]
 #[ORM\Index(name: 'fk_client', columns: ['client_id'])]
@@ -19,21 +19,26 @@ class ReservationOffresVoyage
     private ?int $reservationId = null;
 
     #[ORM\Column(name: 'client_id')]
+    #[Assert\Positive(message: 'Client ID must be a positive integer.')]
     private ?int $clientId = null;
 
     #[ORM\Column(name: 'offre_id')]
+    #[Assert\Positive(message: 'Offer ID must be a positive integer.')]
     private ?int $offreId = null;
 
     #[ORM\Column(name: 'date_reserved', type: Types::DATE_MUTABLE)]
+    #[Assert\LessThanOrEqual('today', message: 'Reservation date cannot be in the future.')]
     private ?\DateTimeInterface $dateReserved = null;
 
     #[ORM\Column(name: 'status')]
     private ?int $status = null;
 
     #[ORM\Column(name: 'nbr_place')]
+    #[Assert\Positive(message: 'Number of places must be positive.')]
     private ?int $nbrPlace = null;
 
     #[ORM\Column(name: 'prix')]
+    #[Assert\GreaterThanOrEqual(0, message: 'Price cannot be negative.')]
     private ?float $prix = null;
 
     public function getReservationId(): ?int
@@ -48,9 +53,6 @@ class ReservationOffresVoyage
 
     public function setClientId(int $clientId): static
     {
-        if ($clientId <= 0) {
-            throw new InvalidArgumentException('Client ID must be a positive integer');
-        }
         $this->clientId = $clientId;
 
         return $this;
@@ -63,9 +65,6 @@ class ReservationOffresVoyage
 
     public function setOffreId(int $offreId): static
     {
-        if ($offreId <= 0) {
-            throw new InvalidArgumentException('Offer ID must be a positive integer');
-        }
         $this->offreId = $offreId;
 
         return $this;
@@ -78,10 +77,6 @@ class ReservationOffresVoyage
 
     public function setDateReserved(\DateTimeInterface $dateReserved): static
     {
-        $currentDate = new \DateTime();
-        if ($dateReserved > $currentDate) {
-            throw new InvalidArgumentException('Reservation date cannot be in the future');
-        }
         $this->dateReserved = $dateReserved;
 
         return $this;
@@ -94,7 +89,7 @@ class ReservationOffresVoyage
 
     public function setStatus(int $status): static
     {
-                $this->status = $status;
+        $this->status = $status;
 
         return $this;
     }
@@ -106,9 +101,6 @@ class ReservationOffresVoyage
 
     public function setNbrPlace(int $nbrPlace): static
     {
-        if ($nbrPlace <= 0) {
-            throw new InvalidArgumentException('Number of places must be positive');
-        }
         $this->nbrPlace = $nbrPlace;
 
         return $this;
@@ -121,9 +113,6 @@ class ReservationOffresVoyage
 
     public function setPrix(float $prix): static
     {
-        if ($prix < 0) {
-            throw new InvalidArgumentException('Price cannot be negative');
-        }
         $this->prix = $prix;
 
         return $this;

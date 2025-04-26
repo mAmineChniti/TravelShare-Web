@@ -1,0 +1,32 @@
+[
+  {
+    "image": "images/Pier2.jpg",
+    "alt": "Wooden Pier Over Tropical Water",
+    "title": "Relax by the Water",
+    "description": "Stroll along the pier and enjoy breathtaking ocean views."
+  },
+  {
+    "image": "images/Airplane.jpg",
+    "alt": "Airplane Flying Through the Clouds",
+    "title": "Book Your Flight",
+    "description": "Take off to your next adventure with the best flight deals."
+  },
+  {
+    "image": "images/Venice.jpg",
+    "alt": "Colorful Buildings by the Canal at Sunset",
+    "title": "Discover Beautiful Cities",
+    "description": "Explore charming canals and colorful streets around the world."
+  },
+  {
+    "image": "images/Pier.jpg",
+    "alt": "Wooden Pier Leading to the Sea",
+    "title": "Seaside Escape",
+    "description": "Walk into paradise with serene ocean landscapes."
+  },
+  {
+    "image": "images/Cairo.jpg",
+    "alt": "Ancient Pyramids in Cairo",
+    "title": "Marvel at Wonders",
+    "description": "Visit the timeless pyramids and experience history firsthand."
+  }
+]

@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\OffresVoyage;
 use Doctrine\Persistence\ManagerRegistry;
-use Exception;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 class OffresVoyageRepository extends ServiceEntityRepository
@@ -25,8 +24,8 @@ class OffresVoyageRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         $existingFlight = $this->find($offresVoyage->getOffresVoyageId());
-        if(!$existingFlight){
-            throw new \Exception("Flight not found!");
+        if (!$existingFlight) {
+            throw new \Exception('Flight not found!');
         }
         $existingFlight
         ->setTitre($offresVoyage->getTitre())
@@ -36,8 +35,8 @@ class OffresVoyageRepository extends ServiceEntityRepository
         ->setDateRetour($offresVoyage->getDateRetour())
         ->setPrix($offresVoyage->getPrix())
         ->setPlacesDisponibles($offresVoyage->getPlacesDisponibles())
-    ;
-        
+        ;
+
         $entityManager->flush();
     }
 

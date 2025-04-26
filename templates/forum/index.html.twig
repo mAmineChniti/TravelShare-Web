@@ -1,33 +1,44 @@
 {% extends 'base.html.twig' %} {% block title %}Forum{% endblock %} {% block body %}
-<div class="container mx-auto px-4 py-16">
-	<form id="postForm" class="htmx-form">
-		<div class="relative">
+<div class="container mx-auto px-4 mt-8 space-y-6">
+	<form id="postForm" class="bg-white rounded-lg shadow-md p-6 space-y-4">
+		<div>
 			<textarea
 				name="postText"
 				id="postText"
-				class="w-full p-3 pb-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
 				placeholder="Write a post…"
 				maxlength="255"
 			></textarea>
-			<span id="postLength" class="absolute bottom-2 left-3 text-sm text-gray-400 pointer-events-none">0/255</span>
+			<span id="postLength" class="text-sm text-gray-500">0/255</span>
 		</div>
-		<p id="postErrorMessage" class="text-red-500 text-sm mt-2"></p>
-		<div class="flex justify-end">
+		<p id="postErrorMessage" class="mt-1 text-sm text-red-600"></p>
+		<div>
 			<button
 				type="button"
 				onclick="ForumApp.submitPostIfValid()"
-				class="mt-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow hover:bg-blue-700 transition-all cursor-pointer"
+				class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow"
 			>
 				Post
 			</button>
 		</div>
 	</form>
 
-	<div id="postsContainer" class="mt-8">
+	<div id="postsContainer" class="space-y-4">
 		{% for post in posts %}
 		<twig:Post post="{{ post }}" />
 		{% endfor %}
 	</div>
+</div>
+
+<div id="error-messages" class="mt-4">
+	{% if errors is defined and errors|length > 0 %} {% for error in errors %}
+	<p class="text-sm text-red-600">{{ error }}</p>
+	{% endfor %} {% endif %}
+</div>
+<div id="success-messages" class="mt-4">
+	{% if success is defined and success|length > 0 %} {% for message in success %}
+	<p class="text-sm text-green-600">{{ message }}</p>
+	{% endfor %} {% endif %}
 </div>
 
 <script>

@@ -8,3 +8,8 @@ import "./bootstrap.js";
 
 // any CSS you import will output into a single css file (app.css in this case)
 import "./styles/app.css";
+import 'flowbite';
+
+// Ensure Flowbite components are initialized
+import { initFlowbite } from 'flowbite';
+initFlowbite();

@@ -24,9 +24,10 @@
 		{% block stylesheets %} {{ encore_entry_link_tags('app') }} {% endblock %} {% block javascripts %} {{
 		encore_entry_script_tags('app') }} {% endblock %}
 	</head>
-	<body class="min-h-screen">
+	<body class="min-h-screen text-gray-800 antialiased">
 		<twig:Navbar />
-		<main class="pt-20 pb-10 w-full bg-background text-primary-foreground">{% block body %} {% endblock %}</main>
+		<main class="pt-20 pb-10 w-full bg-white text-gray-900">{% block body %} {% endblock %}</main>
 		<twig:Footer />
+		<script src="../node_modules/flowbite/dist/flowbite.min.js"></script>
 	</body>
 </html>
