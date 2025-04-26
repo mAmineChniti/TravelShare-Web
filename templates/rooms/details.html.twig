@@ -74,7 +74,7 @@
 				errorMessages.push("End reservation date cannot be empty.");
 			}
 
-			if (startReservation && endReservation && new Date(startReservation) > new Date(endReservation)) {
+			if (startReservation && endReservation && new Date(startReservation) < new Date(endReservation)) {
 				isValid = false;
 				errorMessages.push("Start reservation date cannot be after the end reservation date.");
 			}
