@@ -5,16 +5,19 @@ namespace App\Controller;
 use App\Entity\Likes;
 use App\Entity\Posts;
 use App\Entity\Comments;
+use App\Entity\PostImages;
 use App\Repository\LikesRepository;
 use App\Repository\PostsRepository;
 use App\Repository\UsersRepository;
 use App\Repository\CommentsRepository;
+use App\Repository\PostImagesRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 final class ForumController extends AbstractController
@@ -24,6 +27,7 @@ final class ForumController extends AbstractController
         PostsRepository $postsRepository,
         CommentsRepository $commentsRepository,
         LikesRepository $likesRepository,
+        PostImagesRepository $postImagesRepository,
     ): Response {
         $userId = 1;
         $posts = $postsRepository->fetchPosts(0, 10, $userId);
@@ -31,6 +35,13 @@ final class ForumController extends AbstractController
             $post['comments'] = $commentsRepository->fetchById($post['postId']);
             $post['likesCount'] = $likesRepository->likesCounter($post['postId']);
             $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
+
+            $images = $postImagesRepository->findImagesByPostId($post['postId']);
+            if ($images) {
+                $post['images'] = array_map(fn ($image) => base64_encode($image), $images);
+            } else {
+                $post['images'] = [];
+            }
         }
 
         return $this->render('forum/index.html.twig', [
@@ -43,13 +54,16 @@ final class ForumController extends AbstractController
         Request $request,
         PostsRepository $postsRepository,
         UsersRepository $userRepository,
+        PostImagesRepository $postImagesRepository,
         ValidatorInterface $validator,
     ): Response {
         $postText = $request->request->get('postText');
+        $postTitle = $request->request->get('postTitle');
         $userId = 1;
 
         $post = new Posts();
         $post->setTextContent($postText);
+        $post->setPostTitle($postTitle);
         $post->setOwnerId($userId);
         $post->setCreatedAt(new \DateTime());
         $post->setUpdatedAt(new \DateTime());
@@ -67,16 +81,33 @@ final class ForumController extends AbstractController
         $postsRepository->add($post);
 
         $user = $userRepository->find($userId);
-
+        $images = $postImagesRepository->findImagesByPostId($post->getPostId());
         $postData = [
             'postId' => $post->getPostId(),
             'name' => $user->getName(),
             'lastName' => $user->getLastName(),
             'textContent' => $post->getTextContent(),
+            'postTitle' => $post->getPostTitle(),
+            'images' => $images ? array_map(fn ($image) => base64_encode($image), $images) : [],
             'isLiked' => false,
             'likesCount' => 0,
             'comments' => [],
         ];
+
+        $uploadedFiles = $request->files->get('postImages');
+        if ($uploadedFiles) {
+            foreach ($uploadedFiles as $uploadedFile) {
+                try {
+                    $imageData = file_get_contents($uploadedFile->getPathname());
+                    $postImage = new PostImages();
+                    $postImage->setPost($post);
+                    $postImage->setImage($imageData);
+                    $postImagesRepository->add($postImage);
+                } catch (FileException $e) {
+                    return new JsonResponse(['error' => 'Failed to process uploaded image.'], 400);
+                }
+            }
+        }
 
         return $this->render('components/Post.html.twig', [
             'post' => $postData,
@@ -104,6 +135,9 @@ final class ForumController extends AbstractController
         $post->setTextContent($postText);
         $post->setUpdatedAt(new \DateTime());
 
+        $postTitle = $request->request->get('editTitle-'.$id);
+        $post->setPostTitle($postTitle);
+
         $errors = $validator->validate($post);
         if (count($errors) > 0) {
             $errorMessages = [];
@@ -118,6 +152,7 @@ final class ForumController extends AbstractController
 
         return $this->render('components/PostText.html.twig', [
             'postId' => $post->getPostId(),
+            'postTitle' => $post->getPostTitle(),
             'textContent' => $post->getTextContent(),
         ]);
     }
