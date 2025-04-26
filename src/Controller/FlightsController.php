@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\OffresVoyage;
 use App\Entity\ReservationOffresVoyage;
 use App\Repository\OffresVoyageRepository;
+use App\Repository\ReservationOffresVoyageRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -39,9 +40,9 @@ final class FlightsController extends AbstractController
     }
 
     #[Route('/flights/{id}/reserve', name: 'app_reserve_flight', methods: ['POST'])]
-    public function reserveFlight(int $id, Request $request, OffresVoyageRepository $voyageService, ValidatorInterface $validator): Response
+    public function reserveFlight(int $id, Request $request, OffresVoyageRepository $VoyageOffre, ReservationOffresVoyageRepository $voyageService, ValidatorInterface $validator): Response
     {
-        $voyage = $voyageService->find($id);
+        $voyage = $VoyageOffre->find($id);
 
         if (!$voyage) {
             $this->addFlash('error', 'Flight not found.');
@@ -66,14 +67,22 @@ final class FlightsController extends AbstractController
         if (count($errors) > 0) {
             foreach ($errors as $error) {
                 $this->addFlash('error', $error->getMessage());
+                return $this->redirectToRoute('app_flight_details', ['id' => $id]);
             }
 
             return $this->redirectToRoute('app_flight_details', ['id' => $id]);
         }
 
-        $voyageService->reserve($reservation);
+        $promoCode = $request->request->get('promoCode', '');
+        // Debugging: Log the received promoCode
+        $this->addFlash('info', 'Received promoCode: ' . $promoCode);
+try{
+        $voyageService->add($reservation, $promoCode);
         $this->addFlash('success', "You have successfully reserved $nbrPlace seat(s). Have fun on your flight!");
-
+}catch (\Exception $e) {
+        $this->addFlash('error', $e->getMessage());
+        return $this->redirectToRoute('app_flight_details', ['id' => $id]);
+        }
         return $this->redirectToRoute('app_flight_details', ['id' => $id]);
     }
 

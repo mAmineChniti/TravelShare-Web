@@ -15,29 +15,40 @@ class PromoRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Promo::class);
     }
+    public function add(Promo $promo): void
+    {
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($promo);
+        $entityManager->flush();
+    }
 
-//    /**
-//     * @return Promo[] Returns an array of Promo objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function update(Promo $promo): void
+    {
+        $entityManager = $this->getEntityManager();
+        $existingPromo = $this->find($promo->getPromoid());
+        if (!$existingPromo) {
+            throw new \Exception('Promo not found');
+        }
+        $existingPromo->setCodepromo($promo->getCodepromo());
+        $existingPromo->setDateexpiration($promo->getDateexpiration());
+        $existingPromo->setPourcentagepromo($promo->getPourcentagepromo());
+        $existingPromo->setNombremaxpersonne($promo->getNombremaxpersonne());
+        $entityManager->flush();
+    }
 
-//    public function findOneBySomeField($value): ?Promo
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function delete(int $id): void
+    {
+        $entityManager = $this->getEntityManager();
+        $promo = $this->find($id);
+        if (!$promo) {
+            throw new \Exception('Promo not found');
+        }
+        $entityManager->remove($promo);
+        $entityManager->flush();
+    }
+
+    public function listAll(): array
+    {
+        return $this->findAll();
+    }
 }
