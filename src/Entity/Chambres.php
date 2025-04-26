@@ -17,7 +17,7 @@ class Chambres
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $chambreId = null;
 
-    #[ORM\ManyToOne(targetEntity: Hotels::class)]
+    #[ORM\ManyToOne(targetEntity: Hotels::class, inversedBy: 'chambres')]
     #[ORM\JoinColumn(name: 'hotel_id', referencedColumnName: 'hotel_id', nullable: false)]
     private ?Hotels $hotel = null;
 
