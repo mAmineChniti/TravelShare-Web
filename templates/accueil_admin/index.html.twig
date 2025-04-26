@@ -41,6 +41,50 @@
 
         <!-- CSS Just for demo purpose, don't include it in your project -->
         <link rel="stylesheet" href="{{ asset('css3/demo.css') }}" />
+
+        <style>
+
+            /* assets/styles/admin.css */
+            .table-hover tbody tr:hover {
+                background-color: rgba(0, 0, 0, 0.02);
+            }
+
+            .avatar-initials {
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+            }
+
+            .btn-sm {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.875rem;
+            }
+
+            .badge {
+                font-size: 0.75em;
+                font-weight: 500;
+                padding: 0.35em 0.65em;
+            }
+
+            .bg-light-blue {
+                background-color: #f8fafc;
+            }
+            .avatar-placeholder {
+                font-weight: 600;
+                font-size: 0.9rem;
+            }
+            .table-hover tbody tr:hover {
+                background-color: rgba(0, 123, 255, 0.05) !important;
+            }
+            .badge {
+                font-weight: 500;
+                letter-spacing: 0.5px;
+            }
+
+        </style>
     {% endblock %}
 
 </head>
@@ -124,7 +168,7 @@
                             </div>
                             <input
                                     type="text"
-                                    placeholder="Rechercher ..."
+                                    placeholder="Search ..."
                                     class="form-control"
                             />
                         </div>
@@ -452,7 +496,7 @@
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="#">Account Setting</a>
                                         <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="#">Logout</a>
+                                        <a class="dropdown-item" href="{{ path('app_logout') }}">Logout</a>
                                     </li>
                                 </div>
                             </ul>
@@ -558,525 +602,113 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="card card-round">
-                            <div class="card-header">
-                                <div class="card-head-row">
-                                    <div class="card-title">User Statistics</div>
-                                    <div class="card-tools">
-                                        <a
-                                                href="#"
-                                                class="btn btn-label-success btn-round btn-sm me-2"
-                                        >
-                          <span class="btn-label">
-                            <i class="fa fa-pencil"></i>
-                          </span>
-                                            Export
-                                        </a>
-                                        <a href="#" class="btn btn-label-info btn-round btn-sm">
-                          <span class="btn-label">
-                            <i class="fa fa-print"></i>
-                          </span>
-                                            Print
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container" style="min-height: 375px">
-                                    <canvas id="statisticsChart"></canvas>
-                                </div>
-                                <div id="myChartLegend"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card card-primary card-round">
-                            <div class="card-header">
-                                <div class="card-head-row">
-                                    <div class="card-title">Daily Sales</div>
-                                    <div class="card-tools">
-                                        <div class="dropdown">
-                                            <button
-                                                    class="btn btn-sm btn-label-light dropdown-toggle"
-                                                    type="button"
-                                                    id="dropdownMenuButton"
-                                                    data-bs-toggle="dropdown"
-                                                    aria-haspopup="true"
-                                                    aria-expanded="false"
-                                            >
-                                                Export
-                                            </button>
-                                            <div
-                                                    class="dropdown-menu"
-                                                    aria-labelledby="dropdownMenuButton"
-                                            >
-                                                <a class="dropdown-item" href="#">Action</a>
-                                                <a class="dropdown-item" href="#">Another action</a>
-                                                <a class="dropdown-item" href="#"
-                                                >Something else here</a
-                                                >
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-category">March 25 - April 02</div>
-                            </div>
-                            <div class="card-body pb-0">
-                                <div class="mb-4 mt-2">
-                                    <h1>$4,578.58</h1>
-                                </div>
-                                <div class="pull-in">
-                                    <canvas id="dailySalesChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card card-round">
-                            <div class="card-body pb-0">
-                                <div class="h1 fw-bold float-end text-primary">+5%</div>
-                                <h2 class="mb-2">17</h2>
-                                <p class="text-muted">Users online</p>
-                                <div class="pull-in sparkline-fix">
-                                    <div id="lineChart"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card card-round">
-                            <div class="card-header">
-                                <div class="card-head-row card-tools-still-right">
-                                    <h4 class="card-title">Users Geolocation</h4>
-                                    <div class="card-tools">
-                                        <button
-                                                class="btn btn-icon btn-link btn-primary btn-xs"
-                                        >
-                                            <span class="fa fa-angle-down"></span>
-                                        </button>
-                                        <button
-                                                class="btn btn-icon btn-link btn-primary btn-xs btn-refresh-card"
-                                        >
-                                            <span class="fa fa-sync-alt"></span>
-                                        </button>
-                                        <button
-                                                class="btn btn-icon btn-link btn-primary btn-xs"
-                                        >
-                                            <span class="fa fa-times"></span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <p class="card-category">
-                                    Map of the distribution of users around the world
-                                </p>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="table-responsive table-hover table-sales">
-                                            <table class="table">
-                                                <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <div class="flag">
-                                                            <img
-                                                                    src="assets/img/flags/id.png"
-                                                                    alt="indonesia"
-                                                            />
-                                                        </div>
-                                                    </td>
-                                                    <td>Indonesia</td>
-                                                    <td class="text-end">2.320</td>
-                                                    <td class="text-end">42.18%</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div class="flag">
-                                                            <img
-                                                                    src="assets/img/flags/us.png"
-                                                                    alt="united states"
-                                                            />
-                                                        </div>
-                                                    </td>
-                                                    <td>USA</td>
-                                                    <td class="text-end">240</td>
-                                                    <td class="text-end">4.36%</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div class="flag">
-                                                            <img
-                                                                    src="assets/img/flags/au.png"
-                                                                    alt="australia"
-                                                            />
-                                                        </div>
-                                                    </td>
-                                                    <td>Australia</td>
-                                                    <td class="text-end">119</td>
-                                                    <td class="text-end">2.16%</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div class="flag">
-                                                            <img
-                                                                    src="assets/img/flags/ru.png"
-                                                                    alt="russia"
-                                                            />
-                                                        </div>
-                                                    </td>
-                                                    <td>Russia</td>
-                                                    <td class="text-end">1.081</td>
-                                                    <td class="text-end">19.65%</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div class="flag">
-                                                            <img
-                                                                    src="assets/img/flags/cn.png"
-                                                                    alt="china"
-                                                            />
-                                                        </div>
-                                                    </td>
-                                                    <td>China</td>
-                                                    <td class="text-end">1.100</td>
-                                                    <td class="text-end">20%</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div class="flag">
-                                                            <img
-                                                                    src="assets/img/flags/br.png"
-                                                                    alt="brazil"
-                                                            />
-                                                        </div>
-                                                    </td>
-                                                    <td>Brasil</td>
-                                                    <td class="text-end">640</td>
-                                                    <td class="text-end">11.63%</td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mapcontainer">
-                                            <div
-                                                    id="world-map"
-                                                    class="w-100"
-                                                    style="height: 300px"
-                                            ></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="card card-round">
                             <div class="card-body">
                                 <div class="card-head-row card-tools-still-right">
-                                    <div class="card-title">New Customers</div>
+                                    <h4 class="card-title text-primary">
+                                        <i class="fas fa-users-cog me-2"></i>User Management
+                                    </h4>
                                     <div class="card-tools">
-                                        <div class="dropdown">
-                                            <button
-                                                    class="btn btn-icon btn-clean me-0"
-                                                    type="button"
-                                                    id="dropdownMenuButton"
-                                                    data-bs-toggle="dropdown"
-                                                    aria-haspopup="true"
-                                                    aria-expanded="false"
-                                            >
-                                                <i class="fas fa-ellipsis-h"></i>
-                                            </button>
-                                            <div
-                                                    class="dropdown-menu"
-                                                    aria-labelledby="dropdownMenuButton"
-                                            >
-                                                <a class="dropdown-item" href="#">Action</a>
-                                                <a class="dropdown-item" href="#">Another action</a>
-                                                <a class="dropdown-item" href="#"
-                                                >Something else here</a
-                                                >
+                                        <div class="input-group">
+                                            <input type="text" class="form-control border-primary" placeholder="Search users..." id="userSearch">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary" type="button">
+                                                    <i class="fas fa-search"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-list py-4">
-                                    <div class="item-list">
-                                        <div class="avatar">
-                                            <img
-                                                    src="assets/img/jm_denis.jpg"
-                                                    alt="..."
-                                                    class="avatar-img rounded-circle"
-                                            />
-                                        </div>
-                                        <div class="info-user ms-3">
-                                            <div class="username">Jimmy Denis</div>
-                                            <div class="status">Graphic Designer</div>
-                                        </div>
-                                        <button class="btn btn-icon btn-link op-8 me-1">
-                                            <i class="far fa-envelope"></i>
-                                        </button>
-                                        <button class="btn btn-icon btn-link btn-danger op-8">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                    </div>
-                                    <div class="item-list">
-                                        <div class="avatar">
-                          <span
-                                  class="avatar-title rounded-circle border border-white"
-                          >CF</span
-                          >
-                                        </div>
-                                        <div class="info-user ms-3">
-                                            <div class="username">Chandra Felix</div>
-                                            <div class="status">Sales Promotion</div>
-                                        </div>
-                                        <button class="btn btn-icon btn-link op-8 me-1">
-                                            <i class="far fa-envelope"></i>
-                                        </button>
-                                        <button class="btn btn-icon btn-link btn-danger op-8">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                    </div>
-                                    <div class="item-list">
-                                        <div class="avatar">
-                                            <img
-                                                    src="assets/img/talha.jpg"
-                                                    alt="..."
-                                                    class="avatar-img rounded-circle"
-                                            />
-                                        </div>
-                                        <div class="info-user ms-3">
-                                            <div class="username">Talha</div>
-                                            <div class="status">Front End Designer</div>
-                                        </div>
-                                        <button class="btn btn-icon btn-link op-8 me-1">
-                                            <i class="far fa-envelope"></i>
-                                        </button>
-                                        <button class="btn btn-icon btn-link btn-danger op-8">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                    </div>
-                                    <div class="item-list">
-                                        <div class="avatar">
-                                            <img
-                                                    src="assets/img/chadengle.jpg"
-                                                    alt="..."
-                                                    class="avatar-img rounded-circle"
-                                            />
-                                        </div>
-                                        <div class="info-user ms-3">
-                                            <div class="username">Chad</div>
-                                            <div class="status">CEO Zeleaf</div>
-                                        </div>
-                                        <button class="btn btn-icon btn-link op-8 me-1">
-                                            <i class="far fa-envelope"></i>
-                                        </button>
-                                        <button class="btn btn-icon btn-link btn-danger op-8">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                    </div>
-                                    <div class="item-list">
-                                        <div class="avatar">
-                          <span
-                                  class="avatar-title rounded-circle border border-white bg-primary"
-                          >H</span
-                          >
-                                        </div>
-                                        <div class="info-user ms-3">
-                                            <div class="username">Hizrian</div>
-                                            <div class="status">Web Designer</div>
-                                        </div>
-                                        <button class="btn btn-icon btn-link op-8 me-1">
-                                            <i class="far fa-envelope"></i>
-                                        </button>
-                                        <button class="btn btn-icon btn-link btn-danger op-8">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                    </div>
-                                    <div class="item-list">
-                                        <div class="avatar">
-                          <span
-                                  class="avatar-title rounded-circle border border-white bg-secondary"
-                          >F</span
-                          >
-                                        </div>
-                                        <div class="info-user ms-3">
-                                            <div class="username">Farrah</div>
-                                            <div class="status">Marketing</div>
-                                        </div>
-                                        <button class="btn btn-icon btn-link op-8 me-1">
-                                            <i class="far fa-envelope"></i>
-                                        </button>
-                                        <button class="btn btn-icon btn-link btn-danger op-8">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card card-round">
-                            <div class="card-header">
-                                <div class="card-head-row card-tools-still-right">
-                                    <div class="card-title">Transaction History</div>
-                                    <div class="card-tools">
-                                        <div class="dropdown">
-                                            <button
-                                                    class="btn btn-icon btn-clean me-0"
-                                                    type="button"
-                                                    id="dropdownMenuButton"
-                                                    data-bs-toggle="dropdown"
-                                                    aria-haspopup="true"
-                                                    aria-expanded="false"
-                                            >
-                                                <i class="fas fa-ellipsis-h"></i>
-                                            </button>
-                                            <div
-                                                    class="dropdown-menu"
-                                                    aria-labelledby="dropdownMenuButton"
-                                            >
-                                                <a class="dropdown-item" href="#">Action</a>
-                                                <a class="dropdown-item" href="#">Another action</a>
-                                                <a class="dropdown-item" href="#"
-                                                >Something else here</a
-                                                >
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body p-0">
-                                <div class="table-responsive">
-                                    <!-- Projects table -->
-                                    <table class="table align-items-center mb-0">
-                                        <thead class="thead-light">
+
+                                <div class="table-responsive mt-3">
+                                    <table class="table table-hover table-striped">
+                                        <thead class="bg-light-blue">
                                         <tr>
-                                            <th scope="col">Payment Number</th>
-                                            <th scope="col" class="text-end">Date & Time</th>
-                                            <th scope="col" class="text-end">Amount</th>
-                                            <th scope="col" class="text-end">Status</th>
+                                            <th class="text-center"><i class="fas fa-image"></i> Photo</th>
+                                            <th><i class="fas fa-user me-1"></i> First Name</th>
+                                            <th><i class="fas fa-user me-1"></i> Last Name</th>
+                                            <th><i class="fas fa-envelope me-1"></i> Email</th>
+                                            <th><i class="fas fa-phone me-1"></i> Phone</th>
+                                            <th><i class="fas fa-map-marker-alt me-1"></i> Address</th>
+                                            <th class="text-center"><i class="fas fa-circle-notch me-1"></i> Status</th>
+                                            <th class="text-center"><i class="fas fa-cog"></i> Actions</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr>
-                                            <th scope="row">
-                                                <button
-                                                        class="btn btn-icon btn-round btn-success btn-sm me-2"
-                                                >
-                                                    <i class="fa fa-check"></i>
-                                                </button>
-                                                Payment from #10231
-                                            </th>
-                                            <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                                            <td class="text-end">$250.00</td>
-                                            <td class="text-end">
-                                                <span class="badge badge-success">Completed</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">
-                                                <button
-                                                        class="btn btn-icon btn-round btn-success btn-sm me-2"
-                                                >
-                                                    <i class="fa fa-check"></i>
-                                                </button>
-                                                Payment from #10231
-                                            </th>
-                                            <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                                            <td class="text-end">$250.00</td>
-                                            <td class="text-end">
-                                                <span class="badge badge-success">Completed</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">
-                                                <button
-                                                        class="btn btn-icon btn-round btn-success btn-sm me-2"
-                                                >
-                                                    <i class="fa fa-check"></i>
-                                                </button>
-                                                Payment from #10231
-                                            </th>
-                                            <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                                            <td class="text-end">$250.00</td>
-                                            <td class="text-end">
-                                                <span class="badge badge-success">Completed</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">
-                                                <button
-                                                        class="btn btn-icon btn-round btn-success btn-sm me-2"
-                                                >
-                                                    <i class="fa fa-check"></i>
-                                                </button>
-                                                Payment from #10231
-                                            </th>
-                                            <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                                            <td class="text-end">$250.00</td>
-                                            <td class="text-end">
-                                                <span class="badge badge-success">Completed</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">
-                                                <button
-                                                        class="btn btn-icon btn-round btn-success btn-sm me-2"
-                                                >
-                                                    <i class="fa fa-check"></i>
-                                                </button>
-                                                Payment from #10231
-                                            </th>
-                                            <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                                            <td class="text-end">$250.00</td>
-                                            <td class="text-end">
-                                                <span class="badge badge-success">Completed</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">
-                                                <button
-                                                        class="btn btn-icon btn-round btn-success btn-sm me-2"
-                                                >
-                                                    <i class="fa fa-check"></i>
-                                                </button>
-                                                Payment from #10231
-                                            </th>
-                                            <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                                            <td class="text-end">$250.00</td>
-                                            <td class="text-end">
-                                                <span class="badge badge-success">Completed</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">
-                                                <button
-                                                        class="btn btn-icon btn-round btn-success btn-sm me-2"
-                                                >
-                                                    <i class="fa fa-check"></i>
-                                                </button>
-                                                Payment from #10231
-                                            </th>
-                                            <td class="text-end">Mar 19, 2020, 2.45pm</td>
-                                            <td class="text-end">$250.00</td>
-                                            <td class="text-end">
-                                                <span class="badge badge-success">Completed</span>
-                                            </td>
-                                        </tr>
+                                        {% for user in users %}
+                                            <tr class="align-middle">
+                                                <td class="text-center">
+                                                    {% if user.photo %}
+                                                        <img src="{{ user.getPhotoBase64() }}"
+                                                             class="rounded-circle shadow-sm"
+                                                             width="40"
+                                                             height="40"
+                                                             alt="Profile"
+                                                             onerror="this.onerror=null;this.src='{{ asset('images/default-avatar.png') }}'">
+                                                    {% else %}
+                                                        <div class="avatar-placeholder rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center"
+                                                             style="width:40px;height:40px;">
+                                                            {{ user.name|first|upper }}{{ user.lastName|first|upper }}
+                                                        </div>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ user.name }}</td>
+                                                <td>{{ user.lastName }}</td>
+                                                <td>{{ user.email }}</td>
+                                                <td>{{ user.phoneNum }}</td>
+                                                <td title="{{ user.address }}">
+                                                    {{ user.address|length > 20 ? user.address|slice(0, 20) ~ '...' : user.address }}
+                                                </td>
+                                                <td class="text-center">
+                                        <span class="badge rounded-pill bg-{{ user.isBlocked() ? 'danger' : 'success' }}">
+                                            <i class="fas fa-{{ user.isBlocked() ? 'lock' : 'check-circle' }} me-1"></i>
+                                            {{ user.isBlocked() ? 'Bloqué' : 'Actif' }}
+                                        </span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="btn-group" role="group">
+                                                        <form method="POST"
+                                                              action="{{ path('admin_user_toggle_block', {'id': user.userId}) }}"
+                                                              class="d-inline toggle-block-form"
+                                                              data-user-id="{{ user.userId }}">
+                                                            <input type="hidden" name="_token" value="{{ csrf_token('toggle-block' ~ user.userId) }}">
+                                                            <button type="submit"
+                                                                    class="btn btn-sm btn-{{ user.isBlocked() ? 'success' : 'danger' }} mx-1"
+                                                                    title="{{ user.isBlocked() ? 'Débloquer' : 'Bloquer' }}">
+                                                                <i class="fas fa-{{ user.isBlocked() ? 'unlock' : 'ban' }}"></i>
+                                                                {{ user.isBlocked() ? 'Débloquer' : 'Bloquer' }}
+                                                            </button>
+                                                        </form>
+
+                                                        <a href="mailto:{{ user.email }}" class="btn btn-sm btn-info mx-1" title="Send Email">
+                                                            <i class="fas fa-envelope"></i>
+                                                        </a>
+
+                                                        <button class="btn btn-sm btn-warning mx-1 edit-user"
+                                                                data-user-id="{{ user.userId }}"
+                                                                title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
                                         </tbody>
                                     </table>
+                                </div>
+
+                                <div class="d-flex justify-content-center mt-4">
+                                    {{ knp_pagination_render(users) }}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+
             </div>
         </div>
     </div>
@@ -1344,6 +976,96 @@
             lineColor: "#ffa534",
             fillColor: "rgba(255, 165, 52, .14)",
         });
+
+
+
+
+        //userbloc
+        document.querySelectorAll('.toggle-block').forEach(button => {
+            button.addEventListener('click', async function() {
+                const userId = this.dataset.userId;
+
+                try {
+                    const response = await fetch(`/admin/user/toggle-block/${userId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Mise à jour immédiate de l'interface
+                        this.innerHTML = `<i class="fas fa-${result.isBlocked ? 'unlock' : 'ban'}"></i> ${result.newButtonText}`;
+                        this.className = `btn btn-sm btn-${result.isBlocked ? 'success' : 'danger'} toggle-block`;
+                        this.title = result.isBlocked ? 'Débloquer' : 'Bloquer';
+
+                        // Mise à jour du statut
+                        const statusBadge = this.closest('tr').querySelector('.badge');
+                        statusBadge.className = `badge rounded-pill bg-${result.isBlocked ? 'danger' : 'success'}`;
+                        statusBadge.innerHTML = `<i class="fas fa-${result.isBlocked ? 'lock' : 'check-circle'} me-1"></i> ${result.newStatusText}`;
+
+                        alert(result.message); // Remplacer par un système de notification plus élégant
+                    }
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    alert('Une erreur est survenue');
+                }
+            });
+        });
+
+
+        //toggle
+
+        document.querySelectorAll('.toggle-block-form').forEach(form => {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();  // Empêche le formulaire de se soumettre de manière classique
+
+                let userId = this.getAttribute('data-user-id'); // Récupère l'ID de l'utilisateur
+                let button = this.querySelector('button');  // Le bouton de blocage/déblocage
+                let statusSpan = this.closest('tr').querySelector('.badge');  // Le badge de statut de l'utilisateur
+
+                // Envoi de la requête AJAX avec Fetch
+                fetch(this.action, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': this.querySelector('input[name="_token"]').value // Token CSRF
+                    },
+                    body: new URLSearchParams(new FormData(this))
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Mise à jour du texte du bouton et du badge en fonction de l'état de l'utilisateur
+                            if (data.isBlocked) {
+                                statusSpan.textContent = 'Bloqué';
+                                statusSpan.className = 'badge rounded-pill bg-danger';
+                                button.innerHTML = '<i class="fas fa-ban"></i> Bloquer';
+                                button.classList.remove('btn-success');
+                                button.classList.add('btn-danger');
+                            } else {
+                                statusSpan.textContent = 'Actif';
+                                statusSpan.className = 'badge rounded-pill bg-success';
+                                button.innerHTML = '<i class="fas fa-unlock"></i> Débloquer';
+                                button.classList.remove('btn-danger');
+                                button.classList.add('btn-success');
+                            }
+                        } else {
+                            alert('Erreur lors du changement de statut de l\'utilisateur.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                        alert('Une erreur est survenue lors de la mise à jour de l\'utilisateur.');
+                    });
+            });
+        });
+
+
     </script>
 {% endblock %}
 </body>

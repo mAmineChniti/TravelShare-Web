@@ -449,7 +449,7 @@
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="#">Account Setting</a>
                                         <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="#">Logout</a>
+                                        <a class="dropdown-item" href="{{ path('app_logout') }}">Logout</a>
                                     </li>
                                 </div>
                             </ul>
@@ -500,12 +500,12 @@
                                         <td>{{ rep.dateReponse ? rep.dateReponse|date('d/m/Y') : '' }}</td>
                                         <td>
                                             <div class="d-flex gap-2">
-                                                <!-- Modifier -->
+                                                <!-- Bouton pour éditer une réponse -->
                                                 <button class="btn btn-sm btn-outline-warning"
                                                         data-bs-toggle="modal"
                                                         data-bs-target="#editReponseModal"
-                                                        onclick="openEditReponseModal({{ rep.reponseId }}, `{{ rep.contenu|e('js') }}`)">
-                                                    <i class="fas fa-edit"></i>
+                                                        onclick="openEditReponseModal({{ rep.reponseId }}, '{{ rep.contenu|e('js') }}')">
+                                                    <i class="fas fa-edit"></i> Edit Answer
                                                 </button>
 
                                                 <!-- Supprimer -->
@@ -528,12 +528,12 @@
                     </div>
                 </div>
 
-                <!-- Modale pour éditer une réponse -->
+                <!-- Modal pour éditer une réponse -->
                 <div class="modal fade" id="editReponseModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header bg-primary text-white">
-                                <h5 class="modal-title">Edit answer</h5>
+                                <h5 class="modal-title">Edit Answer</h5>
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <form method="post" action="" id="editReponseForm" novalidate>
@@ -553,6 +553,9 @@
                         </div>
                     </div>
                 </div>
+
+
+
 
             </div>
         </div>
@@ -639,17 +642,15 @@
             // Définir dynamiquement l'action du formulaire avec l'ID de la réponse
             const routeTemplate = form.getAttribute('data-route-template');
             if (routeTemplate) {
-                // Si la route contient un modèle, remplacer __ID__ par l'ID réel
                 form.action = routeTemplate.replace('__ID__', id);
             } else {
-                // Sinon, utiliser une route statique
-                form.action = '/reponse/edit/' + id;
+                form.action = '/reponse/edit/' + id; // Vous pouvez ajuster cette URL si nécessaire
             }
 
-            // Remplir le champ de description avec le contenu de la réponse
-            const descriptionInput = document.getElementById('edit_description');
-            if (descriptionInput) {
-                descriptionInput.value = contenu;
+            // Remplir le champ de réponse avec le contenu de la réponse
+            const editReponseContentInput = document.getElementById('editReponseContent');
+            if (editReponseContentInput) {
+                editReponseContentInput.value = contenu;
             }
 
             // Ouvrir la modale
@@ -660,7 +661,8 @@
             }
         }
 
-            // Validation pour la modale d'édition de réponse
+
+        // Validation pour la modale d'édition de réponse
             document.getElementById('editReponseForm').addEventListener('submit', function(e) {
             e.preventDefault();
 

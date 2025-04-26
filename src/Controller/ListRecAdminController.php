@@ -48,4 +48,8 @@ final class ListRecAdminController extends AbstractController
 
         $this->addFlash('success', 'Réponse envoyée avec succès !');
         return $this->redirectToRoute('app_list_rec_admin');
-    }}
+
+    }
+}
+
+
