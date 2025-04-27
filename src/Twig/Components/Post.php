@@ -8,6 +8,7 @@ use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 final class Post
 {
     public int $postId;
+    public string $postTitle;
     public string $name;
     public string $lastName;
     public string $textContent;

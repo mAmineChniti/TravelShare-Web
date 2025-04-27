@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PostsRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'posts')]
@@ -43,7 +45,20 @@ class Posts
     private ?string $textContent = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Post title cannot be blank.')]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'Post title cannot be longer than 255 characters.'
+    )]
     private ?string $postTitle = null;
+
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: PostImages::class, cascade: ['persist', 'remove'])]
+    private Collection $images;
+
+    public function __construct()
+    {
+        $this->images = new ArrayCollection();
+    }
 
     public function getPostId(): ?int
     {
@@ -108,5 +123,40 @@ class Posts
         $this->postTitle = $postTitle;
 
         return $this;
+    }
+
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(PostImages $image): static
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImage(PostImages $image): static
+    {
+        if ($this->images->removeElement($image)) {
+            if ($image->getPost() === $this) {
+                $image->setPost(null);
+            }
+        }
+
+        return $this;
+    }
+
+    #[ORM\PreRemove]
+    public function deleteAssociatedImages(): void
+    {
+        foreach ($this->images as $image) {
+            $image->setPost(null);
+        }
+        $this->images->clear();
     }
 }

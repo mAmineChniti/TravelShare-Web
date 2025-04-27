@@ -31,7 +31,7 @@
 		</div>
 	</div>
 
-	<twig:PostText postId="{{ post.postId }}" textContent="{{ post.textContent }}" />
+	<twig:PostText postId="{{ post.postId }}" textContent="{{ post.textContent }}" postTitle="{{ post.postTitle }}" />
 
 	<form
 		id="editPostForm-{{ post.postId }}"
@@ -40,6 +40,16 @@
 		action="{{ path('app_forum_edit', {'id': post.postId}) }}"
 		onsubmit="return false;"
 	>
+		<div>
+			<input
+				type="text"
+				name="editTitle-{{ post.postId }}"
+				id="editTitle-{{ post.postId }}"
+				value="{{ post.postTitle }}"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+				maxlength="255"
+			/>
+		</div>
 		<div>
 			<textarea
 				name="editTextarea-{{ post.postId }}"
@@ -63,7 +73,12 @@
 			</button>
 		</div>
 	</form>
-
+	{% if post.images is defined and post.images|length > 0 %}
+	<div class="mt-4 grid grid-cols-3 gap-4">
+		{% for image in post.images %}
+		<img src="data:image/jpeg;base64,{{ image }}" alt="Post Image" class="w-full h-auto rounded-lg shadow-md" />
+		{% endfor %}
+	</div>
 	<div class="mt-4">
 		<form
 			hx-post="{{ path('app_forum_comment') }}"
@@ -109,6 +124,7 @@
 		/>
 		{% endfor %} {% endif %}
 	</div>
+	{% endif %}
 </div>
 
 <script>
