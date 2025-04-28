@@ -65,10 +65,38 @@
 			</button>
 		</div>
 	</form>
-
+	<div class="flex items-center space-x-4 mb-6">
+    <form id="search-form" method="get" action="{{ path('app_forum_search') }}" class="flex-grow">
+        <input
+            id="search-input"
+            type="text"
+            name="q"
+            placeholder="Search posts..."
+            value="{{ app.request.query.get('q', '') }}"
+            class="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
+        />
+    </form>
+    <form id="sort-form" method="get" action="{{ path('app_forum_sort') }}">
+        <select
+            id="sort-select"
+            name="sortBy"
+            class="w-40 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
+        >
+            <option value="">Sort by</option>
+            <option value="date_asc" {% if app.request.query.get('sortBy') == 'date_asc' %}selected{% endif %}>Date: Oldest First</option>
+            <option value="date_desc" {% if app.request.query.get('sortBy') == 'date_desc' %}selected{% endif %}>Date: Newest First</option>
+            <option value="hot" {% if app.request.query.get('sortBy') == 'hot' %}selected{% endif %}>Hot</option>
+        </select>
+    </form>
+</div>
 	<div id="postsContainer" class="space-y-4">
 		{% for post in posts %}
-		<twig:Post post="{{ post }}" />
+		<twig:Post
+			post="{{ post }}"
+			likesCount="{{ post.likesCount }}"
+			dislikesCount="{{ post.dislikesCount }}"
+			isLiked="{{ post.isLiked }}"
+		/>
 		{% endfor %}
 	</div>
 </div>
@@ -545,6 +573,25 @@
 
 		input.files = dataTransfer.files;
 		updateImagePreview(input.files);
+	});
+		document.addEventListener("DOMContentLoaded", () => {
+		const searchInput = document.getElementById("search-input");
+		const searchForm = document.getElementById("search-form");
+		let searchTimeout;
+
+		searchInput.addEventListener("input", () => {
+			clearTimeout(searchTimeout);
+			searchTimeout = setTimeout(() => {
+				searchForm.submit();
+			}, 500);
+		});
+
+		const sortSelect = document.getElementById("sort-select");
+		const sortForm = document.getElementById("sort-form");
+
+		sortSelect.addEventListener("change", () => {
+			sortForm.submit();
+		});
 	});
 </script>
 {% endblock %}

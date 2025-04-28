@@ -31,7 +31,7 @@ final class FlightsController extends AbstractController
         ]);
     }
 
-    #[Route('/flights/{id}', name: 'app_flight_details')]
+    #[Route('/flights/{id}', name: 'app_flight_details', requirements: ['id' => '\\d+'])]
     public function details(int $id, OffresVoyageRepository $voyageService): Response
     {
         $voyage = $voyageService->find($id);
@@ -189,5 +189,54 @@ final class FlightsController extends AbstractController
         $this->addFlash('success', 'Flight deleted successfully!');
 
         return $this->redirectToRoute('app_dashboard_flights');
+    }
+
+    #[Route('/flights/search', name: 'app_flights_search', methods: ['GET'])]
+    public function searchByDestination(Request $request, OffresVoyageRepository $voyageService): Response
+    {
+        $destination = $request->query->get('destination', '');
+
+        if (empty($destination)) {
+            $this->addFlash('error', 'Please provide a destination to search for.');
+
+            return $this->redirectToRoute('app_flights');
+        }
+
+        $voyages = $voyageService->findByDestination($destination);
+
+        return $this->render('flights/index.html.twig', [
+            'voyages' => $voyages,
+        ]);
+    }
+
+    #[Route('/flights/sort', name: 'app_flights_sort', methods: ['GET'])]
+    public function sortFlights(Request $request, OffresVoyageRepository $voyageService): Response
+    {
+        $sortBy = $request->query->get('sortBy', '');
+
+        switch ($sortBy) {
+            case 'price_asc':
+                $voyages = $voyageService->findBy([], ['prix' => 'ASC']);
+                break;
+            case 'price_desc':
+                $voyages = $voyageService->findBy([], ['prix' => 'DESC']);
+                break;
+            case 'date':
+                $voyages = $voyageService->findBy([], ['dateDepart' => 'ASC']);
+                break;
+            default:
+                $voyages = $voyageService->findAllOffres();
+        }
+
+        $voyages = array_filter($voyages, function ($voyage) {
+            $departureDate = $voyage->getDateDepart();
+            $today = new \DateTime('today');
+
+            return $departureDate > $today;
+        });
+
+        return $this->render('flights/index.html.twig', [
+            'voyages' => $voyages,
+        ]);
     }
 }

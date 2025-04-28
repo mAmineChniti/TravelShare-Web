@@ -38,7 +38,7 @@ class PromoRepository extends ServiceEntityRepository
     }
 
     public function delete(Promo $promo): void
-    {     
+    {
         $entityManager = $this->getEntityManager();
         $entityManager->remove($promo);
         $entityManager->flush();

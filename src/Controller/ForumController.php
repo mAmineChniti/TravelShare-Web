@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Likes;
 use App\Entity\Posts;
 use App\Entity\Comments;
 use App\Entity\PostImages;
@@ -22,20 +21,24 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 final class ForumController extends AbstractController
 {
-    #[Route('/forum', name: 'app_forum')]
+    #[Route('/forum', name: 'app_forum', methods: ['GET'])]
     public function index(
+        Request $request,
         PostsRepository $postsRepository,
         CommentsRepository $commentsRepository,
         LikesRepository $likesRepository,
         PostImagesRepository $postImagesRepository,
     ): Response {
         $userId = 1;
-        $posts = $postsRepository->fetchPosts(0, 10, $userId);
+        $offset = (int) $request->query->get('offset', 0);
+        $limit = (int) $request->query->get('limit', 10);
+
+        $posts = $postsRepository->fetchPosts($offset, $limit, $userId);
         foreach ($posts as &$post) {
             $post['comments'] = $commentsRepository->fetchById($post['postId']);
             $post['likesCount'] = $likesRepository->likesCounter($post['postId']);
+            $post['dislikesCount'] = $likesRepository->dislikesCounter($post['postId']);
             $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
-
             $images = $postImagesRepository->findImagesByPostId($post['postId']);
             if ($images) {
                 $post['images'] = array_map(fn ($image) => base64_encode($image), $images);
@@ -177,8 +180,8 @@ final class ForumController extends AbstractController
         return new Response('', Response::HTTP_OK);
     }
 
-    #[Route('/forum/like', name: 'app_forum_like', methods: ['POST'])]
-    public function like(
+    #[Route('/forum/upvote', name: 'app_forum_upvote', methods: ['POST'])]
+    public function upvote(
         Request $request,
         LikesRepository $likesRepository,
         PostsRepository $postsRepository,
@@ -190,11 +193,7 @@ final class ForumController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Post ID is missing'], 400);
         }
 
-        $like = new Likes();
-        $like->setPostId($postId);
-        $like->setLikerId($userId);
-
-        $likesRepository->addOrRemove($like);
+        $likesRepository->handleVote($userId, $postId, true);
 
         $post = $postsRepository->find($postId);
 
@@ -203,12 +202,43 @@ final class ForumController extends AbstractController
         }
 
         $isLiked = $likesRepository->isLikedByUser($userId, $postId);
-        $likesCount = $likesRepository->likesCounter($postId);
 
-        return $this->render('components/LikeButton.html.twig', [
+        return $this->render('components/VoteButtons.html.twig', [
             'postId' => $postId,
-            'isLiked' => $isLiked,
-            'likesCount' => $likesCount,
+            'isLiked' => null === $isLiked ? null : (bool) $isLiked,
+            'likesCount' => $likesRepository->likesCounter($postId),
+            'dislikesCount' => $likesRepository->dislikesCounter($postId),
+        ]);
+    }
+
+    #[Route('/forum/downvote', name: 'app_forum_downvote', methods: ['POST'])]
+    public function downvote(
+        Request $request,
+        LikesRepository $likesRepository,
+        PostsRepository $postsRepository,
+    ): Response {
+        $postId = $request->request->get('postId');
+        $userId = 1;
+
+        if (empty($postId)) {
+            return new JsonResponse(['success' => false, 'message' => 'Post ID is missing'], 400);
+        }
+
+        $likesRepository->handleVote($userId, $postId, false);
+
+        $post = $postsRepository->find($postId);
+
+        if (!$post) {
+            throw $this->createNotFoundException('No post found for id '.$postId);
+        }
+
+        $isLiked = $likesRepository->isLikedByUser($userId, $postId);
+
+        return $this->render('components/VoteButtons.html.twig', [
+            'postId' => $postId,
+            'isLiked' => null === $isLiked ? null : (bool) $isLiked,
+            'likesCount' => $likesRepository->likesCounter($postId),
+            'dislikesCount' => $likesRepository->dislikesCounter($postId),
         ]);
     }
 
@@ -249,8 +279,8 @@ final class ForumController extends AbstractController
             'comment' => $comment->getComment(),
             'commentedAt' => $comment->getCommentedAt(),
             'updatedAt' => $comment->getUpdatedAt(),
-            'name' => $user ? $user->getName() : 'User',
-            'lastName' => $user ? $user->getLastName() : 'Name',
+            'name' => $user ? $user->getName() : 'Unknown',
+            'lastName' => $user ? $user->getLastName() : 'User',
             'commenterId' => $comment->getCommenterId(),
         ]);
     }
@@ -338,6 +368,75 @@ final class ForumController extends AbstractController
 
         return $this->render('dashboard/forum/index.html.twig', [
             'posts' => $posts,
+        ]);
+    }
+
+    #[Route('/forum/search', name: 'app_forum_search', methods: ['GET'])]
+    public function searchByTextContent(Request $request, PostsRepository $postsRepository, CommentsRepository $commentsRepository, LikesRepository $likesRepository, PostImagesRepository $postImagesRepository): Response
+    {
+        $searchTerm = $request->query->get('q', '');
+        $userId = 1;
+        if (empty($searchTerm)) {
+            return $this->redirectToRoute('app_forum');
+        }
+
+        $posts = $postsRepository->searchByTextContent($searchTerm, 0, 10);
+        foreach ($posts as &$post) {
+            $post['comments'] = $commentsRepository->fetchById($post['postId']);
+            $post['likesCount'] = $likesRepository->likesCounter($post['postId']);
+            $post['dislikesCount'] = $likesRepository->dislikesCounter($post['postId']);
+            $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
+            $images = $postImagesRepository->findImagesByPostId($post['postId']);
+            if ($images) {
+                $post['images'] = array_map(fn ($image) => base64_encode($image), $images);
+            } else {
+                $post['images'] = [];
+            }
+        }
+
+        return $this->render('forum/index.html.twig', [
+            'posts' => $posts,
+            'searchTerm' => $searchTerm,
+        ]);
+    }
+
+    #[Route('/forum/sort', name: 'app_forum_sort', methods: ['GET'])]
+    public function sortPosts(Request $request, PostsRepository $postsRepository, CommentsRepository $commentsRepository, LikesRepository $likesRepository, PostImagesRepository $postImagesRepository): Response
+    {
+        $sortBy = $request->query->get('sortBy', '');
+        if (empty($sortBy)) {
+            return $this->redirectToRoute('app_forum');
+        }
+        $userId = 1;
+        switch ($sortBy) {
+            case 'date_asc':
+                $posts = $postsRepository->fetchPostsSorted('date_asc', 0, 10, 1);
+                break;
+            case 'date_desc':
+                $posts = $postsRepository->fetchPostsSorted('date_desc', 0, 10, 1);
+                break;
+            case 'hot':
+                $posts = $postsRepository->fetchPostsSorted('hot', 0, 10, 1);
+                break;
+            default:
+                $posts = $postsRepository->fetchPostsSorted('date_desc', 0, 10, 1);
+        }
+        foreach ($posts as &$post) {
+            $post['comments'] = $commentsRepository->fetchById($post['postId']);
+            $post['likesCount'] = $likesRepository->likesCounter($post['postId']);
+            $post['dislikesCount'] = $likesRepository->dislikesCounter($post['postId']);
+            $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
+            $images = $postImagesRepository->findImagesByPostId($post['postId']);
+            if ($images) {
+                $post['images'] = array_map(fn ($image) => base64_encode($image), $images);
+            } else {
+                $post['images'] = [];
+            }
+        }
+
+        return $this->render('forum/index.html.twig', [
+            'posts' => $posts,
+            'sortBy' => $sortBy,
         ]);
     }
 }

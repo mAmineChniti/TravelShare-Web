@@ -51,4 +51,13 @@ class OffresVoyageRepository extends ServiceEntityRepository
     {
         return $this->findAll();
     }
+
+    public function findByDestination(string $destination): array
+    {
+        return $this->createQueryBuilder('o')
+            ->where('o.destination LIKE :destination')
+            ->setParameter('destination', '%'.$destination.'%')
+            ->getQuery()
+            ->getResult();
+    }
 }

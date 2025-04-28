@@ -1,0 +1,32 @@
+<div id="voteButtonsContainer-{{ postId }}" class="flex space-x-2">
+	<form
+		hx-post="{{ path('app_forum_upvote') }}"
+		hx-target="#voteButtonsContainer-{{ postId }}"
+		hx-swap="outerHTML"
+		class=""
+	>
+		<input type="hidden" name="postId" value="{{ postId }}" />
+		<button
+			type="submit"
+			class="{% if isLiked is same as(true) %} bg-blue-600 hover:bg-blue-700 {% else %} bg-yellow-300 hover:bg-yellow-400 {% endif %} text-white font-medium py-2 px-4 rounded-lg shadow"
+			title="Upvote this post"
+		>
+			<i class="fas fa-thumbs-up"></i>&nbsp;{{ likesCount }}
+		</button>
+	</form>
+	<form
+		hx-post="{{ path('app_forum_downvote') }}"
+		hx-target="#voteButtonsContainer-{{ postId }}"
+		hx-swap="outerHTML"
+		class=""
+	>
+		<input type="hidden" name="postId" value="{{ postId }}" />
+		<button
+			type="submit"
+			class="{% if isLiked is same as(false) %} bg-red-600 hover:bg-red-700 {% else %} bg-yellow-300 hover:bg-yellow-400 {% endif %} text-white font-medium py-2 px-4 rounded-lg shadow"
+			title="Downvote this post"
+		>
+			<i class="fas fa-thumbs-down"></i>&nbsp;{{ dislikesCount }}
+		</button>
+	</form>
+</div>

@@ -32,10 +32,11 @@ final class PromoController extends AbstractController
                 $promo->setDateexpiration(new \DateTimeImmutable($request->request->get('dateexpiration')));
             } catch (\Exception) {
                 $this->addFlash('error', 'Invalid date format');
+
                 return $this->render('dashboard/promo/add.html.twig');
             }
-            $promo->setPourcentagepromo((int)$request->request->get('pourcentagepromo'));
-            $promo->setNombremaxpersonne((int)$request->request->get('nombremaxpersonne'));
+            $promo->setPourcentagepromo((int) $request->request->get('pourcentagepromo'));
+            $promo->setNombremaxpersonne((int) $request->request->get('nombremaxpersonne'));
 
             $errors = $validator->validate($promo);
             if (count($errors) > 0) {
@@ -44,6 +45,7 @@ final class PromoController extends AbstractController
                     $errorMessages[] = $error->getMessage();
                 }
                 $this->addFlash('error', implode(', ', $errorMessages));
+
                 return $this->render('dashboard/promo/add.html.twig', [
                     'promo' => $promo,
                     'errors' => $errorMessages,
@@ -74,6 +76,7 @@ final class PromoController extends AbstractController
                 $promo->setDateexpiration(new \DateTimeImmutable($request->request->get('dateexpiration')));
             } catch (\Exception) {
                 $this->addFlash('error', 'Invalid date format');
+
                 return $this->render('dashboard/promo/edit.html.twig', [
                     'promo' => $promo,
                 ]);
@@ -88,9 +91,10 @@ final class PromoController extends AbstractController
                     $errorMessages[] = $error->getMessage();
                 }
                 $this->addFlash('error', implode(', ', $errorMessages));
+
                 return $this->render('dashboard/promo/edit.html.twig', [
                     'promo' => $promo,
-                    'errors' => $errorMessages
+                    'errors' => $errorMessages,
                 ]);
             }
             $promoRepository->update($promo);
@@ -112,10 +116,12 @@ final class PromoController extends AbstractController
 
         if (!$promo) {
             $this->addFlash('error', 'Promo not found');
+
             return $this->redirectToRoute('app_promo');
         }
         $promoRepository->delete($promo);
         $this->addFlash('success', 'Promo deleted successfully!');
+
         return $this->redirectToRoute('app_promo');
     }
 }
