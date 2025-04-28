@@ -17,7 +17,6 @@ TravelShare is a web application built with Symfony that provides travel-related
 - **Symfony 6+**
 - **PHP 8.1+**
 - **MySQL** (as the primary database)
-- **JWT Authentication**
 
 ## Getting Started
 
@@ -28,40 +27,78 @@ Ensure you have the following installed:
 - PHP 8.1+
 - Composer
 - MySQL
+- Node.js with npm or Bun (for managing front-end dependencies)
 
 ### Installation & Setup
 
 1. Clone the repository:
+
    ```sh
    git clone https://github.com/mAmineChniti/TravelShare-Symfony.git
    cd TravelShare-Symfony
    ```
+
 2. Install dependencies:
+
    ```sh
    composer install
    ```
-3. Configure the environment variables:
+
+3. Install front-end dependencies:
+
+   ```sh
+   npm install
+   # or if you prefer Bun
+   bun install
+   ```
+
+4. Configure the environment variables:
    - Copy the `.env` file:
+
      ```sh
      cp .env.example .env
      ```
+
    - Update the database credentials in the `.env` file:
+
      ```sh
      DATABASE_URL=mysql://db_user:db_password@127.0.0.1:3306/travelshare
      ```
-4. Generate the database schema:
+
+5. Generate the database schema:
+
    ```sh
    symfony console doctrine:database:create
    symfony console doctrine:migrations:migrate
    ```
-5. Start the Symfony server:
+
+6. Start the asset watcher to compile styling:
+
+   ```sh
+   npm run watch
+   # or if you prefer Bun
+   bun run watch
+   ```
+
+7. Start the Symfony server:
+
    ```sh
    symfony server:start
    ```
-6. Access the application in your browser:
-   ```
+
+8. Access the application in your browser:
+
+   ```sh
    http://127.0.0.1:8000
    ```
+
+## Contributing
+
+We welcome contributions to TravelShare! Please make sure to read the [Contributor Guide](CONTRIBUTING.md) before starting. The guide outlines the rules and best practices for maintaining consistency and quality in the project.
+
+### Reporting Issues
+
+If you encounter any issues or have suggestions for improvements, feel free to open an issue in the repository.
 
 ### License
 
