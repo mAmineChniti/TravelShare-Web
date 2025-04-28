@@ -8,6 +8,7 @@ use App\Repository\PromoRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PromoRepository::class)]
+#[ORM\Table(name: "promo", uniqueConstraints: [new ORM\UniqueConstraint(name: "unique_codepromo", columns: ["codepromo"])])]
 class Promo
 {
     #[ORM\Column]
@@ -15,7 +16,7 @@ class Promo
     #[ORM\GeneratedValue]
     private ?int $promoid = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     #[Assert\NotBlank(message: 'Code promo should not be blank.')]
     #[Assert\Length(
         max: 255,
