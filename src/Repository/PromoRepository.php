@@ -3,8 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Promo;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Promo>
@@ -15,6 +15,7 @@ class PromoRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Promo::class);
     }
+
     public function add(Promo $promo): void
     {
         $entityManager = $this->getEntityManager();
@@ -36,13 +37,9 @@ class PromoRepository extends ServiceEntityRepository
         $entityManager->flush();
     }
 
-    public function delete(int $id): void
-    {
+    public function delete(Promo $promo): void
+    {     
         $entityManager = $this->getEntityManager();
-        $promo = $this->find($id);
-        if (!$promo) {
-            throw new \Exception('Promo not found');
-        }
         $entityManager->remove($promo);
         $entityManager->flush();
     }

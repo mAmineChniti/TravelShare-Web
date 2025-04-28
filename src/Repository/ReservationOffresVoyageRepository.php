@@ -2,10 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Promo;
 use App\Entity\OffresVoyage;
 use App\Entity\ReservationOffresVoyage;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Promo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -19,7 +19,7 @@ class ReservationOffresVoyageRepository extends ServiceEntityRepository
         $this->entityManager = $entityManager;
     }
 
-    public function add(ReservationOffresVoyage $reservation, String $promoCode): void
+    public function add(ReservationOffresVoyage $reservation, string $promoCode): void
     {
         $offre = $this->entityManager->getRepository(OffresVoyage::class)->find($reservation->getOffreId());
 
@@ -41,14 +41,16 @@ class ReservationOffresVoyageRepository extends ServiceEntityRepository
         } else {
             $totalPrix = $offre->getPrix() * $reservation->getNbrPlace();
         }
+
         if ($totalPrix < 0) {
             throw new \Exception('Total price cannot be negative.');
         }
+
         $reservation->setPrix($totalPrix);
+        $reservation->setDateReserved(new \DateTime());
+        $reservation->setStatus(1); // Default status (e.g., 1 for pending)
 
         $offre->setPlacesDisponibles($offre->getPlacesDisponibles() - $reservation->getNbrPlace());
-        $reservation->setDateReserved(new \DateTime());
-        $reservation->setStatus(1);
         $this->entityManager->persist($reservation);
         $this->entityManager->persist($offre);
         $this->entityManager->flush();
