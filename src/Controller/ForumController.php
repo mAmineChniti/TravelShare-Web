@@ -31,7 +31,8 @@ final class ForumController extends AbstractController
     ): Response {
         $userId = 1;
         $offset = max(0, (int) $request->query->get('offset', 0));
-        $limit = min(100, max(100, (int) $request->query->get('limit', 10)));
+-       $limit  = min(100, max(100, (int) $request->query->get('limit', 10)));
++       $limit  = min(100, max(1,   (int) $request->query->get('limit', 10)));
 
         $posts = $postsRepository->fetchPosts($offset, $limit, $userId);
         foreach ($posts as &$post) {
