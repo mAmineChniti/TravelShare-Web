@@ -31,7 +31,7 @@ final class ForumController extends AbstractController
     ): Response {
         $userId = 1;
         $offset = max(0, (int) $request->query->get('offset', 0));
-        $limit =  min(100, (int) $request->query->get('limit', 10));
+        $limit =  min(100, max(100, (int) $request->query->get('limit', 10)));
 
         $posts = $postsRepository->fetchPosts($offset, $limit, $userId);
         foreach ($posts as &$post) {
@@ -41,7 +41,7 @@ final class ForumController extends AbstractController
             $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
             $images = $postImagesRepository->findImagesByPostId($post['postId']);
             if ($images) {
-                $post['images'] = array_map(fn ($image) => base64_encode($image), $images);
+                $post['images'] = array_map(fn($image) => base64_encode($image), $images);
             } else {
                 $post['images'] = [];
             }
@@ -91,7 +91,7 @@ final class ForumController extends AbstractController
             'lastName' => $user->getLastName(),
             'textContent' => $post->getTextContent(),
             'postTitle' => $post->getPostTitle(),
-            'images' => $images ? array_map(fn ($image) => base64_encode($image), $images) : [],
+            'images' => $images ? array_map(fn($image) => base64_encode($image), $images) : [],
             'isLiked' => false,
             'likesCount' => 0,
             'comments' => [],
@@ -106,7 +106,7 @@ final class ForumController extends AbstractController
                     $postImage->setPost($post);
                     $postImage->setImage($imageData);
                     $postImagesRepository->add($postImage);
-                } catch (FileException $e) {
+                } catch (FileException) {
                     return new JsonResponse(['error' => 'Failed to process uploaded image.'], 400);
                 }
             }
@@ -134,11 +134,11 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $postText = $request->request->get('editTextarea-'.$id);
+        $postText = $request->request->get('editTextarea-' . $id);
         $post->setTextContent($postText);
         $post->setUpdatedAt(new \DateTime());
 
-        $postTitle = $request->request->get('editTitle-'.$id);
+        $postTitle = $request->request->get('editTitle-' . $id);
         $post->setPostTitle($postTitle);
 
         $errors = $validator->validate($post);
@@ -168,7 +168,7 @@ final class ForumController extends AbstractController
         $post = $postsRepository->find($id);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id '.$id);
+            throw $this->createNotFoundException('No post found for id ' . $id);
         }
 
         if (1 !== $post->getOwnerId()) {
@@ -192,10 +192,10 @@ final class ForumController extends AbstractController
         if (empty($postId)) {
             return new JsonResponse(['success' => false, 'message' => 'Post ID is missing'], 400);
         }
-        if(!$postsRepository->find($postId)) {
+        if (!$postsRepository->find($postId)) {
             return new JsonResponse(['success' => false, 'message' => 'Post not found'], 404);
         }
-        
+
         $likesRepository->handleVote($userId, $postId, true);
         $isLiked = $likesRepository->isLikedByUser($userId, $postId);
 
@@ -225,7 +225,7 @@ final class ForumController extends AbstractController
         $post = $postsRepository->find($postId);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id '.$postId);
+            throw $this->createNotFoundException('No post found for id ' . $postId);
         }
 
         $isLiked = $likesRepository->isLikedByUser($userId, $postId);
@@ -289,7 +289,7 @@ final class ForumController extends AbstractController
         $comment = $commentsRepository->find($id);
 
         if (!$comment) {
-            throw $this->createNotFoundException('No comment found for id '.$id);
+            throw $this->createNotFoundException('No comment found for id ' . $id);
         }
 
         if (1 !== $comment->getCommenterId()) {
@@ -318,7 +318,7 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $commentText = $request->request->get('editTextarea-'.$id);
+        $commentText = $request->request->get('editTextarea-' . $id);
         $comment->setComment($commentText);
         $comment->setUpdatedAt(new \DateTime());
 
@@ -350,13 +350,13 @@ final class ForumController extends AbstractController
 
         foreach ($posts as &$post) {
             $user = $usersRepository->find($post['ownerId']);
-            $post['ownerName'] = $user ? $user->getName().' '.$user->getLastName() : 'Unknown User';
+            $post['ownerName'] = $user ? $user->getName() . ' ' . $user->getLastName() : 'Unknown User';
 
             $comments = $commentsRepository->fetchById($post['postId']);
 
             foreach ($comments as &$comment) {
                 $commenter = $usersRepository->find($comment['commenterId']);
-                $comment['commenterName'] = $commenter ? $commenter->getName().' '.$commenter->getLastName() : 'Unknown User';
+                $comment['commenterName'] = $commenter ? $commenter->getName() . ' ' . $commenter->getLastName() : 'Unknown User';
             }
 
             $post['comments'] = $comments;
@@ -375,8 +375,9 @@ final class ForumController extends AbstractController
         if (empty($searchTerm)) {
             return $this->redirectToRoute('app_forum');
         }
-
-        $posts = $postsRepository->searchByTextContent($searchTerm, 0, 10);
+        $offset = max(0, (int) $request->query->get('offset', 0));
+        $limit = min(100, max(1, (int) $request->query->get('limit', 10)));
+        $posts = $postsRepository->searchByTextContent($searchTerm, $offset, $limit);
         foreach ($posts as &$post) {
             $post['comments'] = $commentsRepository->fetchById($post['postId']);
             $post['likesCount'] = $likesRepository->likesCounter($post['postId']);
@@ -384,7 +385,7 @@ final class ForumController extends AbstractController
             $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
             $images = $postImagesRepository->findImagesByPostId($post['postId']);
             if ($images) {
-                $post['images'] = array_map(fn ($image) => base64_encode($image), $images);
+                $post['images'] = array_map(fn($image) => base64_encode($image), $images);
             } else {
                 $post['images'] = [];
             }
@@ -403,19 +404,21 @@ final class ForumController extends AbstractController
         if (empty($sortBy)) {
             return $this->redirectToRoute('app_forum');
         }
+        $offset = max(0, (int) $request->query->get('offset', 0));
+        $limit = min(100, max(1, (int) $request->query->get('limit', 10)));
         $userId = 1;
         switch ($sortBy) {
             case 'date_asc':
-                $posts = $postsRepository->fetchPostsSorted('date_asc', 0, 10, 1);
+                $posts = $postsRepository->fetchPostsSorted('date_asc', $offset, $limit, $userId);
                 break;
             case 'date_desc':
-                $posts = $postsRepository->fetchPostsSorted('date_desc', 0, 10, 1);
+                $posts = $postsRepository->fetchPostsSorted('date_desc', $offset, $limit, $userId);
                 break;
             case 'hot':
-                $posts = $postsRepository->fetchPostsSorted('hot', 0, 10, 1);
+                $posts = $postsRepository->fetchPostsSorted('hot', $offset, $limit, $userId);
                 break;
             default:
-                $posts = $postsRepository->fetchPostsSorted('date_desc', 0, 10, 1);
+                $posts = $postsRepository->fetchPostsSorted('date_desc', $offset, $limit, $userId);
         }
         foreach ($posts as &$post) {
             $post['comments'] = $commentsRepository->fetchById($post['postId']);
@@ -424,7 +427,7 @@ final class ForumController extends AbstractController
             $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
             $images = $postImagesRepository->findImagesByPostId($post['postId']);
             if ($images) {
-                $post['images'] = array_map(fn ($image) => base64_encode($image), $images);
+                $post['images'] = array_map(fn($image) => base64_encode($image), $images);
             } else {
                 $post['images'] = [];
             }
