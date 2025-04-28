@@ -59,7 +59,7 @@ final class PromoController extends AbstractController
         return $this->render('dashboard/promo/add.html.twig');
     }
 
-    #[Route('/dashboard/promo/edit/{id}', name: 'app_promo_edit')]
+    #[Route('/dashboard/promo/edit/{id}', name: 'app_promo_edit', methods: ['GET', 'POST'])]
     public function edit(int $id, PromoRepository $promoRepository, Request $request, ValidatorInterface $validator): Response
     {
         $promo = $promoRepository->find($id);
@@ -70,7 +70,14 @@ final class PromoController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $promo->setCodepromo($request->request->get('codepromo'));
-            $promo->setDateexpiration(new \DateTime($request->request->get('dateexpiration')));
+            try {
+                $promo->setDateexpiration(new \DateTimeImmutable($request->request->get('dateexpiration')));
+            } catch (\Exception) {
+                $this->addFlash('error', 'Invalid date format');
+                return $this->render('dashboard/promo/edit.html.twig', [
+                    'promo' => $promo,
+                ]);
+            }
             $promo->setPourcentagepromo($request->request->get('pourcentagepromo'));
             $promo->setNombremaxpersonne($request->request->get('nombremaxpersonne'));
 
