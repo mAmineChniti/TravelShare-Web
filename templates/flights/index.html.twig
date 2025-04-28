@@ -2,6 +2,31 @@
 <div class="container mx-auto px-4 mt-8 space-y-6">
 	<h1 class="text-5xl font-bold mb-6">Available Flights</h1>
 
+	<div class="flex items-center space-x-4 mb-6">
+		<form id="search-form" method="get" action="{{ path('app_flights_search') }}" class="flex-grow">
+			<input
+				id="search-input"
+				type="text"
+				name="destination"
+				placeholder="Search by destination"
+				value="{{ app.request.query.get('destination', '') }}"
+				class="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
+			/>
+		</form>
+		<form id="sort-form" method="get" action="{{ path('app_flights_sort') }}">
+			<select
+				id="sort-select"
+				name="sortBy"
+				class="w-40 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
+			>
+				<option value="">Sort by</option>
+				<option value="price_asc">Price: Low to High</option>
+				<option value="price_desc">Price: High to Low</option>
+				<option value="date">Date</option>
+			</select>
+		</form>
+	</div>
+
 	<div id="error-messages" class="mt-4">
 		{% if errors is defined and errors|length > 0 %} {% for error in errors %}
 		<p class="text-sm text-red-600">{{ error }}</p>
@@ -50,4 +75,25 @@
 	<p class="text-center text-gray-700">No flights available at the moment.</p>
 	{% endif %}
 </div>
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		const searchInput = document.getElementById("search-input");
+		const searchForm = document.getElementById("search-form");
+		let searchTimeout;
+
+		searchInput.addEventListener("input", () => {
+			clearTimeout(searchTimeout);
+			searchTimeout = setTimeout(() => {
+				searchForm.submit();
+			}, 500);
+		});
+
+		const sortSelect = document.getElementById("sort-select");
+		const sortForm = document.getElementById("sort-form");
+
+		sortSelect.addEventListener("change", () => {
+			sortForm.submit();
+		});
+	});
+</script>
 {% endblock %}

@@ -61,76 +61,78 @@
 	</form>
 </div>
 <script>
-const PromoFormValidation = (() => {
-    const CONFIG = {
-        MIN_DISCOUNT: 0,
-        MAX_DISCOUNT: 100,
-        MIN_PEOPLE: 1,
-    };
+	const PromoFormValidation = (() => {
+		const CONFIG = {
+			MIN_DISCOUNT: 0,
+			MAX_DISCOUNT: 100,
+			MIN_PEOPLE: 1,
+		};
 
-    const elements = {
-        codepromo: document.getElementById("codepromo"),
-        dateexpiration: document.getElementById("dateexpiration"),
-        pourcentagepromo: document.getElementById("pourcentagepromo"),
-        nombremaxpersonne: document.getElementById("nombremaxpersonne"),
-        errorMessages: document.getElementById("error-messages"),
-        form: document.querySelector("form"),
-    };
+		const elements = {
+			codepromo: document.getElementById("codepromo"),
+			dateexpiration: document.getElementById("dateexpiration"),
+			pourcentagepromo: document.getElementById("pourcentagepromo"),
+			nombremaxpersonne: document.getElementById("nombremaxpersonne"),
+			errorMessages: document.getElementById("error-messages"),
+			form: document.querySelector("form"),
+		};
 
-    const Validator = {
-        validateForm() {
-            const errors = [];
-            const today = new Date().toISOString().split("T")[0];
+		const Validator = {
+			validateForm() {
+				const errors = [];
+				const today = new Date().toISOString().split("T")[0];
 
-            if (!elements.codepromo.value.trim()) {
-                errors.push("Promo code cannot be empty.");
-            }
+				if (!elements.codepromo.value.trim()) {
+					errors.push("Promo code cannot be empty.");
+				}
 
-            if (!elements.dateexpiration.value || elements.dateexpiration.value < today) {
-                errors.push("Expiration date must be today or in the future.");
-            }
+				if (!elements.dateexpiration.value || elements.dateexpiration.value < today) {
+					errors.push("Expiration date must be today or in the future.");
+				}
 
-            if (!elements.pourcentagepromo.value ||
-                parseInt(elements.pourcentagepromo.value) < CONFIG.MIN_DISCOUNT ||
-                parseInt(elements.pourcentagepromo.value) > CONFIG.MAX_DISCOUNT) {
-                errors.push(`Discount must be between ${CONFIG.MIN_DISCOUNT} and ${CONFIG.MAX_DISCOUNT}.`);
-            }
+				if (
+					!elements.pourcentagepromo.value ||
+					parseInt(elements.pourcentagepromo.value) < CONFIG.MIN_DISCOUNT ||
+					parseInt(elements.pourcentagepromo.value) > CONFIG.MAX_DISCOUNT
+				) {
+					errors.push(`Discount must be between ${CONFIG.MIN_DISCOUNT} and ${CONFIG.MAX_DISCOUNT}.`);
+				}
 
-            if (!elements.nombremaxpersonne.value || parseInt(elements.nombremaxpersonne.value) < CONFIG.MIN_PEOPLE) {
-                errors.push("Max people must be at least 1.");
-            }
+				if (!elements.nombremaxpersonne.value || parseInt(elements.nombremaxpersonne.value) < CONFIG.MIN_PEOPLE) {
+					errors.push("Max people must be at least 1.");
+				}
 
-            elements.errorMessages.innerHTML = "";
-            if (errors.length > 0) {
-                elements.errorMessages.innerHTML = errors.map((error) => `<p class='text-red-500'>${error}</p>`).join("");
-                return false;
-            }
+				elements.errorMessages.innerHTML = "";
+				if (errors.length > 0) {
+					elements.errorMessages.innerHTML = errors.map((error) => `<p class='text-red-500'>${error}</p>`).join("");
+					return false;
+				}
 
-            return true;
-        },
-    };
+				return true;
+			},
+		};
 
-    const FormHandler = {
-        submitForm(event) {
-            if (!Validator.validateForm()) {
-                event.preventDefault();
-            }
-        },
-    };
+		const FormHandler = {
+			submitForm(event) {
+				if (!Validator.validateForm()) {
+					event.preventDefault();
+				}
+			},
+		};
 
-    const init = () => {
-        elements.form.addEventListener("submit", FormHandler.submitForm);
-    };
+		const init = () => {
+			elements.form.addEventListener("submit", FormHandler.submitForm);
+		};
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
-    } else {
-        init();
-    }
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", init);
+		} else {
+			init();
+		}
 
-    return {
-        validateForm: Validator.validateForm,
-    };
-})();
+		return {
+			validateForm: Validator.validateForm,
+		};
+	})();
 </script>
 {% endblock %}

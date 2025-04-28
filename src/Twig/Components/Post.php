@@ -12,7 +12,8 @@ final class Post
     public string $name;
     public string $lastName;
     public string $textContent;
-    public bool $isLiked = false;
+    public ?bool $isLiked = null;
     public int $likesCount = 0;
+    public int $dislikesCount = 0;
     public array $comments = [];
 }

@@ -8,7 +8,7 @@ use App\Repository\PromoRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PromoRepository::class)]
-#[ORM\Table(name: "promo", uniqueConstraints: [new ORM\UniqueConstraint(name: "unique_codepromo", columns: ["codepromo"])])]
+#[ORM\Table(name: 'promo', uniqueConstraints: [new ORM\UniqueConstraint(name: 'unique_codepromo', columns: ['codepromo'])])]
 class Promo
 {
     #[ORM\Column]
