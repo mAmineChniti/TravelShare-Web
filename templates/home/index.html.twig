@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %} {% block title %}Welcome to TravelShare{% endblock %} {% block body %}
-<div class="absolute top-16 bottom-10 w-full" data-carousel="static">
+<div class="absolute top-16 bottom-10 w-full" data-carousel="slide">
 	<div class="relative h-full overflow-hidden rounded-lg">
 		{% for slide in slides %}
 		<div class="hidden duration-700 ease-in-out" data-carousel-item="{{ loop.first ? 'active' : '' }}">
@@ -65,52 +65,4 @@
 		</span>
 	</button>
 </div>
-<script>
-	document.addEventListener("DOMContentLoaded", () => {
-		const carousel = document.querySelector('[data-carousel="static"]');
-		if (carousel) {
-			let currentIndex = 0;
-			const items = carousel.querySelectorAll("[data-carousel-item]");
-			const prevButton = carousel.querySelector("[data-carousel-prev]");
-			const nextButton = carousel.querySelector("[data-carousel-next]");
-			const indicators = carousel.querySelectorAll("[data-carousel-slide-to]");
-			const totalItems = items.length;
-
-			const updateCarousel = () => {
-				items.forEach((item, index) => {
-					item.classList.toggle("hidden", index !== currentIndex);
-				});
-				indicators.forEach((indicator, index) => {
-					indicator.classList.toggle("bg-gray-600", index === currentIndex);
-					indicator.classList.toggle("bg-gray-400", index !== currentIndex);
-				});
-			};
-
-			const moveToNext = () => {
-				currentIndex = (currentIndex + 1) % totalItems;
-				updateCarousel();
-			};
-
-			const moveToPrev = () => {
-				currentIndex = (currentIndex - 1 + totalItems) % totalItems;
-				updateCarousel();
-			};
-
-			const moveToIndex = (index) => {
-				currentIndex = index;
-				updateCarousel();
-			};
-
-			prevButton?.addEventListener("click", moveToPrev);
-			nextButton?.addEventListener("click", moveToNext);
-			indicators.forEach((indicator, index) => {
-				indicator.addEventListener("click", () => moveToIndex(index));
-			});
-
-			setInterval(moveToNext, 3000);
-
-			updateCarousel();
-		}
-	});
-</script>
 {% endblock %}
