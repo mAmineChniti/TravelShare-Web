@@ -26,7 +26,7 @@
     "watch": "encore dev --watch",
     "build": "encore production --progress",
     "format:twig": "prettier --write \"templates/**/*.twig\"",
-    "format:php": "./vendor/bin/php-cs-fixer fix"
+    "format:php": "PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.3",

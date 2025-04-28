@@ -2,48 +2,52 @@
 
 namespace App\Entity;
 
-use App\Repository\PromoRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\PromoRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PromoRepository::class)]
 class Promo
 {
+    #[ORM\Column]
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
-    #[ORM\Column]
     private ?int $promoid = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Code promo should not be blank.')]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'Code promo cannot be longer than {{ limit }} characters.'
+    )]
     private ?string $codepromo = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotNull(message: 'Date expiration should not be null.')]
+    #[Assert\GreaterThanOrEqual(
+        value: 'today',
+        message: 'Date expiration must be today or in the future.'
+    )]
     private ?\DateTimeInterface $dateexpiration = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: 'Pourcentage promo should not be null.')]
+    #[Assert\Range(
+        min: 0,
+        max: 100,
+        notInRangeMessage: 'Pourcentage promo must be between {{ min }} and {{ max }}.'
+    )]
     private ?int $pourcentagepromo = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: 'Nombre max personne should not be null.')]
+    #[Assert\Positive(message: 'Nombre max personne must be a positive number.')]
     private ?int $nombremaxpersonne = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getPromoid(): ?int
     {
         return $this->promoid;
-    }
-
-    public function setPromoid(int $promoid): static
-    {
-        $this->promoid = $promoid;
-
-        return $this;
     }
 
     public function getCodepromo(): ?string

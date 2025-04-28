@@ -5,11 +5,11 @@ namespace App\Controller;
 use App\Entity\OffresVoyage;
 use App\Entity\ReservationOffresVoyage;
 use App\Repository\OffresVoyageRepository;
-use App\Repository\ReservationOffresVoyageRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Repository\ReservationOffresVoyageRepository;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -19,6 +19,12 @@ final class FlightsController extends AbstractController
     public function index(OffresVoyageRepository $voyageService): Response
     {
         $voyages = $voyageService->findAllOffres();
+        $voyages = array_filter($voyages, function ($voyage) {
+            $departureDate = $voyage->getDateDepart();
+            $today = new \DateTime('today');
+
+            return $departureDate > $today;
+        });
 
         return $this->render('flights/index.html.twig', [
             'voyages' => $voyages,
@@ -62,27 +68,29 @@ final class FlightsController extends AbstractController
         $reservation->setOffreId($voyage->getOffresVoyageId());
         $reservation->setNbrPlace($nbrPlace);
         $reservation->setClientId(1);
+        $reservation->setDateReserved(new \DateTime('today'));
+        $reservation->setStatus(1);
+        $reservation->setPrix($voyage->getPrix() * $nbrPlace);
 
         $errors = $validator->validate($reservation);
         if (count($errors) > 0) {
             foreach ($errors as $error) {
                 $this->addFlash('error', $error->getMessage());
-                return $this->redirectToRoute('app_flight_details', ['id' => $id]);
             }
 
             return $this->redirectToRoute('app_flight_details', ['id' => $id]);
         }
 
         $promoCode = $request->request->get('promoCode', '');
-        // Debugging: Log the received promoCode
-        $this->addFlash('info', 'Received promoCode: ' . $promoCode);
-try{
-        $voyageService->add($reservation, $promoCode);
-        $this->addFlash('success', "You have successfully reserved $nbrPlace seat(s). Have fun on your flight!");
-}catch (\Exception $e) {
-        $this->addFlash('error', $e->getMessage());
-        return $this->redirectToRoute('app_flight_details', ['id' => $id]);
+        try {
+            $voyageService->add($reservation, $promoCode);
+            $this->addFlash('success', "You have successfully reserved $nbrPlace seat(s). Have fun on your flight!");
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
+
+            return $this->redirectToRoute('app_flight_details', ['id' => $id]);
         }
+
         return $this->redirectToRoute('app_flight_details', ['id' => $id]);
     }
 

@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %} {% block title %}Add New Promo{% endblock %} {% block body %}
+<div class="container mx-auto px-4 mt-8 space-y-6">
+	<h1 class="text-5xl font-bold mb-6">Add New Promo</h1>
+	<form method="post" action="{{ path('app_promo_add') }}" class="bg-white rounded-lg shadow-md p-6 space-y-4">
+		<div>
+			<label for="codepromo" class="block text-base font-medium text-gray-700 mb-2">Promo Code</label>
+			<input
+				type="text"
+				id="codepromo"
+				name="codepromo"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+			/>
+		</div>
+		<div>
+			<label for="dateexpiration" class="block text-base font-medium text-gray-700 mb-2">Expiration Date</label>
+			<input
+				type="date"
+				id="dateexpiration"
+				name="dateexpiration"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+			/>
+		</div>
+		<div>
+			<label for="pourcentagepromo" class="block text-base font-medium text-gray-700 mb-2">Discount (%)</label>
+			<input
+				type="number"
+				id="pourcentagepromo"
+				name="pourcentagepromo"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+			/>
+		</div>
+		<div>
+			<label for="nombremaxpersonne" class="block text-base font-medium text-gray-700 mb-2">Max People</label>
+			<input
+				type="number"
+				id="nombremaxpersonne"
+				name="nombremaxpersonne"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+			/>
+		</div>
+		<div id="error-messages" class="text-red-500"></div>
+		<div class="flex justify-between">
+			<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow">
+				Add Promo
+			</button>
+			<a
+				href="{{ path('app_promo') }}"
+				class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg"
+			>
+				Cancel
+			</a>
+		</div>
+	</form>
+</div>
+<script>
+const PromoFormValidation = (() => {
+    const CONFIG = {
+        MIN_DISCOUNT: 0,
+        MAX_DISCOUNT: 100,
+        MIN_PEOPLE: 1,
+    };
+
+    const elements = {
+        codepromo: document.getElementById("codepromo"),
+        dateexpiration: document.getElementById("dateexpiration"),
+        pourcentagepromo: document.getElementById("pourcentagepromo"),
+        nombremaxpersonne: document.getElementById("nombremaxpersonne"),
+        errorMessages: document.getElementById("error-messages"),
+        form: document.querySelector("form"),
+    };
+
+    const Validator = {
+        validateForm() {
+            const errors = [];
+            const today = new Date().toISOString().split("T")[0];
+
+            if (!elements.codepromo.value.trim()) {
+                errors.push("Promo code cannot be empty.");
+            }
+
+            if (!elements.dateexpiration.value || elements.dateexpiration.value < today) {
+                errors.push("Expiration date must be today or in the future.");
+            }
+
+            if (!elements.pourcentagepromo.value ||
+                parseInt(elements.pourcentagepromo.value) < CONFIG.MIN_DISCOUNT ||
+                parseInt(elements.pourcentagepromo.value) > CONFIG.MAX_DISCOUNT) {
+                errors.push(`Discount must be between ${CONFIG.MIN_DISCOUNT} and ${CONFIG.MAX_DISCOUNT}.`);
+            }
+
+            if (!elements.nombremaxpersonne.value || parseInt(elements.nombremaxpersonne.value) < CONFIG.MIN_PEOPLE) {
+                errors.push("Max people must be at least 1.");
+            }
+
+            elements.errorMessages.innerHTML = "";
+            if (errors.length > 0) {
+                elements.errorMessages.innerHTML = errors.map((error) => `<p class='text-red-500'>${error}</p>`).join("");
+                return false;
+            }
+
+            return true;
+        },
+    };
+
+    const FormHandler = {
+        submitForm(event) {
+            if (!Validator.validateForm()) {
+                event.preventDefault();
+            }
+        },
+    };
+
+    const init = () => {
+        elements.form.addEventListener("submit", FormHandler.submitForm);
+    };
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+
+    return {
+        validateForm: Validator.validateForm,
+    };
+})();
+</script>
+{% endblock %}
