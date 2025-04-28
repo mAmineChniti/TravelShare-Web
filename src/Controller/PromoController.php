@@ -81,8 +81,8 @@ final class PromoController extends AbstractController
                     'promo' => $promo,
                 ]);
             }
-            $promo->setPourcentagepromo($request->request->get('pourcentagepromo'));
-            $promo->setNombremaxpersonne($request->request->get('nombremaxpersonne'));
+            $promo->setPourcentagepromo((int) $request->request->get('pourcentagepromo'));
+            $promo->setNombremaxpersonne((int) $request->request->get('nombremaxpersonne'));
 
             $errors = $validator->validate($promo);
             if (count($errors) > 0) {

@@ -203,7 +203,12 @@ final class FlightsController extends AbstractController
         }
 
         $voyages = $voyageService->findByDestination($destination);
+        $voyages = array_filter($voyages, function ($voyage) {
+            $departureDate = $voyage->getDateDepart();
+            $today = new \DateTime('today');
 
+            return $departureDate > $today;
+        });
         return $this->render('flights/index.html.twig', [
             'voyages' => $voyages,
         ]);

@@ -30,8 +30,8 @@ final class ForumController extends AbstractController
         PostImagesRepository $postImagesRepository,
     ): Response {
         $userId = 1;
-        $offset = (int) $request->query->get('offset', 0);
-        $limit = (int) $request->query->get('limit', 10);
+        $offset = max(0, (int) $request->query->get('offset', 0));
+        $limit =  min(100, (int) $request->query->get('limit', 10));
 
         $posts = $postsRepository->fetchPosts($offset, $limit, $userId);
         foreach ($posts as &$post) {
@@ -192,15 +192,11 @@ final class ForumController extends AbstractController
         if (empty($postId)) {
             return new JsonResponse(['success' => false, 'message' => 'Post ID is missing'], 400);
         }
-
-        $likesRepository->handleVote($userId, $postId, true);
-
-        $post = $postsRepository->find($postId);
-
-        if (!$post) {
-            throw $this->createNotFoundException('No post found for id '.$postId);
+        if(!$postsRepository->find($postId)) {
+            return new JsonResponse(['success' => false, 'message' => 'Post not found'], 404);
         }
-
+        
+        $likesRepository->handleVote($userId, $postId, true);
         $isLiked = $likesRepository->isLikedByUser($userId, $postId);
 
         return $this->render('components/VoteButtons.html.twig', [
