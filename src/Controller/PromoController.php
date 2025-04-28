@@ -45,6 +45,7 @@ final class PromoController extends AbstractController
                 }
                 $this->addFlash('error', implode(', ', $errorMessages));
                 return $this->render('dashboard/promo/add.html.twig', [
+                    'promo' => $promo,
                     'errors' => $errorMessages,
                 ]);
             }
