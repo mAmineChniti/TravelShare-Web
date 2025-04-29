@@ -629,7 +629,7 @@
 		if(!text) return false;
 		if (text.length < 15) return false;
 		if (text.length > 255) return false;
-		const cachedResult = sessionStorage.getItem(`profanity_${bota(text)}`);
+		const cachedResult = sessionStorage.getItem(`profanity_${btoa(text)}`);
 		if (cachedResult !== null) return JSON.parse(cachedResult);
 		try {
 			const controller = new AbortController();
@@ -651,7 +651,7 @@
 			}
 
 			const result = await response.json();
-			sessionStorage.setItem(`profanity_${bota(text)}`, JSON.stringify(result.isProfanity));
+			sessionStorage.setItem(`profanity_${btoa(text)}`, JSON.stringify(result.isProfanity));
 			return result.isProfanity;
 		} catch (error) {
 			console.error('Error validating profanity:', error);
