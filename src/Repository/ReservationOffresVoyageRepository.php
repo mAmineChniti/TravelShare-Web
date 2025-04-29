@@ -19,7 +19,7 @@ class ReservationOffresVoyageRepository extends ServiceEntityRepository
         $this->entityManager = $entityManager;
     }
 
-    public function add(ReservationOffresVoyage $reservation, string $promoCode): void
+    public function add(ReservationOffresVoyage $reservation, string $promoCode): int
     {
         $offre = $this->entityManager->getRepository(OffresVoyage::class)->find($reservation->getOffreId());
 
@@ -48,12 +48,14 @@ class ReservationOffresVoyageRepository extends ServiceEntityRepository
 
         $reservation->setPrix($totalPrix);
         $reservation->setDateReserved(new \DateTime());
-        $reservation->setStatus(1); // Default status (e.g., 1 for pending)
+        $reservation->setStatus(1);
 
         $offre->setPlacesDisponibles($offre->getPlacesDisponibles() - $reservation->getNbrPlace());
         $this->entityManager->persist($reservation);
         $this->entityManager->persist($offre);
         $this->entityManager->flush();
+
+        return $reservation->getReservationId();
     }
 
     public function update(ReservationOffresVoyage $reservation): void

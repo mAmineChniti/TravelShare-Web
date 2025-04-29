@@ -2,14 +2,17 @@
 
 namespace App\Controller;
 
+use Knp\Snappy\Pdf;
 use App\Entity\OffresVoyage;
 use App\Entity\ReservationOffresVoyage;
 use App\Repository\OffresVoyageRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\ReservationOffresVoyageRepository;
+use Knp\Bundle\SnappyBundle\Snappy\Response\PdfResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -32,16 +35,20 @@ final class FlightsController extends AbstractController
     }
 
     #[Route('/flights/{id}', name: 'app_flight_details', requirements: ['id' => '\\d+'])]
-    public function details(int $id, OffresVoyageRepository $voyageService): Response
+    public function details(int $id, OffresVoyageRepository $voyageService, Request $request): Response
     {
         $voyage = $voyageService->find($id);
 
         if (!$voyage) {
-            throw $this->createNotFoundException('The flight does not exist');
+            $this->addFlash('error', 'Flight not found.');
+            return $this->redirectToRoute('app_flights');
         }
+
+        $reservationId = $request->query->get('reservationId');
 
         return $this->render('flights/details.html.twig', [
             'voyage' => $voyage,
+            'reservationId' => $reservationId,
         ]);
     }
 
@@ -83,8 +90,10 @@ final class FlightsController extends AbstractController
 
         $promoCode = $request->request->get('promoCode', '');
         try {
-            $voyageService->add($reservation, $promoCode);
+            $reservationId = $voyageService->add($reservation, $promoCode);
             $this->addFlash('success', "You have successfully reserved $nbrPlace seat(s). Have fun on your flight!");
+
+            return $this->redirectToRoute('app_flight_details', ['id' => $reservation->getOffreId(), 'reservationId' => $reservationId]);
         } catch (\Exception $e) {
             $this->addFlash('error', $e->getMessage());
 
@@ -95,7 +104,7 @@ final class FlightsController extends AbstractController
     }
 
     #[Route('/dashboard/flights', name: 'app_dashboard_flights')]
-    public function dashboardFlights(OffresVoyageRepository $voyageService, Request $request): Response
+    public function dashboardFlights(OffresVoyageRepository $voyageService): Response
     {
         $voyages = $voyageService->findAllOffres();
 
@@ -244,5 +253,57 @@ final class FlightsController extends AbstractController
         return $this->render('flights/index.html.twig', [
             'voyages' => $voyages,
         ]);
+    }
+
+    #[Route('/flights/{id}/generate-pdf', name: 'app_generate_pdf', methods: ['POST'])]
+    public function generatePdf(
+        int $id,
+        ReservationOffresVoyageRepository $reservationRepo,
+        OffresVoyageRepository $offreVoyageRepo,
+        Pdf $pdf,
+    ): Response {
+        $reservation = $reservationRepo->find($id);
+        if (!$reservation) {
+            $this->addFlash('error', 'Reservation not found.');
+
+            return $this->redirectToRoute('app_flights');
+        }
+
+        $voyage = $offreVoyageRepo->find($reservation->getOffreId());
+        if (!$voyage) {
+            $this->addFlash('error', 'Flight not found.');
+
+            return $this->redirectToRoute('app_flights');
+        }
+
+        $qrCodeData = sprintf(
+            'Reservation ID: %s, Title: %s, Destination: %s, Price: %s €, Departure Date: %s, Return Date: %s, Number of Seats: %s, Total Price: %s €',
+            $reservation->getReservationId(),
+            $voyage->getTitre(),
+            $voyage->getDestination(),
+            $voyage->getPrix(),
+            $voyage->getDateDepart()->format('d-m-Y'),
+            $voyage->getDateRetour()->format('d-m-Y'),
+            $reservation->getNbrPlace(),
+            $reservation->getPrix()
+        );
+
+        $qrCodeUrl = sprintf(
+            'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=%s',
+            urlencode($qrCodeData)
+        );
+        $html = $this->renderView('flights/pdf.html.twig', [
+            'reservation' => $reservation,
+            'voyage' => $voyage,
+            'qrCodeUrl' => $qrCodeUrl,
+        ]);
+        $pdfOutput = $pdf->getOutputFromHtml($html);
+
+        return new PdfResponse(
+            $pdfOutput,
+            'reservation_' . $id . '.pdf',
+            'application/pdf',
+            HeaderUtils::DISPOSITION_ATTACHMENT
+        );
     }
 }
