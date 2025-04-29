@@ -92,6 +92,33 @@ Ensure you have the following installed:
    http://127.0.0.1:8000
    ```
 
+### Installing wkhtmltopdf and wkhtmltoimage
+
+To generate PDFs, the application relies on `wkhtmltopdf` and `wkhtmltoimage`. Follow these steps to install them:
+
+1. **Linux**:
+
+   ```sh
+   sudo apt-get install -y wkhtmltopdf
+   ```
+
+2. **MacOS**:
+
+   ```sh
+   brew install wkhtmltopdf
+   ```
+
+3. **Windows**:
+   - Download the installer from [wkhtmltopdf.org](https://wkhtmltopdf.org/).
+   - Follow the installation instructions.
+
+After installation, ensure the binaries are accessible in your system's PATH or update the `.env` file with their paths:
+
+```env
+WKHTMLTOPDF_PATH=/path/to/wkhtmltopdf
+WKHTMLTOIMAGE_PATH=/path/to/wkhtmltoimage
+```
+
 ## Contributing
 
 We welcome contributions to TravelShare! Please make sure to read the [Contributor Guide](CONTRIBUTING.md) before starting. The guide outlines the rules and best practices for maintaining consistency and quality in the project.
