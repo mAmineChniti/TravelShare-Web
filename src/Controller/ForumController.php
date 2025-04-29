@@ -83,20 +83,6 @@ final class ForumController extends AbstractController
 
         $postsRepository->add($post);
 
-        $user = $userRepository->find($userId);
-        $images = $postImagesRepository->findImagesByPostId($post->getPostId());
-        $postData = [
-            'postId' => $post->getPostId(),
-            'name' => $user->getName(),
-            'lastName' => $user->getLastName(),
-            'textContent' => $post->getTextContent(),
-            'postTitle' => $post->getPostTitle(),
-            'images' => $images ? array_map(fn ($image) => base64_encode($image), $images) : [],
-            'isLiked' => false,
-            'likesCount' => 0,
-            'comments' => [],
-        ];
-
         $uploadedFiles = $request->files->get('postImages');
         if ($uploadedFiles) {
             foreach ($uploadedFiles as $uploadedFile) {
@@ -111,6 +97,19 @@ final class ForumController extends AbstractController
                 }
             }
         }
+        $user = $userRepository->find($userId);
+        $images = $postImagesRepository->findImagesByPostId($post->getPostId());
+        $postData = [
+            'postId' => $post->getPostId(),
+            'name' => $user->getName(),
+            'lastName' => $user->getLastName(),
+            'textContent' => $post->getTextContent(),
+            'postTitle' => $post->getPostTitle(),
+            'images' => $images ? array_map(fn ($image) => base64_encode($image), $images) : [],
+            'isLiked' => false,
+            'likesCount' => 0,
+            'comments' => [],
+        ];
 
         return $this->render('components/Post.html.twig', [
             'post' => $postData,

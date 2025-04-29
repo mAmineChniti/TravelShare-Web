@@ -15,8 +15,8 @@ class PostImages
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $postImageId = null;
 
-    #[ORM\ManyToOne(targetEntity: Posts::class)]
-    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'Post_id', nullable: false)]
+    #[ORM\ManyToOne(targetEntity: Posts::class, inversedBy: 'images')]
+    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'Post_id', nullable: false, onDelete: 'CASCADE')]
     private ?Posts $post = null;
 
     #[ORM\Column(name: 'image', type: Types::BLOB)]

@@ -83,13 +83,14 @@
 		<img src="data:image/jpeg;base64,{{ image }}" alt="Post Image" class="w-full h-auto rounded-lg shadow-md" />
 		{% endfor %}
 	</div>
+	{% endif %}
 	<div class="mt-4">
 		<form
 			hx-post="{{ path('app_forum_comment') }}"
 			hx-target="#commentsContainer-{{ post.postId }}"
 			hx-swap="beforeend"
 			hx-on::after-request="if(event.detail.successful) this.reset()"
-			onsubmit="return validateCommentForm(this);"
+			onsubmit="return handleCommentFormSubmit(this);"
 		>
 			<input type="hidden" name="postId" value="{{ post.postId }}" />
 			<div>
@@ -107,7 +108,7 @@
 					type="button"
 					class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg"
 					title="Add comment"
-					onclick="if(validateCommentForm(this.form)) { htmx.trigger(this.form, 'submit'); }"
+					onclick="handleAddCommentButtonClick(this);"
 				>
 					<i class="fas fa-paper-plane"></i>
 				</button>
@@ -128,10 +129,16 @@
 		/>
 		{% endfor %} {% endif %}
 	</div>
-	{% endif %}
 </div>
 
 <script>
+	async function handleAddCommentButtonClick(button) {
+		const form = button.form;
+		if (await validateCommentForm(form)) {
+			htmx.trigger(form, "submit");
+		}
+	}
+
 	(function () {
 		const textarea = document.getElementById("editTextarea-{{ post.postId }}");
 		if (textarea) {

@@ -41,6 +41,7 @@ final class FlightsController extends AbstractController
 
         if (!$voyage) {
             $this->addFlash('error', 'Flight not found.');
+
             return $this->redirectToRoute('app_flights');
         }
 
@@ -301,7 +302,7 @@ final class FlightsController extends AbstractController
 
         return new PdfResponse(
             $pdfOutput,
-            'reservation_' . $id . '.pdf',
+            'reservation_'.$id.'.pdf',
             'application/pdf',
             HeaderUtils::DISPOSITION_ATTACHMENT
         );
