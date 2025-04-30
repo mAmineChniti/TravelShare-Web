@@ -11,7 +11,6 @@
 	</form>
 	<form hx-post="{{ path('app_forum_downvote') }}" hx-target="#voteButtonsContainer-{{ postId }}" hx-swap="outerHTML">
 		<input type="hidden" name="postId" value="{{ postId }}" />
-		<span> {{postId}} </span>
 		<button
 			type="submit"
 			class="{% if isLiked is same as(false) %} bg-red-600 hover:bg-red-700 {% else %} bg-yellow-300 hover:bg-yellow-400 {% endif %} text-white font-medium py-2 px-4 rounded-lg shadow"

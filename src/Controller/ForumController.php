@@ -22,6 +22,21 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 final class ForumController extends AbstractController
 {
+    private function enrichPost(array $post, int $userId, CommentsRepository $commentsRepository, LikesRepository $likesRepository, PostImagesRepository $postImagesRepository): array
+    {
+        $post['comments'] = $commentsRepository->fetchById($post['postId']);
+        $post['likesCount'] = $likesRepository->likesCounter($post['postId']);
+        $post['dislikesCount'] = $likesRepository->dislikesCounter($post['postId']);
+        $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
+        $images = $postImagesRepository->findImagesByPostId($post['postId']);
+        if($images){
+            $post['images'] = $images ? array_map(fn ($image) => base64_encode($image), $images) : [];
+        } else {
+            $post['images'] = [];
+        }
+        return $post;
+    }
+
     #[Route('/forum', name: 'app_forum', methods: ['GET'])]
     public function index(
         Request $request,
@@ -36,16 +51,7 @@ final class ForumController extends AbstractController
 
         $posts = $postsRepository->fetchPosts($offset, $limit, $userId);
         foreach ($posts as &$post) {
-            $post['comments'] = $commentsRepository->fetchById($post['postId']);
-            $post['likesCount'] = $likesRepository->likesCounter($post['postId']);
-            $post['dislikesCount'] = $likesRepository->dislikesCounter($post['postId']);
-            $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
-            $images = $postImagesRepository->findImagesByPostId($post['postId']);
-            if ($images) {
-                $post['images'] = array_map(fn ($image) => base64_encode($image), $images);
-            } else {
-                $post['images'] = [];
-            }
+            $post = $this->enrichPost($post, $userId, $commentsRepository, $likesRepository, $postImagesRepository);
         }
 
         $postsToBeAnalyzed = $postsRepository->listAll();
@@ -57,14 +63,14 @@ final class ForumController extends AbstractController
             ];
         }, $postsToBeAnalyzed);
 
-        $geminiApiKey = $this->getParameter('app.gemini_api_key') ?? null;
+        $geminiApiKey = $this->getParameter('app.gemini_api_key');
 
-        if (empty($geminiApiKey)) {
-            throw new \Exception('GEMINI_API_KEY is not set in the environment variables.');
+        if (!$geminiApiKey) {
+            throw new \RuntimeException('API key is missing.');
         }
 
         $httpClient = HttpClient::create();
-        $response = $httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='.$geminiApiKey, [
+        $response = $httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $geminiApiKey, [
             'headers' => [
                 'Content-Type' => 'application/json',
             ],
@@ -100,25 +106,16 @@ final class ForumController extends AbstractController
         $recommendedPosts = $postsRepository->fetchPostsByIds($recommendedPostIds, $userId);
         if (!empty($recommendedPosts)) {
             foreach ($recommendedPosts as &$post) {
-                $post['comments'] = $commentsRepository->fetchById($post['postId']);
-                $post['likesCount'] = $likesRepository->likesCounter($post['postId']);
-                $post['dislikesCount'] = $likesRepository->dislikesCounter($post['postId']);
-                $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
-                $images = $postImagesRepository->findImagesByPostId($post['postId']);
-                if ($images) {
-                    $post['images'] = array_map(fn ($image) => base64_encode($image), $images);
-                } else {
-                    $post['images'] = [];
-                }
+                $post = $this->enrichPost($post, $userId, $commentsRepository, $likesRepository, $postImagesRepository);
             }
         } else {
             $recommendedPosts = [];
         }
 
-        /**$recommendedPostIds = array_column($recommendedPosts, 'postId');
+        $recommendedPostIds = array_column($recommendedPosts, 'postId');
         $posts = array_filter($posts, function ($post) use ($recommendedPostIds) {
             return !in_array($post['postId'], $recommendedPostIds);
-        });**/
+        });
 
         return $this->render('forum/index.html.twig', [
             'posts' => $posts,
@@ -179,7 +176,7 @@ final class ForumController extends AbstractController
             'lastName' => $user->getLastName(),
             'textContent' => $post->getTextContent(),
             'postTitle' => $post->getPostTitle(),
-            'images' => $images ? array_map(fn ($image) => base64_encode($image), $images) : [],
+            'images' => $images ? array_map(fn($image) => base64_encode($image), $images) : [],
             'isLiked' => false,
             'likesCount' => 0,
             'comments' => [],
@@ -207,11 +204,11 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $postText = $request->request->get('editTextarea-'.$id);
+        $postText = $request->request->get('editTextarea-' . $id);
         $post->setTextContent($postText);
         $post->setUpdatedAt(new \DateTime());
 
-        $postTitle = $request->request->get('editTitle-'.$id);
+        $postTitle = $request->request->get('editTitle-' . $id);
         $post->setPostTitle($postTitle);
 
         $errors = $validator->validate($post);
@@ -241,7 +238,7 @@ final class ForumController extends AbstractController
         $post = $postsRepository->find($id);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id '.$id);
+            throw $this->createNotFoundException('No post found for id ' . $id);
         }
 
         if (1 !== $post->getOwnerId()) {
@@ -298,7 +295,7 @@ final class ForumController extends AbstractController
         $post = $postsRepository->find($postId);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id '.$postId);
+            throw $this->createNotFoundException('No post found for id ' . $postId);
         }
 
         $isLiked = $likesRepository->isLikedByUser($userId, $postId);
@@ -329,7 +326,6 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => 'Post not found.'], 404);
         }
         $comment->setPost($post);
-        $comment->setPostId($postId);
         $comment->setCommenterId($userId);
         $comment->setComment($commentText);
         $comment->setCommentedAt(new \DateTime());
@@ -368,7 +364,7 @@ final class ForumController extends AbstractController
         $comment = $commentsRepository->find($id);
 
         if (!$comment) {
-            throw $this->createNotFoundException('No comment found for id '.$id);
+            throw $this->createNotFoundException('No comment found for id ' . $id);
         }
 
         if (1 !== $comment->getCommenterId()) {
@@ -398,7 +394,7 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $commentText = $request->request->get('editTextarea-'.$id);
+        $commentText = $request->request->get('editTextarea-' . $id);
         $comment->setComment($commentText);
         $comment->setUpdatedAt(new \DateTime());
         $post = $postsRepository->find($comment->getPostId());
@@ -434,13 +430,13 @@ final class ForumController extends AbstractController
 
         foreach ($posts as &$post) {
             $user = $usersRepository->find($post['ownerId']);
-            $post['ownerName'] = $user ? $user->getName().' '.$user->getLastName() : 'Unknown User';
+            $post['ownerName'] = $user ? $user->getName() . ' ' . $user->getLastName() : 'Unknown User';
 
             $comments = $commentsRepository->fetchById($post['postId']);
 
             foreach ($comments as &$comment) {
                 $commenter = $usersRepository->find($comment['commenterId']);
-                $comment['commenterName'] = $commenter ? $commenter->getName().' '.$commenter->getLastName() : 'Unknown User';
+                $comment['commenterName'] = $commenter ? $commenter->getName() . ' ' . $commenter->getLastName() : 'Unknown User';
             }
 
             $post['comments'] = $comments;
@@ -463,16 +459,7 @@ final class ForumController extends AbstractController
         $limit = min(100, max(1, (int) $request->query->get('limit', 10)));
         $posts = $postsRepository->searchByTextContent($searchTerm, $offset, $limit);
         foreach ($posts as &$post) {
-            $post['comments'] = $commentsRepository->fetchById($post['postId']);
-            $post['likesCount'] = $likesRepository->likesCounter($post['postId']);
-            $post['dislikesCount'] = $likesRepository->dislikesCounter($post['postId']);
-            $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
-            $images = $postImagesRepository->findImagesByPostId($post['postId']);
-            if ($images) {
-                $post['images'] = array_map(fn ($image) => base64_encode($image), $images);
-            } else {
-                $post['images'] = [];
-            }
+            $post = $this->enrichPost($post, $userId, $commentsRepository, $likesRepository, $postImagesRepository);
         }
 
         return $this->render('forum/index.html.twig', [
@@ -505,16 +492,7 @@ final class ForumController extends AbstractController
                 $posts = $postsRepository->fetchPostsSorted('date_desc', $offset, $limit, $userId);
         }
         foreach ($posts as &$post) {
-            $post['comments'] = $commentsRepository->fetchById($post['postId']);
-            $post['likesCount'] = $likesRepository->likesCounter($post['postId']);
-            $post['dislikesCount'] = $likesRepository->dislikesCounter($post['postId']);
-            $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
-            $images = $postImagesRepository->findImagesByPostId($post['postId']);
-            if ($images) {
-                $post['images'] = array_map(fn ($image) => base64_encode($image), $images);
-            } else {
-                $post['images'] = [];
-            }
+            $post = $this->enrichPost($post, $userId, $commentsRepository, $likesRepository, $postImagesRepository);
         }
 
         return $this->render('forum/index.html.twig', [
