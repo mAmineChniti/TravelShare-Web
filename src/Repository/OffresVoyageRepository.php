@@ -60,4 +60,21 @@ class OffresVoyageRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findByDateRange(?\DateTime $departureDate, ?\DateTime $returnDate): array
+    {
+        $qb = $this->createQueryBuilder('o');
+
+        if ($departureDate) {
+            $qb->andWhere('o.dateDepart >= :departureDate')
+               ->setParameter('departureDate', $departureDate);
+        }
+
+        if ($returnDate) {
+            $qb->andWhere('o.dateRetour <= :returnDate')
+               ->setParameter('returnDate', $returnDate);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

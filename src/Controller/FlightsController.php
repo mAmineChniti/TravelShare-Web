@@ -12,12 +12,20 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\ReservationOffresVoyageRepository;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Knp\Bundle\SnappyBundle\Snappy\Response\PdfResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class FlightsController extends AbstractController
 {
+    private HttpClientInterface $httpClient;
+
+    public function __construct(HttpClientInterface $httpClient)
+    {
+        $this->httpClient = $httpClient;
+    }
+
     #[Route('/flights', name: 'app_flights')]
     public function index(OffresVoyageRepository $voyageService): Response
     {
@@ -311,16 +319,18 @@ final class FlightsController extends AbstractController
     #[Route('/api/currencies', name: 'api_fetch_currencies', methods: ['GET'])]
     public function fetchCurrencies(): JsonResponse
     {
-        $apiKey = $_ENV['EXCHANGE_API_KEY'];
+        $apiKey = $this->getParameter('app.exchange_api_key');
         $url = "https://v6.exchangerate-api.com/v6/{$apiKey}/codes";
 
         try {
-            $response = file_get_contents($url);
-            if (false === $response) {
+            $response = $this->httpClient->request('GET', $url);
+            $statusCode = $response->getStatusCode();
+
+            if (200 !== $statusCode) {
                 return new JsonResponse(['error' => 'Failed to fetch currencies'], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
-            $data = json_decode($response, true);
+            $data = $response->toArray();
 
             return new JsonResponse($data);
         } catch (\Exception $e) {
@@ -338,27 +348,26 @@ final class FlightsController extends AbstractController
         if (empty($country)) {
             return new JsonResponse(['error' => 'Country parameter is required'], Response::HTTP_BAD_REQUEST);
         }
-        $apiToken = $_ENV['COUNTRY_CURRENCY_API_TOKEN'];
+
+        $token = $this->getParameter('app.country_currency_api_token');
         $url = 'https://aaapis.com/api/v1/info/country/';
 
-        $payload = json_encode(['country' => $country]);
-
         try {
-            $options = [
-                'http' => [
-                    'header' => "Authorization: Token {$apiToken}\r\nContent-Type: application/json\r\n",
-                    'method' => 'POST',
-                    'content' => $payload,
+            $response = $this->httpClient->request('POST', $url, [
+                'headers' => [
+                    'Authorization' => "Token {$token}",
+                    'Content-Type' => 'application/json',
                 ],
-            ];
-            $context = stream_context_create($options);
-            $response = file_get_contents($url, false, $context);
+                'json' => ['country' => $country],
+            ]);
 
-            if (false === $response) {
+            $statusCode = $response->getStatusCode();
+
+            if (200 !== $statusCode) {
                 return new JsonResponse(['error' => 'Failed to fetch country currency'], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
-            $data = json_decode($response, true);
+            $data = $response->toArray();
 
             if (!isset($data['currency']['code'])) {
                 return new JsonResponse(['error' => 'Invalid response from external API'], Response::HTTP_BAD_REQUEST);
@@ -383,16 +392,18 @@ final class FlightsController extends AbstractController
             return new JsonResponse(['error' => 'Invalid request data'], Response::HTTP_BAD_REQUEST);
         }
 
-        $apiKey = $_ENV['EXCHANGE_API_KEY'];
+        $apiKey = $this->getParameter('app.exchange_api_key');
         $url = "https://v6.exchangerate-api.com/v6/{$apiKey}/latest/{$fromCurrency}";
 
         try {
-            $response = file_get_contents($url);
-            if (false === $response) {
+            $response = $this->httpClient->request('GET', $url);
+            $statusCode = $response->getStatusCode();
+
+            if (200 !== $statusCode) {
                 return new JsonResponse(['error' => 'Failed to fetch conversion rates'], Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
-            $data = json_decode($response, true);
+            $data = $response->toArray();
             $rates = $data['conversion_rates'] ?? [];
 
             if (!isset($rates[$toCurrency])) {
