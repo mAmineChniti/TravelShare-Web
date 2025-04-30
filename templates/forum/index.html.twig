@@ -90,6 +90,24 @@
     </form>
 </div>
 	<div id="postsContainer" class="space-y-4">
+		{% if recommendedPosts is defined and recommendedPosts|length > 0 %}
+		<h2 class="text-lg font-semibold">Recommended Posts</h2>
+		<div class="space-y-4">
+			{% for post in recommendedPosts %}
+			<twig:Post
+				post="{{ post }}"
+				likesCount="{{ post.likesCount }}"
+				dislikesCount="{{ post.dislikesCount }}"
+				isLiked="{{ post.isLiked }}"
+			/>
+			{% endfor %}
+		</div>
+		{% endif %}
+	<h2 class="text-lg font-semibold">All Posts</h2>
+		{% if posts is empty %}
+		<p class="text-sm text-gray-500">No posts available.</p>
+		{% endif %}
+		{% if posts is defined and posts|length > 0 %}
 		{% for post in posts %}
 		<twig:Post
 			post="{{ post }}"
@@ -98,6 +116,7 @@
 			isLiked="{{ post.isLiked }}"
 		/>
 		{% endfor %}
+		{% endif %}
 	</div>
 </div>
 

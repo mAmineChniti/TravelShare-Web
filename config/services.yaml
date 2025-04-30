@@ -6,6 +6,7 @@
 parameters:
     app.exchange_api_key: '%env(EXCHANGE_API_KEY)%'
     app.country_currency_api_token: '%env(COUNTRY_CURRENCY_API_TOKEN)%'
+    app.gemini_api_key: '%env(GEMINI_API_KEY)%'
 
 services:
   # default configuration for services in *this* file

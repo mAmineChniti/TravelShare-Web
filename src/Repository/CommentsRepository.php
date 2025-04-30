@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Posts;
 use App\Entity\Comments;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -21,14 +22,15 @@ class CommentsRepository extends ServiceEntityRepository
         parent::__construct($registry, Comments::class);
     }
 
-    public function add(Comments $comment): void
+    public function add(Comments $comment, Posts $post): void
     {
+        $comment->setPost($post);
         $entityManager = $this->getEntityManager();
         $entityManager->persist($comment);
         $entityManager->flush();
     }
 
-    public function update(Comments $comment): void
+    public function update(Comments $comment, Posts $post): void
     {
         $entityManager = $this->getEntityManager();
         $existingComment = $this->find($comment->getCommentId());
@@ -37,6 +39,7 @@ class CommentsRepository extends ServiceEntityRepository
         }
         $existingComment->setComment($comment->getComment());
         $existingComment->setUpdatedAt(new \DateTime());
+        $existingComment->setPost($post);
         $entityManager->flush();
     }
 

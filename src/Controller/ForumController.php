@@ -10,6 +10,7 @@ use App\Repository\PostsRepository;
 use App\Repository\UsersRepository;
 use App\Repository\CommentsRepository;
 use App\Repository\PostImagesRepository;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -47,8 +48,81 @@ final class ForumController extends AbstractController
             }
         }
 
+        $postsToBeAnalyzed = $postsRepository->listAll();
+
+        $postContents = array_map(function ($post) {
+            return [
+                'postId' => $post->getPostId(),
+                'textContent' => $post->getTextContent(),
+            ];
+        }, $postsToBeAnalyzed);
+
+        $geminiApiKey = $this->getParameter('app.gemini_api_key') ?? null;
+
+        if (empty($geminiApiKey)) {
+            throw new \Exception('GEMINI_API_KEY is not set in the environment variables.');
+        }
+
+        $httpClient = HttpClient::create();
+        $response = $httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='.$geminiApiKey, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'contents' => [
+                    [
+                        'parts' => [
+                            [
+                                'text' => json_encode([
+                                    'posts' => $postContents,
+                                    'instructions' => 'Analyze the text content of the posts and recommend 3 posts. Return only a JSON array with the postIds of the recommended posts.',
+                                ]),
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $responseData = $response->toArray();
+
+        $recommendedPostIds = [];
+        if (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
+            $rawPostIds = $responseData['candidates'][0]['content']['parts'][0]['text'];
+
+            $rawPostIds = preg_replace('/^```json\\n|\\n```$/', '', $rawPostIds);
+            $recommendedPostIds = json_decode($rawPostIds, true);
+
+            if (JSON_ERROR_NONE !== json_last_error()) {
+                $recommendedPostIds = [];
+            }
+        }
+        $recommendedPosts = $postsRepository->fetchPostsByIds($recommendedPostIds, $userId);
+        if (!empty($recommendedPosts)) {
+            foreach ($recommendedPosts as &$post) {
+                $post['comments'] = $commentsRepository->fetchById($post['postId']);
+                $post['likesCount'] = $likesRepository->likesCounter($post['postId']);
+                $post['dislikesCount'] = $likesRepository->dislikesCounter($post['postId']);
+                $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
+                $images = $postImagesRepository->findImagesByPostId($post['postId']);
+                if ($images) {
+                    $post['images'] = array_map(fn ($image) => base64_encode($image), $images);
+                } else {
+                    $post['images'] = [];
+                }
+            }
+        } else {
+            $recommendedPosts = [];
+        }
+
+        /**$recommendedPostIds = array_column($recommendedPosts, 'postId');
+        $posts = array_filter($posts, function ($post) use ($recommendedPostIds) {
+            return !in_array($post['postId'], $recommendedPostIds);
+        });**/
+
         return $this->render('forum/index.html.twig', [
             'posts' => $posts,
+            'recommendedPosts' => $recommendedPosts,
         ]);
     }
 
@@ -186,15 +260,15 @@ final class ForumController extends AbstractController
         PostsRepository $postsRepository,
     ): Response {
         $postId = $request->request->get('postId');
-        $userId = 1;
-
         if (empty($postId)) {
-            return new JsonResponse(['success' => false, 'message' => 'Post ID is missing'], 400);
+            return new JsonResponse(['success' => false, 'message' => 'Post ID is missing or invalid'], 400);
         }
+
         if (!$postsRepository->find($postId)) {
             return new JsonResponse(['success' => false, 'message' => 'Post not found'], 404);
         }
 
+        $userId = 1;
         $likesRepository->handleVote($userId, $postId, true);
         $isLiked = $likesRepository->isLikedByUser($userId, $postId);
 
@@ -213,11 +287,11 @@ final class ForumController extends AbstractController
         PostsRepository $postsRepository,
     ): Response {
         $postId = $request->request->get('postId');
-        $userId = 1;
-
         if (empty($postId)) {
-            return new JsonResponse(['success' => false, 'message' => 'Post ID is missing'], 400);
+            return new JsonResponse(['success' => false, 'message' => 'Post ID is missing or invalid'], 400);
         }
+
+        $userId = 1;
 
         $likesRepository->handleVote($userId, $postId, false);
 
@@ -242,6 +316,7 @@ final class ForumController extends AbstractController
         Request $request,
         CommentsRepository $commentsRepository,
         UsersRepository $userRepository,
+        PostsRepository $postsRepository,
         ValidatorInterface $validator,
     ): Response {
         $postId = $request->request->get('postId');
@@ -249,6 +324,11 @@ final class ForumController extends AbstractController
         $userId = 1;
 
         $comment = new Comments();
+        $post = $postsRepository->find($postId);
+        if (!$post) {
+            return new JsonResponse(['error' => 'Post not found.'], 404);
+        }
+        $comment->setPost($post);
         $comment->setPostId($postId);
         $comment->setCommenterId($userId);
         $comment->setComment($commentText);
@@ -265,7 +345,7 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => $errorMessages], 400);
         }
 
-        $commentsRepository->add($comment);
+        $commentsRepository->add($comment, $post);
 
         $user = $userRepository->find($userId);
 
@@ -304,6 +384,7 @@ final class ForumController extends AbstractController
     public function editComment(
         Request $request,
         CommentsRepository $commentsRepository,
+        PostsRepository $postsRepository,
         ValidatorInterface $validator,
         int $id,
     ): Response {
@@ -320,7 +401,11 @@ final class ForumController extends AbstractController
         $commentText = $request->request->get('editTextarea-'.$id);
         $comment->setComment($commentText);
         $comment->setUpdatedAt(new \DateTime());
-
+        $post = $postsRepository->find($comment->getPostId());
+        if (!$post) {
+            return new JsonResponse(['error' => 'Post not found.'], 404);
+        }
+        $comment->setPost($post);
         $errors = $validator->validate($comment);
         if (count($errors) > 0) {
             $errorMessages = [];
@@ -331,7 +416,7 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => $errorMessages], 400);
         }
 
-        $commentsRepository->update($comment);
+        $commentsRepository->update($comment, $post);
 
         return $this->render('components/CommentText.html.twig', [
             'commentId' => $comment->getCommentId(),

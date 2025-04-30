@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Likes;
+use App\Entity\Posts;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -65,7 +66,6 @@ class LikesRepository extends ServiceEntityRepository
     public function handleVote(int $userId, int $postId, bool $likeType): void
     {
         $entityManager = $this->getEntityManager();
-
         $existingLike = $this->findOneBy(['likerId' => $userId, 'postId' => $postId]);
 
         if ($existingLike) {
@@ -80,6 +80,12 @@ class LikesRepository extends ServiceEntityRepository
             $newLike->setLikerId($userId);
             $newLike->setPostId($postId);
             $newLike->setLikeType($likeType);
+
+            $post = $entityManager->getRepository(Posts::class)->find($postId);
+            if (!$post) {
+                throw new \Exception('Post not found for ID: '.$postId);
+            }
+            $newLike->setPost($post);
 
             $entityManager->persist($newLike);
         }

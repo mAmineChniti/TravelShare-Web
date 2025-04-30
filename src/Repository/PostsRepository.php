@@ -121,4 +121,20 @@ class PostsRepository extends ServiceEntityRepository
 
         return $queryBuilder->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
+
+    public function fetchPostsByIds(array $postIds, int $userId): array
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId, p.postTitle
+             FROM App\Entity\Posts p 
+             JOIN App\Entity\Users u WITH p.ownerId = u.userId 
+             LEFT JOIN App\Entity\FlaggedContent f WITH p.postId = f.postId AND f.flaggerId = :userId 
+             WHERE f.postId IS NULL AND p.postId IN (:postIds)'
+        )
+        ->setParameter('userId', $userId)
+        ->setParameter('postIds', $postIds);
+
+        return $query->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+    }
 }
