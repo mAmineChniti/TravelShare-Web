@@ -89,35 +89,42 @@
         </select>
     </form>
 </div>
-	<div id="postsContainer" class="space-y-4">
-		{% if recommendedPosts is defined and recommendedPosts|length > 0 %}
-		<h2 class="text-lg font-semibold">Recommended Posts</h2>
-		<div class="space-y-4">
-			{% for post in recommendedPosts %}
-			<twig:Post
-				post="{{ post }}"
-				likesCount="{{ post.likesCount }}"
-				dislikesCount="{{ post.dislikesCount }}"
-				isLiked="{{ post.isLiked }}"
-			/>
-			{% endfor %}
-		</div>
-		{% endif %}
-	<h2 class="text-lg font-semibold">All Posts</h2>
-		{% if posts is empty %}
-		<p class="text-sm text-gray-500">No posts available.</p>
-		{% endif %}
-		{% if posts is defined and posts|length > 0 %}
-		{% for post in posts %}
-		<twig:Post
-			post="{{ post }}"
-			likesCount="{{ post.likesCount }}"
-			dislikesCount="{{ post.dislikesCount }}"
-			isLiked="{{ post.isLiked }}"
-		/>
-		{% endfor %}
-		{% endif %}
-	</div>
+	<div class="container mx-auto px-4 mt-8 space-y-6">
+        {% if recommendedPosts is defined and recommendedPosts|length > 0 %}
+    <div class="bg-gray-100 p-6 rounded-lg shadow-md">
+        <h2 class="text-lg font-semibold text-blue-600 border-b border-blue-300 pb-2 mb-4">Recommended Posts</h2>
+        <div class="space-y-6"> <!-- Added spacing between recommended posts -->
+            {% for post in recommendedPosts %}
+            <twig:Post
+                post="{{ post }}"
+                likesCount="{{ post.likesCount }}"
+                dislikesCount="{{ post.dislikesCount }}"
+                isLiked="{{ post.isLiked }}"
+            />
+            {% endfor %}
+        </div>
+    </div>
+        {% endif %}
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-2 mb-4">All Posts</h2>
+        {% if posts is empty %}
+        <p class="text-sm text-gray-500">No posts available.</p>
+        {% endif %}
+        {% if posts is defined and posts|length > 0 %}
+        <div class="space-y-6"> <!-- Added spacing between all posts -->
+            {% for post in posts %}
+            <twig:Post
+                post="{{ post }}"
+                likesCount="{{ post.likesCount }}"
+                dislikesCount="{{ post.dislikesCount }}"
+                isLiked="{{ post.isLiked }}"
+            />
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
 </div>
 
 <div id="error-messages" class="mt-4">

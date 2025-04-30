@@ -29,12 +29,80 @@ final class ForumController extends AbstractController
         $post['dislikesCount'] = $likesRepository->dislikesCounter($post['postId']);
         $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
         $images = $postImagesRepository->findImagesByPostId($post['postId']);
-        if($images){
+        if ($images) {
             $post['images'] = $images ? array_map(fn ($image) => base64_encode($image), $images) : [];
         } else {
             $post['images'] = [];
         }
+
         return $post;
+    }
+
+    private function getRecommendedPosts(array $postsToBeAnalyzed, PostsRepository $postsRepository, CommentsRepository $commentsRepository, LikesRepository $likesRepository, PostImagesRepository $postImagesRepository, int $userId): array
+    {
+        $postContents = array_map(function ($post) {
+            return [
+                'postId' => $post->getPostId(),
+                'textContent' => $post->getTextContent(),
+            ];
+        }, $postsToBeAnalyzed);
+
+        $geminiApiKey = $this->getParameter('app.gemini_api_key');
+
+        if (!$geminiApiKey) {
+            throw new \RuntimeException('API key is missing.');
+        }
+
+        $recommendedPostIds = [];
+        try {
+            $httpClient = HttpClient::create();
+            $response = $httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='.$geminiApiKey, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                [
+                                    'text' => json_encode([
+                                        'posts' => $postContents,
+                                        'instructions' => 'Analyze the text content of the posts and recommend 3 posts. Return only a JSON array with the postIds of the recommended posts.',
+                                    ]),
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+
+            $responseData = $response->toArray();
+
+            if (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
+                $rawPostIds = $responseData['candidates'][0]['content']['parts'][0]['text'];
+
+                $rawPostIds = preg_replace('/^```json\\n|\\n```$/', '', $rawPostIds);
+                $recommendedPostIds = json_decode($rawPostIds, true);
+
+                if (JSON_ERROR_NONE !== json_last_error()) {
+                    $recommendedPostIds = [];
+                }
+            }
+        } catch (\Exception) {
+            $recommendedPostIds = [];
+        }
+
+        $recommendedPosts = [];
+        if (!empty($recommendedPostIds)) {
+            $recommendedPosts = $postsRepository->fetchPostsByIds($recommendedPostIds, $userId);
+            if (!empty($recommendedPosts)) {
+                foreach ($recommendedPosts as &$post) {
+                    $post = $this->enrichPost($post, $userId, $commentsRepository, $likesRepository, $postImagesRepository);
+                }
+            }
+        }
+
+        return $recommendedPosts;
     }
 
     #[Route('/forum', name: 'app_forum', methods: ['GET'])]
@@ -55,67 +123,14 @@ final class ForumController extends AbstractController
         }
 
         $postsToBeAnalyzed = $postsRepository->listAll();
+        $recommendedPosts = $this->getRecommendedPosts($postsToBeAnalyzed, $postsRepository, $commentsRepository, $likesRepository, $postImagesRepository, $userId);
 
-        $postContents = array_map(function ($post) {
-            return [
-                'postId' => $post->getPostId(),
-                'textContent' => $post->getTextContent(),
-            ];
-        }, $postsToBeAnalyzed);
-
-        $geminiApiKey = $this->getParameter('app.gemini_api_key');
-
-        if (!$geminiApiKey) {
-            throw new \RuntimeException('API key is missing.');
-        }
-
-        $httpClient = HttpClient::create();
-        $response = $httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $geminiApiKey, [
-            'headers' => [
-                'Content-Type' => 'application/json',
-            ],
-            'json' => [
-                'contents' => [
-                    [
-                        'parts' => [
-                            [
-                                'text' => json_encode([
-                                    'posts' => $postContents,
-                                    'instructions' => 'Analyze the text content of the posts and recommend 3 posts. Return only a JSON array with the postIds of the recommended posts.',
-                                ]),
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ]);
-
-        $responseData = $response->toArray();
-
-        $recommendedPostIds = [];
-        if (isset($responseData['candidates'][0]['content']['parts'][0]['text'])) {
-            $rawPostIds = $responseData['candidates'][0]['content']['parts'][0]['text'];
-
-            $rawPostIds = preg_replace('/^```json\\n|\\n```$/', '', $rawPostIds);
-            $recommendedPostIds = json_decode($rawPostIds, true);
-
-            if (JSON_ERROR_NONE !== json_last_error()) {
-                $recommendedPostIds = [];
-            }
-        }
-        $recommendedPosts = $postsRepository->fetchPostsByIds($recommendedPostIds, $userId);
         if (!empty($recommendedPosts)) {
-            foreach ($recommendedPosts as &$post) {
-                $post = $this->enrichPost($post, $userId, $commentsRepository, $likesRepository, $postImagesRepository);
-            }
-        } else {
-            $recommendedPosts = [];
+            $recommendedPostIds = array_column($recommendedPosts, 'postId');
+            $posts = array_filter($posts, function ($post) use ($recommendedPostIds) {
+                return !in_array($post['postId'], $recommendedPostIds);
+            });
         }
-
-        $recommendedPostIds = array_column($recommendedPosts, 'postId');
-        $posts = array_filter($posts, function ($post) use ($recommendedPostIds) {
-            return !in_array($post['postId'], $recommendedPostIds);
-        });
 
         return $this->render('forum/index.html.twig', [
             'posts' => $posts,
@@ -176,7 +191,7 @@ final class ForumController extends AbstractController
             'lastName' => $user->getLastName(),
             'textContent' => $post->getTextContent(),
             'postTitle' => $post->getPostTitle(),
-            'images' => $images ? array_map(fn($image) => base64_encode($image), $images) : [],
+            'images' => $images ? array_map(fn ($image) => base64_encode($image), $images) : [],
             'isLiked' => false,
             'likesCount' => 0,
             'comments' => [],
@@ -204,11 +219,11 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $postText = $request->request->get('editTextarea-' . $id);
+        $postText = $request->request->get('editTextarea-'.$id);
         $post->setTextContent($postText);
         $post->setUpdatedAt(new \DateTime());
 
-        $postTitle = $request->request->get('editTitle-' . $id);
+        $postTitle = $request->request->get('editTitle-'.$id);
         $post->setPostTitle($postTitle);
 
         $errors = $validator->validate($post);
@@ -238,7 +253,7 @@ final class ForumController extends AbstractController
         $post = $postsRepository->find($id);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id ' . $id);
+            throw $this->createNotFoundException('No post found for id '.$id);
         }
 
         if (1 !== $post->getOwnerId()) {
@@ -295,7 +310,7 @@ final class ForumController extends AbstractController
         $post = $postsRepository->find($postId);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id ' . $postId);
+            throw $this->createNotFoundException('No post found for id '.$postId);
         }
 
         $isLiked = $likesRepository->isLikedByUser($userId, $postId);
@@ -364,7 +379,7 @@ final class ForumController extends AbstractController
         $comment = $commentsRepository->find($id);
 
         if (!$comment) {
-            throw $this->createNotFoundException('No comment found for id ' . $id);
+            throw $this->createNotFoundException('No comment found for id '.$id);
         }
 
         if (1 !== $comment->getCommenterId()) {
@@ -394,7 +409,7 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $commentText = $request->request->get('editTextarea-' . $id);
+        $commentText = $request->request->get('editTextarea-'.$id);
         $comment->setComment($commentText);
         $comment->setUpdatedAt(new \DateTime());
         $post = $postsRepository->find($comment->getPostId());
@@ -430,13 +445,13 @@ final class ForumController extends AbstractController
 
         foreach ($posts as &$post) {
             $user = $usersRepository->find($post['ownerId']);
-            $post['ownerName'] = $user ? $user->getName() . ' ' . $user->getLastName() : 'Unknown User';
+            $post['ownerName'] = $user ? $user->getName().' '.$user->getLastName() : 'Unknown User';
 
             $comments = $commentsRepository->fetchById($post['postId']);
 
             foreach ($comments as &$comment) {
                 $commenter = $usersRepository->find($comment['commenterId']);
-                $comment['commenterName'] = $commenter ? $commenter->getName() . ' ' . $commenter->getLastName() : 'Unknown User';
+                $comment['commenterName'] = $commenter ? $commenter->getName().' '.$commenter->getLastName() : 'Unknown User';
             }
 
             $post['comments'] = $comments;
@@ -495,9 +510,20 @@ final class ForumController extends AbstractController
             $post = $this->enrichPost($post, $userId, $commentsRepository, $likesRepository, $postImagesRepository);
         }
 
+        $postsToBeAnalyzed = $postsRepository->listAll();
+        $recommendedPosts = $this->getRecommendedPosts($postsToBeAnalyzed, $postsRepository, $commentsRepository, $likesRepository, $postImagesRepository, $userId);
+
+        if (!empty($recommendedPosts)) {
+            $recommendedPostIds = array_column($recommendedPosts, 'postId');
+            $posts = array_filter($posts, function ($post) use ($recommendedPostIds) {
+                return !in_array($post['postId'], $recommendedPostIds);
+            });
+        }
+
         return $this->render('forum/index.html.twig', [
             'posts' => $posts,
             'sortBy' => $sortBy,
+            'recommendedPosts' => $recommendedPosts,
         ]);
     }
 }
