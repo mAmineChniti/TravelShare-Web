@@ -307,4 +307,103 @@ final class FlightsController extends AbstractController
             HeaderUtils::DISPOSITION_ATTACHMENT
         );
     }
+
+    #[Route('/api/currencies', name: 'api_fetch_currencies', methods: ['GET'])]
+    public function fetchCurrencies(): JsonResponse
+    {
+        $apiKey = $_ENV['EXCHANGE_API_KEY'];
+        $url = "https://v6.exchangerate-api.com/v6/{$apiKey}/codes";
+
+        try {
+            $response = file_get_contents($url);
+            if (false === $response) {
+                return new JsonResponse(['error' => 'Failed to fetch currencies'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            $data = json_decode($response, true);
+
+            return new JsonResponse($data);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/api/country-currency', name: 'api_fetch_country_currency', methods: ['POST'])]
+    public function fetchCountryCurrencyCode(Request $request): JsonResponse
+    {
+        $content = $request->getContent();
+        $data = json_decode($content, true);
+        $country = $data['country'] ?? null;
+
+        if (empty($country)) {
+            return new JsonResponse(['error' => 'Country parameter is required'], Response::HTTP_BAD_REQUEST);
+        }
+        $apiToken = $_ENV['COUNTRY_CURRENCY_API_TOKEN'];
+        $url = 'https://aaapis.com/api/v1/info/country/';
+
+        $payload = json_encode(['country' => $country]);
+
+        try {
+            $options = [
+                'http' => [
+                    'header' => "Authorization: Token {$apiToken}\r\nContent-Type: application/json\r\n",
+                    'method' => 'POST',
+                    'content' => $payload,
+                ],
+            ];
+            $context = stream_context_create($options);
+            $response = file_get_contents($url, false, $context);
+
+            if (false === $response) {
+                return new JsonResponse(['error' => 'Failed to fetch country currency'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            $data = json_decode($response, true);
+
+            if (!isset($data['currency']['code'])) {
+                return new JsonResponse(['error' => 'Invalid response from external API'], Response::HTTP_BAD_REQUEST);
+            }
+
+            return new JsonResponse(['currency' => $data['currency']]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/api/convert-currency', name: 'api_convert_currency', methods: ['POST'])]
+    public function convertCurrency(Request $request): JsonResponse
+    {
+        $content = $request->getContent();
+        $data = json_decode($content, true);
+        $fromCurrency = $data['fromCurrency'] ?? null;
+        $toCurrency = $data['toCurrency'] ?? null;
+        $amount = (float) ($data['amount'] ?? 0);
+
+        if (empty($fromCurrency) || empty($toCurrency) || $amount <= 0) {
+            return new JsonResponse(['error' => 'Invalid request data'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $apiKey = $_ENV['EXCHANGE_API_KEY'];
+        $url = "https://v6.exchangerate-api.com/v6/{$apiKey}/latest/{$fromCurrency}";
+
+        try {
+            $response = file_get_contents($url);
+            if (false === $response) {
+                return new JsonResponse(['error' => 'Failed to fetch conversion rates'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
+            $data = json_decode($response, true);
+            $rates = $data['conversion_rates'] ?? [];
+
+            if (!isset($rates[$toCurrency])) {
+                return new JsonResponse(['error' => 'Currency code not found'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $convertedAmount = $amount * $rates[$toCurrency];
+
+            return new JsonResponse(['convertedAmount' => $convertedAmount]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

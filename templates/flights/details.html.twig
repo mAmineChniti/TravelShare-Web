@@ -20,11 +20,26 @@
 		</div>
 	</div>
 	<div class="currency-converter bg-gray-100 p-4 rounded-lg shadow-md flex justify-between items-center space-x-4">
-		<input id="fromCurrencyValue" type="text" class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ voyage.prix }} €">
-		<select id="fromCurrency" name="fromCurrency" class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+		<input
+			id="fromCurrencyValue"
+			type="text"
+			class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+			value="{{ voyage.prix }}"
+		/>
+		<select
+			id="fromCurrency"
+			name="fromCurrency"
+			class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+		></select>
 		<span id="toCurrencyValue" class="text-lg font-medium text-gray-800 text-center flex-grow"></span>
-		<select id="toCurrency" name="toCurrency" class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
-		<button id="convertButton" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow">Convert</button>
+		<select
+			id="toCurrency"
+			name="toCurrency"
+			class="w-32 rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+		></select>
+		<button id="convertButton" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow">
+			Convert
+		</button>
 	</div>
 	<div class="bg-white rounded-lg shadow-md p-6">
 		<form method="post" action="{{ path('app_reserve_flight', {id: voyage.offresVoyageId}) }}" class="space-y-4">
@@ -151,137 +166,137 @@
 			validateForm: Validator.validateForm,
 		};
 	})();
-    document.addEventListener("DOMContentLoaded", () => {
-        const fromCurrencySelect = document.getElementById("fromCurrency");
-        const toCurrencySelect = document.getElementById("toCurrency");
-        const fromCurrencyValue = document.getElementById("fromCurrencyValue");
-        const toCurrencyValue = document.getElementById("toCurrencyValue");
-        const convertButton = document.getElementById("convertButton");
-        const COUNTRY_CURRENCY_API = "https://aaapis.com/api/v1/info/country/";
-		const EXCHANGE_API_KEY = "{{ app.request.server.get('EXCHANGE_API_KEY') }}";
-    	const COUNTRY_CURRENCY_API_TOKEN = "{{ app.request.server.get('COUNTRY_CURRENCY_API_TOKEN') }}";
+	document.addEventListener("DOMContentLoaded", () => {
+		const fromCurrencySelect = document.getElementById("fromCurrency");
+		const toCurrencySelect = document.getElementById("toCurrency");
+		const fromCurrencyValue = document.getElementById("fromCurrencyValue");
+		const toCurrencyValue = document.getElementById("toCurrencyValue");
+		const convertButton = document.getElementById("convertButton");
 
-        async function fetchCurrencies() {
-            const url = `https://v6.exchangerate-api.com/v6/${EXCHANGE_API_KEY}/codes`;
+		async function fetchCurrencies() {
+			try {
+				const response = await fetch("/api/currencies");
+				if (!response.ok) {
+					console.error("Failed to fetch currencies: ", response.statusText);
+					return;
+				}
 
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    console.error("Failed to get currency list: ", response.statusText);
-                    return;
-                }
+				const data = await response.json();
+				const currenciesArray = data.supported_codes;
 
-                const data = await response.json();
-                const currenciesArray = data.supported_codes;
+				currenciesArray.forEach((currencyPair) => {
+					const option = document.createElement("option");
+					option.value = currencyPair[0];
+					option.textContent = `${currencyPair[0]} - ${currencyPair[1]}`;
+					fromCurrencySelect.appendChild(option);
+				});
+			} catch (error) {
+				console.error("Error fetching currencies: ", error);
+			}
+		}
 
-                currenciesArray.forEach(currencyPair => {
-                    const option = document.createElement("option");
-                    option.value = currencyPair[0];
-                    option.textContent = `${currencyPair[0]} - ${currencyPair[1]}`;
-                    fromCurrencySelect.appendChild(option);
-                });
-            } catch (error) {
-                console.error("Failed to fetch currencies: ", error);
-            }
-        }
+		async function fetchCountryCurrencyCode(country) {
+			if (!country) {
+				console.error("Country is not provided.");
+				return null;
+			}
 
-        async function fetchCountryCurrencyCode(country) {
-            const encodedCountry = encodeURIComponent(country);
-            const url = COUNTRY_CURRENCY_API;
-            const payload = JSON.stringify({ country: encodedCountry });
+			console.log("Fetching currency code for country:", country); // Log the country parameter
 
-            try {
-                const response = await fetch(url, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Token ${COUNTRY_CURRENCY_API_TOKEN}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: payload,
-                });
+			try {
+				const response = await fetch("/api/country-currency", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ country }),
+				});
 
-                if (!response.ok) {
-                    console.error("Request failed: ", response.statusText);
-                    return null;
-                }
+				if (!response.ok) {
+					console.error("Failed to fetch country currency: ", response.statusText);
+					return null;
+				}
 
-                const data = await response.json();
-                const currencyObject = data.currency;
-                return currencyObject ? currencyObject.code : null;
-            } catch (error) {
-                console.error("Error fetching currency: ", error);
-                return null;
-            }
-        }
+				const data = await response.json();
+				return data.currency ? data.currency.code : null;
+			} catch (error) {
+				console.error("Error fetching country currency: ", error);
+				return null;
+			}
+		}
 
-        async function convertCurrency(amount, fromCurrency, toCurrency) {
-            const url = `https://v6.exchangerate-api.com/v6/${EXCHANGE_API_KEY}/latest/${encodeURIComponent(fromCurrency)}`;
+		async function convertCurrency(amount, fromCurrency, toCurrency) {
+			try {
+				const response = await fetch("/api/convert-currency", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ amount, fromCurrency, toCurrency }),
+				});
 
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    console.error("Request failed: ", response.statusText);
-                    return null;
-                }
+				if (!response.ok) {
+					console.error("Failed to convert currency: ", response.statusText);
+					return null;
+				}
 
-                const data = await response.json();
-                const rates = data.conversion_rates;
+				const data = await response.json();
+				return data.convertedAmount || null;
+			} catch (error) {
+				console.error("Error converting currency: ", error);
+				return null;
+			}
+		}
 
-                if (!rates[toCurrency]) {
-                    console.error("Currency code not found: ", toCurrency);
-                    return null;
-                }
+		async function initializeCurrencyConverter() {
+			await fetchCurrencies();
 
-                return amount * rates[toCurrency];
-            } catch (error) {
-                console.error("Error converting currency: ", error);
-                return null;
-            }
-        }
+			const destination = "{{ voyage.destination }}";
+			if (!destination) {
+				console.error("Destination is not defined.");
+				return;
+			}
 
-        async function initializeCurrencyConverter() {
-            await fetchCurrencies();
+			const destinationCurrencyCode = await fetchCountryCurrencyCode(destination);
+			if (destinationCurrencyCode) {
+				const option = document.createElement("option");
+				option.value = destinationCurrencyCode;
+				option.textContent = destinationCurrencyCode;
+				toCurrencySelect.appendChild(option);
+				toCurrencySelect.value = destinationCurrencyCode;
+			}
+		}
 
-            const destinationCurrencyCode = await fetchCountryCurrencyCode("{{ voyage.destination }}");
-            if (destinationCurrencyCode) {
-                const option = document.createElement("option");
-                option.value = destinationCurrencyCode;
-                option.textContent = destinationCurrencyCode;
-                toCurrencySelect.appendChild(option);
-                toCurrencySelect.value = destinationCurrencyCode;
-            }
-        }
+		convertButton.addEventListener("click", async () => {
+			const fromCurrency = fromCurrencySelect.value;
+			const toCurrency = toCurrencySelect.value;
+			const amountText = fromCurrencyValue.value;
 
-        convertButton.addEventListener("click", async () => {
-            const fromCurrency = fromCurrencySelect.value;
-            const toCurrency = toCurrencySelect.value;
-            const amountText = fromCurrencyValue.value;
+			if (!fromCurrency || !toCurrency || !amountText) {
+				toCurrencyValue.textContent = "Please enter valid values.";
+				return;
+			}
 
-            if (!fromCurrency || !toCurrency || !amountText) {
-                toCurrencyValue.textContent = "Please enter valid values.";
-                return;
-            }
+			try {
+				const amount = parseFloat(amountText);
+				if (isNaN(amount)) {
+					toCurrencyValue.textContent = "Invalid amount.";
+					return;
+				}
 
-            try {
-                const amount = parseFloat(amountText);
-                if (isNaN(amount)) {
-                    toCurrencyValue.textContent = "Invalid amount.";
-                    return;
-                }
+				const convertedAmount = await convertCurrency(amount, fromCurrency, toCurrency);
+				if (convertedAmount !== null) {
+					toCurrencyValue.textContent = `${convertedAmount.toFixed(2)} ${toCurrency}`;
+				} else {
+					toCurrencyValue.textContent = "Conversion failed.";
+				}
+			} catch (error) {
+				toCurrencyValue.textContent = "An error occurred.";
+				console.error(error);
+			}
+		});
 
-                const convertedAmount = await convertCurrency(amount, fromCurrency, toCurrency);
-                if (convertedAmount !== null) {
-                    toCurrencyValue.textContent = `${convertedAmount.toFixed(2)} ${toCurrency}`;
-                } else {
-                    toCurrencyValue.textContent = "Conversion failed.";
-                }
-            } catch (error) {
-                toCurrencyValue.textContent = "An error occurred.";
-                console.error(error);
-            }
-        });
-
-        initializeCurrencyConverter();
-    });
+		initializeCurrencyConverter();
+	});
 </script>
 {% endblock %}
