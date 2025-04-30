@@ -51,6 +51,7 @@ final class ForumController extends AbstractController
 
         if (!$geminiApiKey) {
             throw new \RuntimeException('API key is missing.');
+            return [];
         }
 
         $recommendedPostIds = [];
