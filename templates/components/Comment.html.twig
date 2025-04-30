@@ -1,5 +1,5 @@
-<div id="comment-{{ commentId }}" class="bg-white rounded-lg shadow-md p-6">
-	<span class="text-blue-600 font-medium">{{ name ~ ' ' ~ lastName }}</span>
+<div id="comment-{{ commentId }}" class="bg-gray-50 rounded-lg shadow-md p-2 border border-gray-200 truncate">
+	<span class="text-blue-600 font-medium truncate">{{ name ~ ' ' ~ lastName }}</span>
 	<twig:CommentText commentId="{{ commentId }}" comment="{{ comment }}" />
 
 	<form id="editCommentForm-{{ commentId }}" style="display: none" class="space-y-4" onsubmit="return false;">
@@ -28,10 +28,10 @@
 		</div>
 	</form>
 
-	<div class="flex justify-between mt-4">
+	<div class="flex justify-between mt-2">
 		<button
 			id="editCommentButton-{{ commentId }}"
-			class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg"
+			class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-1 px-3 rounded-lg"
 			onclick="ForumApp.editComment('{{ commentId }}')"
 			title="Edit comment"
 		>
@@ -47,7 +47,7 @@
 		>
 			<button
 				type="submit"
-				class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg shadow"
+				class="bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-3 rounded-lg"
 				title="Delete comment"
 			>
 				<i class="fas fa-trash"></i>

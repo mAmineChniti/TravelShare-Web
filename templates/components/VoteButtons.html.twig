@@ -1,10 +1,5 @@
 <div id="voteButtonsContainer-{{ postId }}" class="flex space-x-2">
-	<form
-		hx-post="{{ path('app_forum_upvote') }}"
-		hx-target="#voteButtonsContainer-{{ postId }}"
-		hx-swap="outerHTML"
-		class=""
-	>
+	<form hx-post="{{ path('app_forum_upvote') }}" hx-target="#voteButtonsContainer-{{ postId }}" hx-swap="outerHTML">
 		<input type="hidden" name="postId" value="{{ postId }}" />
 		<button
 			type="submit"
@@ -14,12 +9,7 @@
 			<i class="fas fa-thumbs-up"></i>&nbsp;{{ likesCount }}
 		</button>
 	</form>
-	<form
-		hx-post="{{ path('app_forum_downvote') }}"
-		hx-target="#voteButtonsContainer-{{ postId }}"
-		hx-swap="outerHTML"
-		class=""
-	>
+	<form hx-post="{{ path('app_forum_downvote') }}" hx-target="#voteButtonsContainer-{{ postId }}" hx-swap="outerHTML">
 		<input type="hidden" name="postId" value="{{ postId }}" />
 		<button
 			type="submit"

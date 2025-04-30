@@ -1,10 +1,13 @@
-<div id="post-{{ post.postId }}" class="bg-white rounded-lg shadow-md p-6">
-	<div class="flex justify-between items-center mb-4">
-		<span class="text-blue-600 font-medium">{{ post.name ~ ' ' ~ post.lastName }}</span>
+<div
+	id="post-{{ post.postId }}"
+	class="bg-white rounded-lg shadow-md p-4 border border-gray-200 max-h-[600px] overflow-hidden"
+>
+	<div class="flex justify-between items-center mb-2">
+		<span class="text-blue-600 font-medium truncate">{{ post.name ~ ' ' ~ post.lastName }}</span>
 		<div class="flex space-x-2">
 			<button
 				id="editButton-{{ post.postId }}"
-				class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg"
+				class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-1 px-3 rounded-lg"
 				onclick="ForumApp.editPost('{{ post.postId }}')"
 				title="Edit post"
 			>
@@ -20,7 +23,7 @@
 			>
 				<button
 					type="submit"
-					class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg"
+					class="bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-3 rounded-lg"
 					title="Delete post"
 				>
 					<i class="fas fa-trash"></i>
@@ -78,7 +81,7 @@
 		</div>
 	</form>
 	{% if post.images is defined and post.images|length > 0 %}
-	<div class="mt-4 grid grid-cols-3 gap-4">
+	<div class="mt-2 grid grid-cols-3 gap-2 max-h-[150px] overflow-y-auto">
 		{% for image in post.images %}
 		<img src="data:image/jpeg;base64,{{ image }}" alt="Post Image" class="w-full h-auto rounded-lg shadow-md" />
 		{% endfor %}
@@ -116,8 +119,12 @@
 		</form>
 	</div>
 
-	<div id="commentsContainer-{{ post.postId }}" class="mt-4 space-y-4">
-		{% if post.comments is defined %} {% for comment in post.comments %}
+	{% if post.comments is defined and post.comments|length > 0 %}
+	<div
+		id="commentsContainer-{{ post.postId }}"
+		class="mt-2 space-y-2 bg-gray-50 p-2 rounded-lg border border-gray-200 max-h-[200px] overflow-y-auto"
+	>
+		{% for comment in post.comments %}
 		<twig:Comment
 			commentId="{{ comment.commentId }}"
 			comment="{{ comment.comment }}"
@@ -127,8 +134,9 @@
 			commentedAt="{{ comment.commentedAt }}"
 			updatedAt="{{ comment.updatedAt }}"
 		/>
-		{% endfor %} {% endif %}
+		{% endfor %}
 	</div>
+	{% endif %}
 </div>
 
 <script>

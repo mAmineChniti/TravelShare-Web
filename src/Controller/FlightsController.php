@@ -417,4 +417,23 @@ final class FlightsController extends AbstractController
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    #[Route('/flights/filter', name: 'app_flights_filter', methods: ['GET'])]
+    public function filterFlightsByDateRange(Request $request, OffresVoyageRepository $voyageService): Response
+    {
+        $departureDate = $request->query->get('departureDate');
+        $returnDate = $request->query->get('returnDate');
+
+        if (!$departureDate || !$returnDate) {
+            $this->addFlash('error', 'Please provide both departure and return dates.');
+
+            return $this->redirectToRoute('app_flights');
+        }
+
+        $voyages = $voyageService->findByDateRange(new \DateTime($departureDate), new \DateTime($returnDate));
+
+        return $this->render('flights/index.html.twig', [
+            'voyages' => $voyages,
+        ]);
+    }
 }

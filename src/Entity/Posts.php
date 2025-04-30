@@ -55,9 +55,17 @@ class Posts
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: PostImages::class, cascade: ['persist', 'remove'])]
     private Collection $images;
 
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: Comments::class, cascade: ['remove'])]
+    private Collection $comments;
+
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: Likes::class, cascade: ['remove'])]
+    private Collection $likes;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->likes = new ArrayCollection();
     }
 
     public function getPostId(): ?int
@@ -151,6 +159,58 @@ class Posts
         return $this;
     }
 
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comments $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comments $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            if ($comment->getPost() === $this) {
+                $comment->setPost(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getLikes(): Collection
+    {
+        return $this->likes;
+    }
+
+    public function addLike(Likes $like): static
+    {
+        if (!$this->likes->contains($like)) {
+            $this->likes->add($like);
+            $like->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLike(Likes $like): static
+    {
+        if ($this->likes->removeElement($like)) {
+            if ($like->getPost() === $this) {
+                $like->setPost(null);
+            }
+        }
+
+        return $this;
+    }
+
     #[ORM\PreRemove]
     public function deleteAssociatedImages(): void
     {
@@ -158,5 +218,23 @@ class Posts
             $image->setPost(null);
         }
         $this->images->clear();
+    }
+
+    #[ORM\PreRemove]
+    public function deleteAssociatedComments(): void
+    {
+        foreach ($this->comments as $comment) {
+            $comment->setPost(null);
+        }
+        $this->comments->clear();
+    }
+
+    #[ORM\PreRemove]
+    public function deleteAssociatedLikes(): void
+    {
+        foreach ($this->likes as $like) {
+            $like->setPost(null);
+        }
+        $this->likes->clear();
     }
 }
