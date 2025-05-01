@@ -58,6 +58,47 @@
 			/>
 			{% endif %}
 		</div>
+		{% set categories = {
+    'Hotel Rating': ['2 Stars', '3 Stars', '4 Stars', '5 Stars', 'Boutique Hotel', 'Luxury Resort'],
+    'Location Type': ['Beachfront', 'City Center', 'Countryside', 'Mountain Area', 'Forest Nearby', 'Island'],
+    'Experience Theme': ['Spa & Wellness', 'Adventure & Activities', 'Romantic Getaway', 'Family-Friendly', 'Eco-Friendly', 'Business Hotel'],
+    'Price Range': ['Budget-Friendly', 'Mid-Range', 'Premium', 'Luxury', 'All-Inclusive']
+} %}
+
+<div>
+    <label class="block text-base font-medium text-gray-700 mb-2">Hotel Features</label>
+    <div class="space-y-4">
+        {% for category, features in categories %}
+        <div>
+            <h3 class="text-lg font-semibold">{{ category }}</h3>
+            <div class="flex flex-wrap gap-2 mt-2">
+                {% for feature in features %}
+                <label class="relative cursor-pointer">
+                    <input
+                        type="checkbox"
+                        name="description[]"
+                        value="{{ feature }}"
+                        class="peer sr-only"
+                        {% if hotel.description and feature in hotel.description|split(',') %}checked{% endif %}
+                    />
+                    <div class="flex items-center justify-center px-4 py-2 rounded-full border border-gray-300 
+                                bg-white text-gray-700 transition-all duration-300
+                                peer-checked:bg-blue-500 peer-checked:text-white
+                                peer-checked:underline peer-checked:-translate-y-1">
+                        <span>{{ feature }}</span>
+                        <svg class="w-4 h-4 ml-2 opacity-0 peer-checked:opacity-100 transition-opacity"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 		<div id="error-messages" class="mt-4"></div>
 		<div class="flex justify-between">
 			<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow">

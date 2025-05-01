@@ -44,6 +44,9 @@ class Hotels
     #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: Chambres::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $chambres;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['length' => 65535])]
+    private ?string $description = null;
+
     public function __construct()
     {
         $this->chambres = new ArrayCollection();
@@ -141,6 +144,18 @@ class Hotels
                 $chambre->setHotel(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

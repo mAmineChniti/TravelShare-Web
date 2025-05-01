@@ -40,6 +40,10 @@
 			<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
 				<span class="block sm:inline">{{ message }}</span>
 			</div>
+			{% endfor %} {% for message in app.flashes('info') %}
+			<div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">
+				<span class="block sm:inline">{{ message }}</span>
+			</div>
 			{% endfor %}
 			<div>
 				<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow">
@@ -48,60 +52,223 @@
 			</div>
 		</form>
 	</div>
-</div>
 
-<script>
-	document.addEventListener("DOMContentLoaded", () => {
-		const form = document.querySelector("form");
-		const errorMessagesContainer = document.getElementById("error-messages");
+	<div class="bg-white rounded-lg shadow-md p-6 mb-6">
+		<h2 class="text-2xl font-semibold mb-4">Location</h2>
+		<div id="map" class="h-96 rounded-lg" data-address="{{ room.hotel.adress }}"></div>
+	</div>
 
-		form.addEventListener("submit", (event) => {
-			errorMessagesContainer.innerHTML = "";
+	<div class="bg-white rounded-lg shadow-md p-6 mb-6">
+		<h2 class="text-2xl font-semibold mb-4">Nearby Places</h2>
+		<ul id="nearby-places" class="space-y-2">
+			<li>Loading nearby places...</li>
+		</ul>
+	</div>
 
-			const startReservation = document.querySelector("input[name='startReservation']").value.trim();
-			const endReservation = document.querySelector("input[name='endReservation']").value.trim();
+	<!-- Add Leaflet CSS and JS -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
 
-			let isValid = true;
-			let errorMessages = [];
+	<style>
+		.category-header {
+			font-size: 1.5rem;
+			font-weight: bold;
+			margin-top: 1.5rem;
+			color: #34495e;
+			border-bottom: 2px solid #3498db;
+			padding-bottom: 0.5rem;
+		}
 
-			if (!startReservation) {
-				isValid = false;
-				errorMessages.push("Start reservation date cannot be empty.");
+		.category-list {
+			list-style-type: none;
+			padding: 0;
+			margin: 0;
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 1rem;
+		}
+
+		.category-list li {
+			background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+			margin: 0;
+			padding: 1rem;
+			border-radius: 0.75rem;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			transition:
+				transform 0.3s,
+				box-shadow 0.3s;
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+		}
+
+		.category-list li:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+		}
+
+		.category-list li img {
+			width: 50px;
+			height: 50px;
+			border-radius: 50%;
+			object-fit: cover;
+			border: 2px solid #3498db;
+		}
+
+		.category-list li .place-info {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.category-list li .place-info .place-name {
+			font-size: 1.1rem;
+			font-weight: bold;
+			color: #2c3e50;
+		}
+
+		.category-list li .place-info .place-type {
+			font-size: 0.9rem;
+			color: #7f8c8d;
+		}
+	</style>
+
+	<script>
+		window.onload = () => {
+			const mapElement = document.getElementById("map");
+			const placesList = document.getElementById("nearby-places");
+			let activeRequests = [];
+
+			const abortActiveRequests = () => {
+				activeRequests.forEach((controller) => controller.abort());
+				activeRequests = [];
+			};
+
+			if (mapElement) {
+				const address = mapElement.dataset.address;
+
+				const initializeMap = (lat, lon) => {
+					const map = L.map("map").setView([lat, lon], 15);
+
+					// Add OpenStreetMap tiles
+					L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+						maxZoom: 19,
+						attribution: "© OpenStreetMap contributors",
+					}).addTo(map);
+
+					// Add a marker for the location
+					L.marker([lat, lon]).addTo(map).bindPopup("Location of the hotel").openPopup();
+
+					// Fetch nearby places
+					const controller = new AbortController();
+					activeRequests.push(controller);
+
+					fetch(`/nearby-places?lat=${lat}&lon=${lon}`, { signal: controller.signal })
+						.then((response) => response.json())
+						.then((places) => {
+							placesList.innerHTML = "";
+
+							const categories = {
+								restaurant: [],
+								cafe: [],
+								bar: [],
+							};
+
+							places.forEach((place) => {
+								if (categories[place.type]) {
+									categories[place.type].push(place);
+								}
+							});
+
+							Object.keys(categories).forEach((category) => {
+								if (categories[category].length > 0) {
+									const categoryHeader = document.createElement("h3");
+									categoryHeader.textContent = category.charAt(0).toUpperCase() + category.slice(1) + "s";
+									categoryHeader.classList.add("category-header");
+									placesList.appendChild(categoryHeader);
+
+									const categoryList = document.createElement("ul");
+									categoryList.classList.add("category-list");
+
+									categories[category].forEach((place) => {
+										const listItem = document.createElement("li");
+
+										const placeImage = document.createElement("i");
+										placeImage.classList.add("fas");
+										if (place.type === "restaurant") {
+											placeImage.classList.add("fa-utensils");
+										} else if (place.type === "cafe") {
+											placeImage.classList.add("fa-coffee");
+										} else if (place.type === "bar") {
+											placeImage.classList.add("fa-glass-martini-alt");
+										}
+										placeImage.style.fontSize = "24px";
+										placeImage.style.color = "#3498db";
+
+										const placeInfo = document.createElement("div");
+										placeInfo.classList.add("place-info");
+
+										const placeName = document.createElement("span");
+										placeName.textContent = place.name;
+										placeName.classList.add("place-name");
+
+										const placeType = document.createElement("span");
+										placeType.textContent = place.type.charAt(0).toUpperCase() + place.type.slice(1);
+										placeType.classList.add("place-type");
+
+										placeInfo.appendChild(placeName);
+										placeInfo.appendChild(placeType);
+
+										listItem.appendChild(placeImage);
+										listItem.appendChild(placeInfo);
+
+										// Add a marker for each nearby place
+										L.marker([place.lat, place.lon]).addTo(map).bindPopup(`${place.name} (${place.type})`);
+
+										categoryList.appendChild(listItem);
+									});
+
+									placesList.appendChild(categoryList);
+								}
+							});
+
+							if (places.length === 0) {
+								placesList.innerHTML = "<li>No nearby places found.</li>";
+							}
+						})
+						.catch((error) => {
+							if (error.name === "AbortError") {
+								console.log("Request aborted");
+							} else {
+								console.error("Error fetching nearby places:", error);
+								placesList.innerHTML = "<li>Error loading nearby places.</li>";
+							}
+						});
+				};
+
+				// Fetch coordinates from your Symfony backend
+				const controller = new AbortController();
+				activeRequests.push(controller);
+
+				fetch(`/geocode?address=${encodeURIComponent(address)}`, { signal: controller.signal })
+					.then((response) => response.json())
+					.then((data) => {
+						if (data.lat && data.lon) {
+							abortActiveRequests();
+							initializeMap(data.lat, data.lon);
+						} else {
+							console.error("Coordinates not found for the address.");
+						}
+					})
+					.catch((error) => {
+						if (error.name === "AbortError") {
+							console.log("Request aborted");
+						} else {
+							console.error("Error loading map:", error);
+						}
+					});
 			}
+		};
+	</script>
+	{% endblock %}
 
-			if (!endReservation) {
-				isValid = false;
-				errorMessages.push("End reservation date cannot be empty.");
-			}
-
-			if (startReservation && endReservation && new Date(startReservation) < new Date(endReservation)) {
-				isValid = false;
-				errorMessages.push("Start reservation date cannot be after the end reservation date.");
-			}
-
-			const today = new Date();
-			today.setHours(0, 0, 0, 0);
-
-			if (startReservation && new Date(startReservation) < today) {
-				isValid = false;
-				errorMessages.push("Start reservation date cannot be today or in the past.");
-			}
-
-			if (endReservation && new Date(endReservation) < today) {
-				isValid = false;
-				errorMessages.push("End reservation date cannot be today or in the past.");
-			}
-
-			if (!isValid) {
-				event.preventDefault();
-				errorMessages.forEach((message) => {
-					const errorElement = document.createElement("p");
-					errorElement.textContent = message;
-					errorElement.classList.add("text-sm", "text-red-600");
-					errorMessagesContainer.appendChild(errorElement);
-				});
-			}
-		});
-	});
-</script>
-{% endblock %}
