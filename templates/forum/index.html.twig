@@ -111,8 +111,8 @@
         {% if posts is empty %}
         <p class="text-sm text-gray-500">No posts available.</p>
         {% endif %}
-        {% if posts is defined and posts|length > 0 %}
         <div id="postsContainer" class="space-y-6">
+        {% if posts is defined and posts|length > 0 %}
             {% for post in posts %}
             <twig:Post
                 post="{{ post }}"
@@ -121,8 +121,8 @@
                 isLiked="{{ post.isLiked }}"
             />
             {% endfor %}
-        </div>
         {% endif %}
+        </div>
     </div>
 </div>
 </div>
@@ -220,6 +220,13 @@
 				const isProfanity = await validateProfanity(text);
 				if (isProfanity) {
 					elements.postErrorMessage.textContent = 'Post contains inappropriate language.';
+					return false;
+				}
+
+				const files = document.getElementById('postImages').files;
+				const isImageProfanity = await validateImageProfanity(files);
+				if (isImageProfanity) {
+					elements.postErrorMessage.textContent = 'Uploaded images contain inappropriate content.';
 					return false;
 				}
 
@@ -631,7 +638,7 @@
 		input.files = dataTransfer.files;
 		updateImagePreview(input.files);
 	});
-		document.addEventListener("DOMContentLoaded", () => {
+	document.addEventListener("DOMContentLoaded", () => {
 		const searchInput = document.getElementById("search-input");
 		const searchForm = document.getElementById("search-form");
 		let searchTimeout;
@@ -650,7 +657,6 @@
 			sortForm.submit();
 		});
 	});
-
 	async function validateProfanity(text) {
 		if(!text) return false;
 		if (text.length < 15) return false;
@@ -683,6 +689,43 @@
 			return result.isProfanity;
 		} catch (error) {
 			console.error('Error validating profanity:', error);
+			if (error.name === 'AbortError') {
+				console.error('Request timed out');
+			}
+			return false;
+		}
+	}
+
+	async function validateImageProfanity(files) {
+		if (!files || files.length === 0) return false;
+
+		const formData = new FormData();
+		Array.from(files).forEach(file => {
+			formData.append('postImages[]', file);
+		});
+
+		try {
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => {
+				controller.abort();
+			}, 5000);
+
+			const response = await fetch('/forum/validate-image', {
+				method: 'POST',
+				body: formData,
+				signal: controller.signal
+			});
+
+			clearTimeout(timeoutId);
+
+			if (!response.ok) {
+				throw new Error('Failed to validate image profanity');
+			}
+
+			const result = await response.json();
+			return result.isInappropriate;
+		} catch (error) {
+			console.error('Error validating image profanity:', error);
 			if (error.name === 'AbortError') {
 				console.error('Request timed out');
 			}

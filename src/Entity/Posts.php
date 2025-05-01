@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PostsRepository;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -51,6 +52,13 @@ class Posts
         maxMessage: 'Post title cannot be longer than 255 characters.'
     )]
     private ?string $postTitle = null;
+
+    #[Gedmo\Slug(fields: ['postTitle', 'postUnique'])]
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    private ?string $slug = null;
+
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    private ?string $postUnique = null;
 
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: PostImages::class, cascade: ['persist', 'remove'])]
     private Collection $images;
@@ -129,6 +137,30 @@ class Posts
     public function setPostTitle(string $postTitle): static
     {
         $this->postTitle = $postTitle;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getPostUnique(): ?string
+    {
+        return $this->postUnique;
+    }
+
+    public function setPostUnique(string $postUnique): static
+    {
+        $this->postUnique = $postUnique;
 
         return $this;
     }

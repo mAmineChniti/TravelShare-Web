@@ -38,7 +38,12 @@
 		</div>
 	</div>
 
-	<twig:PostText postId="{{ post.postId }}" textContent="{{ post.textContent }}" postTitle="{{ post.postTitle }}" />
+	<twig:PostText
+		postId="{{ post.postId }}"
+		textContent="{{ post.textContent }}"
+		postTitle="{{ post.postTitle }}"
+		slug="{{ post.slug }}"
+	/>
 
 	<form
 		id="editPostForm-{{ post.postId }}"
@@ -81,7 +86,7 @@
 		</div>
 	</form>
 	{% if post.images is defined and post.images|length > 0 %}
-	<div class="mt-2 grid grid-cols-3 gap-2 max-h-[150px] overflow-y-auto">
+	<div class="mt-2 grid grid-cols-3 gap-2 overflow-y-auto">
 		{% for image in post.images %}
 		<img src="data:image/jpeg;base64,{{ image }}" alt="Post Image" class="w-full h-auto rounded-lg shadow-md" />
 		{% endfor %}
@@ -93,7 +98,6 @@
 			hx-target="#commentsContainer-{{ post.postId }}"
 			hx-swap="beforeend"
 			hx-on::after-request="if(event.detail.successful) this.reset()"
-			onsubmit="return handleCommentFormSubmit(this);"
 		>
 			<input type="hidden" name="postId" value="{{ post.postId }}" />
 			<div>
@@ -142,7 +146,8 @@
 <script>
 	async function handleAddCommentButtonClick(button) {
 		const form = button.form;
-		if (await validateCommentForm(form)) {
+		const isValid = await validateCommentForm(form);
+		if (isValid) {
 			htmx.trigger(form, "submit");
 		}
 	}

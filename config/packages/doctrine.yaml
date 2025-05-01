@@ -54,3 +54,9 @@ when@prod:
           adapter: cache.app
         doctrine.system_cache_pool:
           adapter: cache.system
+
+stof_doctrine_extensions:
+  default_locale: '%kernel.default_locale%'
+  orm:
+    default:
+      sluggable: true

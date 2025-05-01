@@ -1,11 +1,5 @@
 [
   {
-    "image": "images/Pier2.jpg",
-    "alt": "Wooden Pier Over Tropical Water",
-    "title": "Relax by the Water",
-    "description": "Stroll along the pier and enjoy breathtaking ocean views."
-  },
-  {
     "image": "images/Airplane.jpg",
     "alt": "Airplane Flying Through the Clouds",
     "title": "Book Your Flight",
@@ -22,6 +16,12 @@
     "alt": "Wooden Pier Leading to the Sea",
     "title": "Seaside Escape",
     "description": "Walk into paradise with serene ocean landscapes."
+  },
+  {
+    "image": "images/Pier2.jpg",
+    "alt": "Wooden Pier Over Tropical Water",
+    "title": "Relax by the Water",
+    "description": "Stroll along the pier and enjoy breathtaking ocean views."
   },
   {
     "image": "images/Cairo.jpg",

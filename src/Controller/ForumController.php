@@ -30,7 +30,7 @@ final class ForumController extends AbstractController
         $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
         $images = $postImagesRepository->findImagesByPostId($post['postId']);
         if ($images) {
-            $post['images'] = $images ? array_map(fn ($image) => base64_encode($image), $images) : [];
+            $post['images'] = $images ? array_map(fn($image) => base64_encode($image), $images) : [];
         } else {
             $post['images'] = [];
         }
@@ -58,7 +58,7 @@ final class ForumController extends AbstractController
         $recommendedPostIds = [];
         try {
             $httpClient = HttpClient::create();
-            $response = $httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='.$geminiApiKey, [
+            $response = $httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $geminiApiKey, [
                 'headers' => [
                     'Content-Type' => 'application/json',
                 ],
@@ -158,6 +158,8 @@ final class ForumController extends AbstractController
         $post->setOwnerId($userId);
         $post->setCreatedAt(new \DateTime());
         $post->setUpdatedAt(new \DateTime());
+        $post->setPostUnique(uniqid());
+        $post->setSlug($post->getPostTitle() . '' . $post->getPostUnique());
 
         $errors = $validator->validate($post);
         if (count($errors) > 0) {
@@ -169,6 +171,7 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => $errorMessages], 400);
         }
         $postsRepository->add($post);
+
         $uploadedFiles = $request->files->get('postImages');
         if ($uploadedFiles) {
             foreach ($uploadedFiles as $uploadedFile) {
@@ -191,7 +194,8 @@ final class ForumController extends AbstractController
             'lastName' => $user->getLastName(),
             'textContent' => $post->getTextContent(),
             'postTitle' => $post->getPostTitle(),
-            'images' => $images ? array_map(fn ($image) => base64_encode($image), $images) : [],
+            'slug' => $post->getSlug(),
+            'images' => $images ? array_map(fn($image) => base64_encode($image), $images) : [],
             'isLiked' => null,
             'likesCount' => 0,
             'dislikesCount' => 0,
@@ -220,11 +224,11 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $postText = $request->request->get('editTextarea-'.$id);
+        $postText = $request->request->get('editTextarea-' . $id);
         $post->setTextContent($postText);
         $post->setUpdatedAt(new \DateTime());
 
-        $postTitle = $request->request->get('editTitle-'.$id);
+        $postTitle = $request->request->get('editTitle-' . $id);
         $post->setPostTitle($postTitle);
 
         $errors = $validator->validate($post);
@@ -254,7 +258,7 @@ final class ForumController extends AbstractController
         $post = $postsRepository->find($id);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id '.$id);
+            throw $this->createNotFoundException('No post found for id ' . $id);
         }
 
         if (1 !== $post->getOwnerId()) {
@@ -311,7 +315,7 @@ final class ForumController extends AbstractController
         $post = $postsRepository->find($postId);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id '.$postId);
+            throw $this->createNotFoundException('No post found for id ' . $postId);
         }
 
         $isLiked = $likesRepository->isLikedByUser($userId, $postId);
@@ -336,12 +340,13 @@ final class ForumController extends AbstractController
         $commentText = $request->request->get('commentText');
         $userId = 1;
 
-        $comment = new Comments();
-        $post = $postsRepository->find($postId);
+        $post = $postsRepository->findOneBy(['postId' => $postId]);
         if (!$post) {
             return new JsonResponse(['error' => 'Post not found.'], 404);
         }
+        $comment = new Comments();
         $comment->setPost($post);
+        $comment->setPostId($postId);
         $comment->setCommenterId($userId);
         $comment->setComment($commentText);
         $comment->setCommentedAt(new \DateTime());
@@ -380,7 +385,7 @@ final class ForumController extends AbstractController
         $comment = $commentsRepository->find($id);
 
         if (!$comment) {
-            throw $this->createNotFoundException('No comment found for id '.$id);
+            throw $this->createNotFoundException('No comment found for id ' . $id);
         }
 
         if (1 !== $comment->getCommenterId()) {
@@ -410,7 +415,7 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $commentText = $request->request->get('editTextarea-'.$id);
+        $commentText = $request->request->get('editTextarea-' . $id);
         $comment->setComment($commentText);
         $comment->setUpdatedAt(new \DateTime());
         $post = $postsRepository->find($comment->getPostId());
@@ -520,5 +525,99 @@ final class ForumController extends AbstractController
             'sortBy' => $sortBy,
             'recommendedPosts' => $recommendedPosts,
         ]);
+    }
+
+    #[Route('/forum/post/{slug}', name: 'app_forum_post_by_slug', methods: ['GET'])]
+    public function viewPostBySlug(
+        string $slug,
+        PostsRepository $postsRepository,
+        CommentsRepository $commentsRepository,
+        LikesRepository $likesRepository,
+        PostImagesRepository $postImagesRepository,
+        UsersRepository $usersRepository,
+    ): Response {
+        $post = $postsRepository->findOneBy(['slug' => $slug]);
+
+        if (!$post) {
+            throw $this->createNotFoundException('Post not found.');
+        }
+
+        $userId = 1;
+        $user = $usersRepository->find($post->getOwnerId());
+        if (!$user) {
+            throw $this->createNotFoundException('User not found.');
+        }
+        $userName = $user->getName();
+        $userLastName = $user->getLastName();
+        if (!$userName || !$userLastName) {
+            throw $this->createNotFoundException('User name or last name not found.');
+        }
+        $postData = [
+            'postId' => $post->getPostId(),
+            'name' => $userName,
+            'lastName' => $userLastName,
+            'textContent' => $post->getTextContent(),
+            'postTitle' => $post->getPostTitle(),
+            'createdAt' => $post->getCreatedAt(),
+            'updatedAt' => $post->getUpdatedAt(),
+            'slug' => $post->getSlug(),
+        ];
+        $post = $this->enrichPost($postData, $userId, $commentsRepository, $likesRepository, $postImagesRepository);
+
+        return $this->render('forum/post.html.twig', [
+            'post' => $post,
+        ]);
+    }
+
+    #[Route('/forum/validate-image', name: 'app_forum_validate_image', methods: ['POST'])]
+    public function validateImage(Request $request): JsonResponse
+    {
+        $uploadedFiles = $request->files->get('postImages');
+        if (!$uploadedFiles) {
+            return new JsonResponse(['error' => 'No images uploaded.'], 400);
+        }
+
+        $apiUser = $this->getParameter('app.image_profanity_api_user');
+        $apiSecret = $this->getParameter('app.image_profanity_api_key');
+        $isInappropriate = false;
+
+        foreach ($uploadedFiles as $uploadedFile) {
+            try {
+                $filePath = $uploadedFile->getPathname();
+                $httpClient = HttpClient::create();
+                $response = $httpClient->request('POST', 'https://api.sightengine.com/1.0/check.json', [
+                    'headers' => [
+                        'Content-Type' => 'multipart/form-data',
+                    ],
+                    'body' => [
+                        'media' => fopen($filePath, 'r'),
+                        'models' => 'nudity-2.1,weapon,recreational_drug,medical,offensive-2.0,text-content,face-attributes,gore-2.0,text,violence,self-harm',
+                        'api_user' => $apiUser,
+                        'api_secret' => $apiSecret,
+                    ],
+                ]);
+
+                $responseData = $response->toArray();
+                if (
+                    $responseData['nudity']['sexual_activity'] > 0.01 ||
+                    $responseData['nudity']['sexual_display'] > 0.01 ||
+                    $responseData['nudity']['erotica'] > 0.01 ||
+                    $responseData['weapon']['classes']['firearm'] > 0.01 ||
+                    $responseData['recreational_drug']['prob'] > 0.01 ||
+                    $responseData['medical']['prob'] > 0.01 ||
+                    $responseData['offensive']['nazi'] > 0.01 ||
+                    $responseData['gore']['prob'] > 0.01 ||
+                    $responseData['violence']['prob'] > 0.01 ||
+                    $responseData['self-harm']['prob'] > 0.01
+                ) {
+                    $isInappropriate = true;
+                    break;
+                }
+            } catch (\Exception $e) {
+                return new JsonResponse(['error' => 'An error occurred while validating the image.'], 500);
+            }
+        }
+
+        return new JsonResponse(['isInappropriate' => $isInappropriate], 200);
     }
 }
