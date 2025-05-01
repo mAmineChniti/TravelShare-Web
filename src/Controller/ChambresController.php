@@ -39,7 +39,7 @@ class ChambresController extends AbstractController
         ]);
 
         $data = $response->toArray();
-        $images = array_map(fn(array $img) => $img['urls']['regular'], $data['results']);
+        $images = array_map(fn (array $img) => $img['urls']['regular'], $data['results']);
 
         $chambres = $chambresRepository->findBy(['hotel' => $id]);
 
