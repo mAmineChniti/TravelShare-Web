@@ -30,7 +30,7 @@ final class ForumController extends AbstractController
         $post['isLiked'] = $likesRepository->isLikedByUser($userId, $post['postId']);
         $images = $postImagesRepository->findImagesByPostId($post['postId']);
         if ($images) {
-            $post['images'] = $images ? array_map(fn($image) => base64_encode($image), $images) : [];
+            $post['images'] = $images ? array_map(fn ($image) => base64_encode($image), $images) : [];
         } else {
             $post['images'] = [];
         }
@@ -58,7 +58,7 @@ final class ForumController extends AbstractController
         $recommendedPostIds = [];
         try {
             $httpClient = HttpClient::create();
-            $response = $httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $geminiApiKey, [
+            $response = $httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='.$geminiApiKey, [
                 'headers' => [
                     'Content-Type' => 'application/json',
                 ],
@@ -159,7 +159,7 @@ final class ForumController extends AbstractController
         $post->setCreatedAt(new \DateTime());
         $post->setUpdatedAt(new \DateTime());
         $post->setPostUnique(uniqid());
-        $post->setSlug($post->getPostTitle() . '' . $post->getPostUnique());
+        $post->setSlug($post->getPostTitle().''.$post->getPostUnique());
 
         $errors = $validator->validate($post);
         if (count($errors) > 0) {
@@ -195,7 +195,7 @@ final class ForumController extends AbstractController
             'textContent' => $post->getTextContent(),
             'postTitle' => $post->getPostTitle(),
             'slug' => $post->getSlug(),
-            'images' => $images ? array_map(fn($image) => base64_encode($image), $images) : [],
+            'images' => $images ? array_map(fn ($image) => base64_encode($image), $images) : [],
             'isLiked' => null,
             'likesCount' => 0,
             'dislikesCount' => 0,
@@ -224,11 +224,11 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $postText = $request->request->get('editTextarea-' . $id);
+        $postText = $request->request->get('editTextarea-'.$id);
         $post->setTextContent($postText);
         $post->setUpdatedAt(new \DateTime());
 
-        $postTitle = $request->request->get('editTitle-' . $id);
+        $postTitle = $request->request->get('editTitle-'.$id);
         $post->setPostTitle($postTitle);
 
         $errors = $validator->validate($post);
@@ -258,7 +258,7 @@ final class ForumController extends AbstractController
         $post = $postsRepository->find($id);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id ' . $id);
+            throw $this->createNotFoundException('No post found for id '.$id);
         }
 
         if (1 !== $post->getOwnerId()) {
@@ -315,7 +315,7 @@ final class ForumController extends AbstractController
         $post = $postsRepository->find($postId);
 
         if (!$post) {
-            throw $this->createNotFoundException('No post found for id ' . $postId);
+            throw $this->createNotFoundException('No post found for id '.$postId);
         }
 
         $isLiked = $likesRepository->isLikedByUser($userId, $postId);
@@ -385,7 +385,7 @@ final class ForumController extends AbstractController
         $comment = $commentsRepository->find($id);
 
         if (!$comment) {
-            throw $this->createNotFoundException('No comment found for id ' . $id);
+            throw $this->createNotFoundException('No comment found for id '.$id);
         }
 
         if (1 !== $comment->getCommenterId()) {
@@ -415,7 +415,7 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
-        $commentText = $request->request->get('editTextarea-' . $id);
+        $commentText = $request->request->get('editTextarea-'.$id);
         $comment->setComment($commentText);
         $comment->setUpdatedAt(new \DateTime());
         $post = $postsRepository->find($comment->getPostId());
@@ -599,16 +599,16 @@ final class ForumController extends AbstractController
 
                 $responseData = $response->toArray();
                 if (
-                    $responseData['nudity']['sexual_activity'] > 0.01 ||
-                    $responseData['nudity']['sexual_display'] > 0.01 ||
-                    $responseData['nudity']['erotica'] > 0.01 ||
-                    $responseData['weapon']['classes']['firearm'] > 0.01 ||
-                    $responseData['recreational_drug']['prob'] > 0.01 ||
-                    $responseData['medical']['prob'] > 0.01 ||
-                    $responseData['offensive']['nazi'] > 0.01 ||
-                    $responseData['gore']['prob'] > 0.01 ||
-                    $responseData['violence']['prob'] > 0.01 ||
-                    $responseData['self-harm']['prob'] > 0.01
+                    $responseData['nudity']['sexual_activity'] > 0.01
+                    || $responseData['nudity']['sexual_display'] > 0.01
+                    || $responseData['nudity']['erotica'] > 0.01
+                    || $responseData['weapon']['classes']['firearm'] > 0.01
+                    || $responseData['recreational_drug']['prob'] > 0.01
+                    || $responseData['medical']['prob'] > 0.01
+                    || $responseData['offensive']['nazi'] > 0.01
+                    || $responseData['gore']['prob'] > 0.01
+                    || $responseData['violence']['prob'] > 0.01
+                    || $responseData['self-harm']['prob'] > 0.01
                 ) {
                     $isInappropriate = true;
                     break;

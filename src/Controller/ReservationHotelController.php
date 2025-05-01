@@ -2,15 +2,14 @@
 
 namespace App\Controller;
 
+use Endroid\QrCode\QrCode;
 use App\Entity\ReservationHotel;
-use Symfony\Component\Mime\Email;
-use Endroid\QrCode\Builder\Builder;
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\PHPMailer;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel;
-use Symfony\Component\Mailer\Mailer;
 use App\Repository\ChambresRepository;
-use Symfony\Component\Mailer\Transport;
+use Endroid\QrCode\ErrorCorrectionLevel;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\ReservationHotelRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,18 +17,13 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Endroid\QrCode\QrCode;
-use Symfony\Component\Mailer\Bridge\Google\Transport\GmailSmtpTransport;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
 
 class ReservationHotelController extends AbstractController
 {
-
     public function __construct(
         private HttpClientInterface $client,
-    ) {}
+    ) {
+    }
 
     #[Route('/room/reserve/{roomId}', name: 'room_reserve', methods: ['POST'])]
     public function reserveRoom(
@@ -97,11 +91,10 @@ class ReservationHotelController extends AbstractController
                 margin: 10
             );
 
-
             $writer = new PngWriter();
             $result = $writer->write($qrCode);
 
-            $qrDir = $this->getParameter('kernel.project_dir') . '/public/qr-codes/';
+            $qrDir = $this->getParameter('kernel.project_dir').'/public/qr-codes/';
             if (!is_dir($qrDir)) {
                 mkdir($qrDir, 0755, true);
             }
@@ -116,25 +109,25 @@ class ReservationHotelController extends AbstractController
             try {
                 $mail = new PHPMailer(true);
                 $mail->isSMTP();
-                $mail->Host       = 'smtp.gmail.com';
-                $mail->SMTPAuth   = true;
-                $mail->Username   = 'voyagepidev@gmail.com';
-                $mail->Password   = $mailer_password;
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'voyagepidev@gmail.com';
+                $mail->Password = $mailer_password;
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port       = 587;
+                $mail->Port = 587;
                 $mail->setFrom('voyagepidev@gmail.com', 'TRAVELSHARE');
                 $mail->addAddress('bouhrem4@gmail.com');
                 $mail->isHTML(true);
                 $mail->Subject = 'Room Reservation Confirmation';
-                $mail->Body    = '
+                $mail->Body = '
                     <div style="font-family: Arial, sans-serif; line-height:1.6;">
                         <h2 style="color:#4CAF50">Reservation Confirmed!</h2>
                         <p>Dear Client,</p>
-                        <p>Your reservation for room <strong>' . $room->getNumeroChambre() . '</strong> is now confirmed.</p>
+                        <p>Your reservation for room <strong>'.$room->getNumeroChambre().'</strong> is now confirmed.</p>
                         <ul>
-                            <li><strong>Check-in:</strong> ' . $start->format('Y-m-d') . '</li>
-                            <li><strong>Check-out:</strong> ' . $end->format('Y-m-d')   . '</li>
-                            <li><strong>Total Price:</strong> ' . $reservation->getPrixTotale() . ' TND</li>
+                            <li><strong>Check-in:</strong> '.$start->format('Y-m-d').'</li>
+                            <li><strong>Check-out:</strong> '.$end->format('Y-m-d').'</li>
+                            <li><strong>Total Price:</strong> '.$reservation->getPrixTotale().' TND</li>
                         </ul>
                         <p>We look forward to hosting you!</p>
                         <p><img src="cid:qr_code" alt="QR Code"></p>
@@ -145,12 +138,12 @@ class ReservationHotelController extends AbstractController
                 $mail->send();
                 $this->addFlash('info', 'A confirmation email has been sent to your email address.');
             } catch (Exception $e) {
-                $this->addFlash('error', 'Mailer Error: ' . $e->getMessage());
+                $this->addFlash('error', 'Mailer Error: '.$e->getMessage());
             }
 
             return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'An error occurred while reserving the room: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['error' => 'An error occurred while reserving the room: '.$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -203,7 +196,7 @@ class ReservationHotelController extends AbstractController
         try {
             $response = $this->client->request('GET', 'https://overpass-api.de/api/interpreter', [
                 'query' => [
-                    'data' => '[out:json];node(around:1000,' . $latitude . ',' . $longitude . ')["amenity"~"restaurant|cafe|bar"];out;'
+                    'data' => '[out:json];node(around:1000,'.$latitude.','.$longitude.')["amenity"~"restaurant|cafe|bar"];out;',
                 ],
             ]);
 
