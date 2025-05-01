@@ -10,4 +10,5 @@ final class PostText
     public int $postId;
     public string $postTitle;
     public string $textContent;
+    public string $slug;
 }

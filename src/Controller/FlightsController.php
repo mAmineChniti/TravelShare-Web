@@ -436,4 +436,10 @@ final class FlightsController extends AbstractController
             'voyages' => $voyages,
         ]);
     }
+
+    #[Route('/flights/calendar', name: 'app_flights_calendar')]
+    public function calendar(): Response
+    {
+        return $this->render('flights/calendar.html.twig');
+    }
 }

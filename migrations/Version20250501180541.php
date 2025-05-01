@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250429200330 extends AbstractMigration
+final class Version20250501180541 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,10 +21,10 @@ final class Version20250429200330 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE post_images DROP FOREIGN KEY FK_D03D5A0F4B89032C
+            CREATE UNIQUE INDEX UNIQ_885DBAFA989D9B62 ON posts (slug)
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE post_images ADD CONSTRAINT FK_D03D5A0F4B89032C FOREIGN KEY (post_id) REFERENCES posts (Post_id) ON DELETE CASCADE
+            CREATE UNIQUE INDEX UNIQ_885DBAFA8080B212 ON posts (post_unique)
         SQL);
     }
 
@@ -32,10 +32,10 @@ final class Version20250429200330 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE post_images DROP FOREIGN KEY FK_D03D5A0F4B89032C
+            DROP INDEX UNIQ_885DBAFA989D9B62 ON posts
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE post_images ADD CONSTRAINT FK_D03D5A0F4B89032C FOREIGN KEY (post_id) REFERENCES posts (Post_id) ON UPDATE NO ACTION ON DELETE NO ACTION
+            DROP INDEX UNIQ_885DBAFA8080B212 ON posts
         SQL);
     }
 }

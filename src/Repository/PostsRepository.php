@@ -59,7 +59,7 @@ class PostsRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
-            'SELECT p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId, p.postTitle
+            'SELECT p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId, p.postTitle, p.slug
          FROM App\Entity\Posts p 
          JOIN App\Entity\Users u WITH p.ownerId = u.userId 
          LEFT JOIN App\Entity\FlaggedContent f WITH p.postId = f.postId AND f.flaggerId = :userId 
@@ -79,7 +79,7 @@ class PostsRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
-            'SELECT p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId, p.postTitle
+            'SELECT p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId, p.postTitle, p.slug
             FROM App\\Entity\\Posts p 
             JOIN App\Entity\Users u WITH p.ownerId = u.userId 
             LEFT JOIN App\Entity\FlaggedContent f WITH p.postId = f.postId AND f.flaggerId = :userId
@@ -99,7 +99,7 @@ class PostsRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
 
         $queryBuilder = $entityManager->createQueryBuilder()
-            ->select('p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId, p.postTitle')
+            ->select('p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId, p.postTitle, p.slug')
             ->from('App\\Entity\\Posts', 'p')
             ->join('App\\Entity\\Users', 'u', 'WITH', 'p.ownerId = u.userId')
             ->leftJoin('App\\Entity\\FlaggedContent', 'f', 'WITH', 'p.postId = f.postId AND f.flaggerId = :userId')
@@ -126,7 +126,7 @@ class PostsRepository extends ServiceEntityRepository
     {
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
-            'SELECT p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId, p.postTitle
+            'SELECT p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId, p.postTitle, p.slug
              FROM App\Entity\Posts p 
              JOIN App\Entity\Users u WITH p.ownerId = u.userId 
              LEFT JOIN App\Entity\FlaggedContent f WITH p.postId = f.postId AND f.flaggerId = :userId 
