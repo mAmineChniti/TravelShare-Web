@@ -105,9 +105,9 @@ class ReservationHotelController extends AbstractController
             if (!is_dir($qrDir)) {
                 mkdir($qrDir, 0777, true);
             }
-            +$qrCodePath = sprintf('%s/%s.png', $qrDir, bin2hex(random_bytes(8)));
+            $qrCodePath = sprintf('%s/%s.png', $qrDir, bin2hex(random_bytes(8)));
             $result->saveToFile($qrCodePath);
-            $mailer_password = $this->getParameter('MAILER_PASSWORD');
+            $mailer_password = $this->getParameter('app.mailer_password');
 
             if (!$mailer_password) {
                 throw new \Exception('Mailer password not set in parameters.');

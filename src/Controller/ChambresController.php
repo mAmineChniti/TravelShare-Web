@@ -26,7 +26,7 @@ class ChambresController extends AbstractController
             throw $this->createNotFoundException('Hotel not found');
         }
 
-        $unsplashClientId = $this->getParameter('unsplash_client_id');
+        $unsplashClientId = $this->getParameter('app.unsplash_client_id');
         if (!$unsplashClientId) {
             throw new \RuntimeException('Unsplash client ID not configured.');
         }

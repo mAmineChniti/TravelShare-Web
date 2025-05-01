@@ -85,8 +85,8 @@ Hotel List:\n" . implode("\n", $hotelSummaries);
         $data = $response->toArray(false); // Set false to avoid exception on non-2xx responses
 
         // Log the API response for debugging
-        $logFilePath = __DIR__ . '/../../var/log/ai_recommendation.log';
-        file_put_contents($logFilePath, print_r($data, true));
+        /**$logFilePath = __DIR__ . '/../../var/log/ai_recommendation.log';
+        file_put_contents($logFilePath, print_r($data, true));**/
 
         $recommendation = null;
         if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
@@ -264,7 +264,7 @@ Hotel List:\n" . implode("\n", $hotelSummaries);
 
         // ─── Unsplash API call ───
         $unsplashImages = [];
-        $unsplashClientId = $this->getParameter('unsplash_client_id');
+        $unsplashClientId = $this->getParameter('app.unsplash_client_id');
         if (!$unsplashClientId) {
             throw new \RuntimeException('Unsplash client ID not configured.');
         }
