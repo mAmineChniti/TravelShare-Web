@@ -103,7 +103,7 @@ class ReservationHotelController extends AbstractController
 
             $qrDir = $this->getParameter('kernel.project_dir') . '/public/qr-codes/';
             if (!is_dir($qrDir)) {
-                mkdir($qrDir, 0777, true);
+                mkdir($qrDir, 0755, true);
             }
             $qrCodePath = sprintf('%s/%s.png', $qrDir, bin2hex(random_bytes(8)));
             $result->saveToFile($qrCodePath);
