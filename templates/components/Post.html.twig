@@ -1,10 +1,13 @@
-<div id="post-{{ post.postId }}" class="bg-white rounded-lg shadow-md p-6">
-	<div class="flex justify-between items-center mb-4">
-		<span class="text-blue-600 font-medium">{{ post.name ~ ' ' ~ post.lastName }}</span>
+<div
+	id="post-{{ post.postId }}"
+	class="bg-white rounded-lg shadow-md p-4 border border-gray-200 max-h-[600px] overflow-hidden"
+>
+	<div class="flex justify-between items-center mb-2">
+		<span class="text-blue-600 font-medium truncate">{{ post.name ~ ' ' ~ post.lastName }}</span>
 		<div class="flex space-x-2">
 			<button
 				id="editButton-{{ post.postId }}"
-				class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg"
+				class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-1 px-3 rounded-lg"
 				onclick="ForumApp.editPost('{{ post.postId }}')"
 				title="Edit post"
 			>
@@ -20,18 +23,27 @@
 			>
 				<button
 					type="submit"
-					class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg"
+					class="bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-3 rounded-lg"
 					title="Delete post"
 				>
 					<i class="fas fa-trash"></i>
 				</button>
 			</form>
-
-			<twig:LikeButton postId="{{ post.postId }}" isLiked="{{ post.isLiked }}" likesCount="{{ post.likesCount }}" />
+			<twig:VoteButtons
+				postId="{{ post.postId }}"
+				isLiked="{{ post.isLiked }}"
+				likesCount="{{ post.likesCount }}"
+				dislikesCount="{{ post.dislikesCount }}"
+			/>
 		</div>
 	</div>
 
-	<twig:PostText postId="{{ post.postId }}" textContent="{{ post.textContent }}" />
+	<twig:PostText
+		postId="{{ post.postId }}"
+		textContent="{{ post.textContent }}"
+		postTitle="{{ post.postTitle }}"
+		slug="{{ post.slug }}"
+	/>
 
 	<form
 		id="editPostForm-{{ post.postId }}"
@@ -40,6 +52,16 @@
 		action="{{ path('app_forum_edit', {'id': post.postId}) }}"
 		onsubmit="return false;"
 	>
+		<div>
+			<input
+				type="text"
+				name="editTitle-{{ post.postId }}"
+				id="editTitle-{{ post.postId }}"
+				value="{{ post.postTitle }}"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+				maxlength="255"
+			/>
+		</div>
 		<div>
 			<textarea
 				name="editTextarea-{{ post.postId }}"
@@ -63,14 +85,19 @@
 			</button>
 		</div>
 	</form>
-
+	{% if post.images is defined and post.images|length > 0 %}
+	<div class="mt-2 grid grid-cols-3 gap-2 overflow-y-auto">
+		{% for image in post.images %}
+		<img src="data:image/jpeg;base64,{{ image }}" alt="Post Image" class="w-full h-auto rounded-lg shadow-md" />
+		{% endfor %}
+	</div>
+	{% endif %}
 	<div class="mt-4">
 		<form
 			hx-post="{{ path('app_forum_comment') }}"
 			hx-target="#commentsContainer-{{ post.postId }}"
 			hx-swap="beforeend"
 			hx-on::after-request="if(event.detail.successful) this.reset()"
-			onsubmit="return validateCommentForm(this);"
 		>
 			<input type="hidden" name="postId" value="{{ post.postId }}" />
 			<div>
@@ -88,7 +115,7 @@
 					type="button"
 					class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg"
 					title="Add comment"
-					onclick="if(validateCommentForm(this.form)) { htmx.trigger(this.form, 'submit'); }"
+					onclick="handleAddCommentButtonClick(this);"
 				>
 					<i class="fas fa-paper-plane"></i>
 				</button>
@@ -96,8 +123,12 @@
 		</form>
 	</div>
 
-	<div id="commentsContainer-{{ post.postId }}" class="mt-4 space-y-4">
-		{% if post.comments is defined %} {% for comment in post.comments %}
+	{% if post.comments is defined and post.comments|length > 0 %}
+	<div
+		id="commentsContainer-{{ post.postId }}"
+		class="mt-2 space-y-2 bg-gray-50 p-2 rounded-lg border border-gray-200 max-h-[200px] overflow-y-auto"
+	>
+		{% for comment in post.comments %}
 		<twig:Comment
 			commentId="{{ comment.commentId }}"
 			comment="{{ comment.comment }}"
@@ -107,11 +138,20 @@
 			commentedAt="{{ comment.commentedAt }}"
 			updatedAt="{{ comment.updatedAt }}"
 		/>
-		{% endfor %} {% endif %}
+		{% endfor %}
 	</div>
+	{% endif %}
 </div>
 
 <script>
+	async function handleAddCommentButtonClick(button) {
+		const form = button.form;
+		const isValid = await validateCommentForm(form);
+		if (isValid) {
+			htmx.trigger(form, "submit");
+		}
+	}
+
 	(function () {
 		const textarea = document.getElementById("editTextarea-{{ post.postId }}");
 		if (textarea) {

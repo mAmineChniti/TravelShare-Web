@@ -27,7 +27,6 @@ class ReservationOffresVoyage
     private ?int $offreId = null;
 
     #[ORM\Column(name: 'date_reserved', type: Types::DATE_MUTABLE)]
-    #[Assert\LessThanOrEqual('today', message: 'Reservation date cannot be in the future.')]
     private ?\DateTimeInterface $dateReserved = null;
 
     #[ORM\Column(name: 'status')]
@@ -75,9 +74,10 @@ class ReservationOffresVoyage
         return $this->dateReserved;
     }
 
-    public function setDateReserved(\DateTimeInterface $dateReserved): static
-    {
-        $this->dateReserved = $dateReserved;
+    public function setDateReserved(
+        \DateTimeInterface $dateReserved,
+    ): static {
+        $this->dateReserved = \DateTime::createFromFormat('Y-m-d', $dateReserved->format('Y-m-d'));
 
         return $this;
     }

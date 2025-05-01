@@ -12,7 +12,7 @@
 			{% for post in posts %}
 			<div id="post-{{ post.postId }}" class="bg-gray-100 rounded-lg p-4">
 				<div class="flex justify-between items-center mb-2">
-					<span class="text-blue-600 font-medium">{{ post.ownerName }}</span>
+					<span class="text-blue-600 font-medium">{{ post.name ~ ' ' ~ post.lastName }}</span>
 					<form
 						hx-post="{{ path('app_forum_delete', {'id': post.postId}) }}"
 						hx-target="#post-{{ post.postId }}"
@@ -32,6 +32,14 @@
 
 				<div id="postText-{{ post.postId }}" class="text-gray-800 mb-2">{{ post.textContent }}</div>
 
+				{% if post.images is defined and post.images|length > 0 %}
+				<div class="grid grid-cols-3 gap-4 mb-4">
+					{% for image in post.images %}
+					<img src="data:image/jpeg;base64,{{ image }}" alt="Post Image" class="rounded-lg shadow-md" />
+					{% endfor %}
+				</div>
+				{% endif %}
+
 				<div class="text-sm text-gray-500">Posted: {{ post.createdAt|date('M d, Y H:i') }}</div>
 
 				<div class="mt-4">
@@ -42,7 +50,7 @@
 					{% if post.comments is defined %} {% for comment in post.comments %}
 					<div id="comment-{{ comment.commentId }}" class="bg-white rounded-lg p-3">
 						<div class="flex justify-between items-center mb-2">
-							<span class="text-blue-600 font-medium">{{ comment.commenterName }}</span>
+							<span class="text-blue-600 font-medium truncate">{{ comment.name ~ ' ' ~ comment.lastName }}</span>
 							<form
 								hx-post="{{ path('comment_delete', {'id': comment.commentId}) }}"
 								hx-target="#comment-{{ comment.commentId }}"

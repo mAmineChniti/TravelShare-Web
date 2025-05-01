@@ -5,6 +5,9 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PostsRepository;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'posts')]
@@ -43,7 +46,35 @@ class Posts
     private ?string $textContent = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Post title cannot be blank.')]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: 'Post title cannot be longer than 255 characters.'
+    )]
     private ?string $postTitle = null;
+
+    #[Gedmo\Slug(fields: ['postTitle', 'postUnique'])]
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    private ?string $slug = null;
+
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
+    private ?string $postUnique = null;
+
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: PostImages::class, cascade: ['persist', 'remove'])]
+    private Collection $images;
+
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: Comments::class, cascade: ['remove'])]
+    private Collection $comments;
+
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: Likes::class, cascade: ['remove'])]
+    private Collection $likes;
+
+    public function __construct()
+    {
+        $this->images = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->likes = new ArrayCollection();
+    }
 
     public function getPostId(): ?int
     {
@@ -108,5 +139,134 @@ class Posts
         $this->postTitle = $postTitle;
 
         return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getPostUnique(): ?string
+    {
+        return $this->postUnique;
+    }
+
+    public function setPostUnique(string $postUnique): static
+    {
+        $this->postUnique = $postUnique;
+
+        return $this;
+    }
+
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(PostImages $image): static
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImage(PostImages $image): static
+    {
+        if ($this->images->removeElement($image)) {
+            if ($image->getPost() === $this) {
+                $image->setPost(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comments $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comments $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            if ($comment->getPost() === $this) {
+                $comment->setPost(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getLikes(): Collection
+    {
+        return $this->likes;
+    }
+
+    public function addLike(Likes $like): static
+    {
+        if (!$this->likes->contains($like)) {
+            $this->likes->add($like);
+            $like->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLike(Likes $like): static
+    {
+        if ($this->likes->removeElement($like)) {
+            if ($like->getPost() === $this) {
+                $like->setPost(null);
+            }
+        }
+
+        return $this;
+    }
+
+    #[ORM\PreRemove]
+    public function deleteAssociatedImages(): void
+    {
+        foreach ($this->images as $image) {
+            $image->setPost(null);
+        }
+        $this->images->clear();
+    }
+
+    #[ORM\PreRemove]
+    public function deleteAssociatedComments(): void
+    {
+        foreach ($this->comments as $comment) {
+            $comment->setPost(null);
+        }
+        $this->comments->clear();
+    }
+
+    #[ORM\PreRemove]
+    public function deleteAssociatedLikes(): void
+    {
+        foreach ($this->likes as $like) {
+            $like->setPost(null);
+        }
+        $this->likes->clear();
     }
 }

@@ -51,4 +51,30 @@ class OffresVoyageRepository extends ServiceEntityRepository
     {
         return $this->findAll();
     }
+
+    public function findByDestination(string $destination): array
+    {
+        return $this->createQueryBuilder('o')
+            ->where('o.destination LIKE :destination')
+            ->setParameter('destination', '%'.$destination.'%')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByDateRange(?\DateTime $departureDate, ?\DateTime $returnDate): array
+    {
+        $qb = $this->createQueryBuilder('o');
+
+        if ($departureDate) {
+            $qb->andWhere('o.dateDepart >= :departureDate')
+               ->setParameter('departureDate', $departureDate);
+        }
+
+        if ($returnDate) {
+            $qb->andWhere('o.dateRetour <= :returnDate')
+               ->setParameter('returnDate', $returnDate);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

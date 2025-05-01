@@ -25,6 +25,26 @@ class Likes
     #[ORM\GeneratedValue(strategy: 'NONE')]
     private ?int $likerId = null;
 
+    #[ORM\Column(name: 'like_type', type: 'boolean')]
+    #[Assert\NotNull(message: 'Like type cannot be null.')]
+    private ?bool $likeType = null;
+
+    #[ORM\ManyToOne(targetEntity: Posts::class, inversedBy: 'likes')]
+    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'Post_id', nullable: false, onDelete: 'CASCADE')]
+    private ?Posts $post = null;
+
+    public function getPost(): ?Posts
+    {
+        return $this->post;
+    }
+
+    public function setPost(?Posts $post): static
+    {
+        $this->post = $post;
+
+        return $this;
+    }
+
     public function getPostId(): ?int
     {
         return $this->postId;
@@ -45,6 +65,18 @@ class Likes
     public function setLikerId(int $likerId): static
     {
         $this->likerId = $likerId;
+
+        return $this;
+    }
+
+    public function getLikeType(): ?bool
+    {
+        return $this->likeType;
+    }
+
+    public function setLikeType(bool $likeType): static
+    {
+        $this->likeType = $likeType;
 
         return $this;
     }

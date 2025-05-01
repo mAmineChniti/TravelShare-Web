@@ -48,6 +48,22 @@ class Comments
     #[Assert\Type(type: \DateTimeInterface::class, message: 'Updated at must be a valid datetime.')]
     private ?\DateTimeInterface $updatedAt = null;
 
+    #[ORM\ManyToOne(targetEntity: Posts::class, inversedBy: 'comments')]
+    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'Post_id', nullable: false, onDelete: 'CASCADE')]
+    private ?Posts $post = null;
+
+    public function getPost(): ?Posts
+    {
+        return $this->post;
+    }
+
+    public function setPost(?Posts $post): static
+    {
+        $this->post = $post;
+
+        return $this;
+    }
+
     public function getCommentId(): ?int
     {
         return $this->commentId;

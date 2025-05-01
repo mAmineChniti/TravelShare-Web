@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Promo;
 use App\Entity\OffresVoyage;
 use App\Entity\ReservationOffresVoyage;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,7 +19,7 @@ class ReservationOffresVoyageRepository extends ServiceEntityRepository
         $this->entityManager = $entityManager;
     }
 
-    public function add(ReservationOffresVoyage $reservation): void
+    public function add(ReservationOffresVoyage $reservation, string $promoCode): int
     {
         $offre = $this->entityManager->getRepository(OffresVoyage::class)->find($reservation->getOffreId());
 
@@ -26,15 +27,35 @@ class ReservationOffresVoyageRepository extends ServiceEntityRepository
             throw new \Exception('Not enough available places for this reservation.');
         }
 
-        $totalPrix = $offre->getPrix() * $reservation->getNbrPlace();
-        $reservation->setPrix($totalPrix);
+        if ($promoCode) {
+            $promo = $this->entityManager->getRepository(Promo::class)->findOneBy(['codepromo' => $promoCode]);
+            if ($promo) {
+                $pourcentagePromo = $promo->getPourcentagePromo();
+                if ($pourcentagePromo < 1 || $pourcentagePromo > 100) {
+                    throw new \Exception('Promo percentage must be between 1 and 100.');
+                }
+                $totalPrix = $offre->getPrix() * $reservation->getNbrPlace() * (1 - $pourcentagePromo / 100);
+            } else {
+                throw new \Exception('Invalid promo code.');
+            }
+        } else {
+            $totalPrix = $offre->getPrix() * $reservation->getNbrPlace();
+        }
 
-        $offre->setPlacesDisponibles($offre->getPlacesDisponibles() - $reservation->getNbrPlace());
+        if ($totalPrix < 0) {
+            throw new \Exception('Total price cannot be negative.');
+        }
+
+        $reservation->setPrix($totalPrix);
         $reservation->setDateReserved(new \DateTime());
         $reservation->setStatus(1);
+
+        $offre->setPlacesDisponibles($offre->getPlacesDisponibles() - $reservation->getNbrPlace());
         $this->entityManager->persist($reservation);
         $this->entityManager->persist($offre);
         $this->entityManager->flush();
+
+        return $reservation->getReservationId();
     }
 
     public function update(ReservationOffresVoyage $reservation): void

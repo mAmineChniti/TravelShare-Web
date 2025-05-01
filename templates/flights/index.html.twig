@@ -2,6 +2,51 @@
 <div class="container mx-auto px-4 mt-8 space-y-6">
 	<h1 class="text-5xl font-bold mb-6">Available Flights</h1>
 
+	<div class="flex items-center space-x-4 mb-6">
+		<form id="search-form" method="get" action="{{ path('app_flights_search') }}" class="flex-grow">
+			<input
+				id="search-input"
+				type="text"
+				name="destination"
+				placeholder="Search by destination"
+				value="{{ app.request.query.get('destination', '') }}"
+				class="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
+			/>
+		</form>
+		<form method="get" action="{{ path('app_flights_filter') }}" class="flex items-center space-x-2">
+			<input
+				type="date"
+				id="departureDate"
+				name="departureDate"
+				placeholder="Departure Date"
+				class="px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
+			/>
+			<input
+				type="date"
+				id="returnDate"
+				name="returnDate"
+				placeholder="Return Date"
+				class="px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
+			/>
+			<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-full shadow">
+				Filter
+			</button>
+		</form>
+		<form id="sort-form" method="get" action="{{ path('app_flights_sort') }}">
+			<select
+				id="sort-select"
+				name="sortBy"
+				class="w-40 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
+			>
+				<option value="">Sort by</option>
+				<option value="price_asc">Price: Low to High</option>
+				<option value="price_desc">Price: High to Low</option>
+				<option value="date">Date</option>
+			</select>
+		</form>
+		<a href="{{ path('app_flights_calendar') }}" class="text-blue-600 hover:underline"> View Calendar </a>
+	</div>
+
 	<div id="error-messages" class="mt-4">
 		{% if errors is defined and errors|length > 0 %} {% for error in errors %}
 		<p class="text-sm text-red-600">{{ error }}</p>
@@ -11,6 +56,12 @@
 		{% if success is defined and success|length > 0 %} {% for message in success %}
 		<p class="text-sm text-green-600">{{ message }}</p>
 		{% endfor %} {% endif %}
+	</div>
+
+	<div id="flash-messages" class="mt-4">
+		{% for label, messages, info in app.flashes %} {% for message in messages %}
+		<p class="text-sm text-{{ label == 'success' ? 'green' : 'red' }}-600">{{ message }}</p>
+		{% endfor %} {% endfor %}
 	</div>
 
 	{% if voyages is not empty %}
@@ -28,6 +79,12 @@
 				<p class="text-base text-gray-700">
 					Available Places: <span class="font-medium">{{ voyage.placesDisponibles }}</span>
 				</p>
+				<p class="text-base text-gray-700">
+					Departure Date: <span class="font-medium">{{ voyage.dateDepart|date('d-m-Y') }}</span>
+				</p>
+				<p class="text-base text-gray-700">
+					Return Date: <span class="font-medium">{{ voyage.dateRetour|date('d-m-Y') }}</span>
+				</p>
 			</div>
 			<div class="mt-4">
 				<a
@@ -44,4 +101,25 @@
 	<p class="text-center text-gray-700">No flights available at the moment.</p>
 	{% endif %}
 </div>
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		const searchInput = document.getElementById("search-input");
+		const searchForm = document.getElementById("search-form");
+		let searchTimeout;
+
+		searchInput.addEventListener("input", () => {
+			clearTimeout(searchTimeout);
+			searchTimeout = setTimeout(() => {
+				searchForm.submit();
+			}, 500);
+		});
+
+		const sortSelect = document.getElementById("sort-select");
+		const sortForm = document.getElementById("sort-form");
+
+		sortSelect.addEventListener("change", () => {
+			sortForm.submit();
+		});
+	});
+</script>
 {% endblock %}

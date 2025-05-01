@@ -1,5 +1,13 @@
-<div id="postText-{{ postId }}">
-	<p class="text-gray-800">{{ textContent }}</p>
+<div id="postContent-{{ postId }}" class="bg-white shadow-md rounded-lg p-4 mb-4 max-h-[500px] overflow-y-auto">
+	<a
+		href="{{ path('app_forum_post_by_slug', {'slug': slug }) }}"
+		id="postTitle-{{ postId }}"
+		class="text-lg font-bold truncate hover:underline"
+		>{{ postTitle|markdown }}</a
+	>
+	<div id="postText-{{ postId }}" class="text-gray-800 text-sm leading-snug">
+		<p>{{ textContent|markdown }}</p>
+	</div>
 </div>
 
 <script>
@@ -18,7 +26,7 @@
 		const postId = {{ postId }};
 		const elements = {
 			editForm: document.getElementById(`editPostForm-${postId}`),
-			editButton: document.getElementById(`editButton-${postId}`)
+			editButton: document.getElementById(`editButton-${postId}`),
 		};
 
 		if (elements.editForm) elements.editForm.style.display = "none";
