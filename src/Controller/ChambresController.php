@@ -8,19 +8,41 @@ use App\Repository\ChambresRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ChambresController extends AbstractController
 {
     #[Route('/dashboard/rooms/{id}', name: 'dashboard_rooms')]
-    public function dashboardRooms(ChambresRepository $chambresRepository, int $id): Response
-    {
+    public function dashboardRooms(
+        HotelsRepository $hotelsRepository,
+        ChambresRepository $chambresRepository,
+        HttpClientInterface $httpClient,
+        int $id,
+    ): Response {
+        $hotel = $hotelsRepository->find($id);
+        if (!$hotel) {
+            throw $this->createNotFoundException('Hotel not found');
+        }
+
+        $response = $httpClient->request('GET', 'https://api.unsplash.com/search/photos', [
+            'query' => [
+                'query' => $hotel->getNom(),
+                'per_page' => 4,
+                'client_id' => '5CSOfED1fFHQrV-N7ocS_I4mq71ZJdaEVeo1LHnRK7w',
+            ],
+        ]);
+
+        $data = $response->toArray();
+        $images = array_map(fn (array $img) => $img['urls']['regular'], $data['results']);
+
         $chambres = $chambresRepository->findBy(['hotel' => $id]);
 
         return $this->render('dashboard/rooms/index.html.twig', [
-            'hotelId' => $id,
-            'chambres' => $chambres,
+            'hotel' => $hotel,
+            'rooms' => $chambres,
+            'images' => $images,
         ]);
     }
 

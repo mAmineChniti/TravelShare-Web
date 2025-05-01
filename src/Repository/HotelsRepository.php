@@ -22,17 +22,20 @@ class HotelsRepository extends ServiceEntityRepository
 
     public function update(Hotels $hotel): void
     {
-        $entityManager = $this->getEntityManager();
-        $existingHotel = $this->find($hotel->getHotelId());
-        if (!$existingHotel) {
+        $em = $this->getEntityManager();
+        $existing = $this->find($hotel->getHotelId());
+        if (!$existing) {
             throw new \Exception('Hotel not found');
         }
-        $existingHotel->setNom($hotel->getNom());
-        $existingHotel->setAdress($hotel->getAdress());
-        $existingHotel->setTelephone($hotel->getTelephone());
-        $existingHotel->setCapaciteTotale($hotel->getCapaciteTotale());
-        $existingHotel->setImageH($hotel->getImageH());
-        $entityManager->flush();
+
+        $existing->setNom($hotel->getNom());
+        $existing->setAdress($hotel->getAdress());
+        $existing->setTelephone($hotel->getTelephone());
+        $existing->setCapaciteTotale($hotel->getCapaciteTotale());
+        $existing->setImageH($hotel->getImageH());
+        $existing->setDescription($hotel->getDescription());
+
+        $em->flush();
     }
 
     public function delete(int $id): void

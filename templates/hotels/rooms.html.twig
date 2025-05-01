@@ -2,7 +2,18 @@
 <div class="container mx-auto px-4 mt-8 space-y-6">
 	<h1 class="text-5xl font-bold mb-6">Available Rooms at {{ hotel.nom }}</h1>
 
-	{% set availableRooms = rooms|filter(r => r.disponible != 0) %} {% if availableRooms is empty %}
+	{% if unsplashImages is defined and unsplashImages|length > 0 %}
+	<h2 class="text-3xl font-semibold mb-4">Photos of {{ hotel.nom }}</h2>
+	<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+		{% for url in unsplashImages %}
+		<div class="overflow-hidden rounded-lg shadow">
+			<img src="{{ url }}" alt="Photo of {{ hotel.nom }}" class="object-cover w-full h-48" />
+		</div>
+		{% endfor %}
+	</div>
+	{% else %}
+	<p class="text-gray-600 mb-8">No photos found for this hotel.</p>
+	{% endif %} {% set availableRooms = rooms|filter(r => r.disponible != 0) %} {% if availableRooms is empty %}
 	<div class="text-center text-gray-700">No rooms available at the moment.</div>
 	{% else %}
 	<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
