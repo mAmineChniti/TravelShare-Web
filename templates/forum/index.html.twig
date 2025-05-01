@@ -93,7 +93,7 @@
         {% if recommendedPosts is defined and recommendedPosts|length > 0 %}
     <div class="bg-gray-100 p-6 rounded-lg shadow-md">
         <h2 class="text-lg font-semibold text-blue-600 border-b border-blue-300 pb-2 mb-4">Recommended Posts</h2>
-        <div class="space-y-6"> <!-- Added spacing between recommended posts -->
+        <div class="space-y-6">
             {% for post in recommendedPosts %}
             <twig:Post
                 post="{{ post }}"
@@ -112,7 +112,7 @@
         <p class="text-sm text-gray-500">No posts available.</p>
         {% endif %}
         {% if posts is defined and posts|length > 0 %}
-        <div class="space-y-6"> <!-- Added spacing between all posts -->
+        <div id="postsContainer" class="space-y-6">
             {% for post in posts %}
             <twig:Post
                 post="{{ post }}"
@@ -655,6 +655,7 @@
 		if(!text) return false;
 		if (text.length < 15) return false;
 		if (text.length > 255) return false;
+		console.log(text);
 		const cachedResult = sessionStorage.getItem(`profanity_${btoa(text)}`);
 		if (cachedResult !== null) return JSON.parse(cachedResult);
 		try {
@@ -678,6 +679,7 @@
 
 			const result = await response.json();
 			sessionStorage.setItem(`profanity_${btoa(text)}`, JSON.stringify(result.isProfanity));
+			console.log(result.isProfanity);
 			return result.isProfanity;
 		} catch (error) {
 			console.error('Error validating profanity:', error);

@@ -51,6 +51,7 @@ final class ForumController extends AbstractController
 
         if (!$geminiApiKey) {
             throw new \RuntimeException('API key is missing.');
+
             return [];
         }
 
@@ -167,9 +168,7 @@ final class ForumController extends AbstractController
 
             return new JsonResponse(['error' => $errorMessages], 400);
         }
-
         $postsRepository->add($post);
-
         $uploadedFiles = $request->files->get('postImages');
         if ($uploadedFiles) {
             foreach ($uploadedFiles as $uploadedFile) {
@@ -193,8 +192,9 @@ final class ForumController extends AbstractController
             'textContent' => $post->getTextContent(),
             'postTitle' => $post->getPostTitle(),
             'images' => $images ? array_map(fn ($image) => base64_encode($image), $images) : [],
-            'isLiked' => false,
+            'isLiked' => null,
             'likesCount' => 0,
+            'dislikesCount' => 0,
             'comments' => [],
         ];
 
@@ -440,22 +440,16 @@ final class ForumController extends AbstractController
     public function dashboard(
         PostsRepository $postsRepository,
         CommentsRepository $commentsRepository,
-        UsersRepository $usersRepository,
+        LikesRepository $likesRepository,
+        PostImagesRepository $postImagesRepository,
+        Request $request,
     ): Response {
-        $posts = $postsRepository->fetchPosts(1, 10, 1);
-
+        $userId = 1;
+        $offset = max(0, (int) $request->query->get('offset', 0));
+        $limit = min(100, max(1, (int) $request->query->get('limit', 10)));
+        $posts = $postsRepository->fetchPosts($offset, $limit, $userId);
         foreach ($posts as &$post) {
-            $user = $usersRepository->find($post['ownerId']);
-            $post['ownerName'] = $user ? $user->getName().' '.$user->getLastName() : 'Unknown User';
-
-            $comments = $commentsRepository->fetchById($post['postId']);
-
-            foreach ($comments as &$comment) {
-                $commenter = $usersRepository->find($comment['commenterId']);
-                $comment['commenterName'] = $commenter ? $commenter->getName().' '.$commenter->getLastName() : 'Unknown User';
-            }
-
-            $post['comments'] = $comments;
+            $post = $this->enrichPost($post, $userId, $commentsRepository, $likesRepository, $postImagesRepository);
         }
 
         return $this->render('dashboard/forum/index.html.twig', [
