@@ -31,12 +31,12 @@ class HotelsController extends AbstractController
             $qb = $hotelsRepository->createQueryBuilder('h');
 
             foreach ($filterDescriptions as $key => $description) {
-                $qb->andWhere('h.description LIKE :description'.$key)
-                   ->setParameter('description'.$key, '%'.$description.'%');
+                $qb->andWhere('h.description LIKE :description' . $key)
+                    ->setParameter('description' . $key, '%' . $description . '%');
             }
             if ($search) {
                 $qb->andWhere('h.nom LIKE :search OR h.adress LIKE :search')
-                   ->setParameter('search', '%'.$search.'%');
+                    ->setParameter('search', '%' . $search . '%');
             }
 
             $hotels = $qb->getQuery()->getResult();
@@ -55,7 +55,7 @@ class HotelsController extends AbstractController
         // Prepare a detailed prompt with hotel names and descriptions for the AI
         $hotelSummaries = [];
         foreach ($hotels as $hotel) {
-            $hotelSummaries[] = 'Hotel: '.$hotel->getNom()."\nDescription: ".$hotel->getDescription();
+            $hotelSummaries[] = 'Hotel: ' . $hotel->getNom() . "\nDescription: " . $hotel->getDescription();
         }
 
         $prompt = "Select the top 3 hotels from the following list and provide a concise, compelling reason for each choice do not write anything else. Format strictly as:
@@ -63,10 +63,14 @@ class HotelsController extends AbstractController
 2. [Hotel Name]: [Reason]
 3. [Hotel Name]: [Reason]
 
-Hotel List:\n".implode("\n", $hotelSummaries);
+Hotel List:\n" . implode("\n", $hotelSummaries);
 
+        $geminiApiKey = $this->getParameter('gemini_api_key');
+        if (!$geminiApiKey) {
+            throw new \RuntimeException('Gemini API key not configured.');
+        }
         // Call the Gemini API with the updated endpoint and payload structure
-        $response = $this->httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCbMkla6N0szNliEtaVlKuM0CtVadxWtag', [
+        $response = $this->httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $geminiApiKey, [
             'json' => [
                 'contents' => [
                     [
@@ -81,7 +85,7 @@ Hotel List:\n".implode("\n", $hotelSummaries);
         $data = $response->toArray(false); // Set false to avoid exception on non-2xx responses
 
         // Log the API response for debugging
-        $logFilePath = __DIR__.'/../../var/log/ai_recommendation.log';
+        $logFilePath = __DIR__ . '/../../var/log/ai_recommendation.log';
         file_put_contents($logFilePath, print_r($data, true));
 
         $recommendation = null;
@@ -260,6 +264,10 @@ Hotel List:\n".implode("\n", $hotelSummaries);
 
         // ─── Unsplash API call ───
         $unsplashImages = [];
+        $unsplashClientId = $this->getParameter('unsplash_client_id');
+        if (!$unsplashClientId) {
+            throw new \RuntimeException('Unsplash client ID not configured.');
+        }
         try {
             $response = $this->httpClient->request('GET', 'https://api.unsplash.com/search/photos', [
                 'query' => [
@@ -267,14 +275,14 @@ Hotel List:\n".implode("\n", $hotelSummaries);
                     'per_page' => 4,
                 ],
                 'headers' => [
-                    'Authorization' => 'Client-ID 5CSOfED1fFHQrV-N7ocS_I4mq71ZJdaEVeo1LHnRK7w',
+                    'Authorization' => 'Client-ID ' . $unsplashClientId,
                 ],
             ]);
             $data = $response->toArray(false);
             foreach ($data['results'] ?? [] as $item) {
                 $unsplashImages[] = $item['urls']['regular'];
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             // log $e if you want, but leave $unsplashImages as empty array
         }
 

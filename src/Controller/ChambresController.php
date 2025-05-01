@@ -26,16 +26,20 @@ class ChambresController extends AbstractController
             throw $this->createNotFoundException('Hotel not found');
         }
 
+        $unsplashClientId = $this->getParameter('unsplash_client_id');
+        if (!$unsplashClientId) {
+            throw new \RuntimeException('Unsplash client ID not configured.');
+        }
         $response = $httpClient->request('GET', 'https://api.unsplash.com/search/photos', [
             'query' => [
                 'query' => $hotel->getNom(),
                 'per_page' => 4,
-                'client_id' => '5CSOfED1fFHQrV-N7ocS_I4mq71ZJdaEVeo1LHnRK7w',
+                'client_id' => $unsplashClientId,
             ],
         ]);
 
         $data = $response->toArray();
-        $images = array_map(fn (array $img) => $img['urls']['regular'], $data['results']);
+        $images = array_map(fn(array $img) => $img['urls']['regular'], $data['results']);
 
         $chambres = $chambresRepository->findBy(['hotel' => $id]);
 

@@ -29,8 +29,7 @@ class ReservationHotelController extends AbstractController
 
     public function __construct(
         private HttpClientInterface $client,
-    ) {       
-    }
+    ) {}
 
     #[Route('/room/reserve/{roomId}', name: 'room_reserve', methods: ['POST'])]
     public function reserveRoom(
@@ -89,7 +88,7 @@ class ReservationHotelController extends AbstractController
                 $end->format('Y-m-d'),
                 $reservation->getPrixTotale()
             );
-            
+
             $qrCode = new QrCode(
                 data: $data,
                 encoding: new Encoding('UTF-8'),
@@ -97,13 +96,22 @@ class ReservationHotelController extends AbstractController
                 size: 300,
                 margin: 10
             );
-            
+
 
             $writer = new PngWriter();
             $result = $writer->write($qrCode);
 
-            $qrCodePath = $this->getParameter('kernel.project_dir').'/public/qr-codes/reservation.png';
+            $qrDir = $this->getParameter('kernel.project_dir') . '/public/qr-codes/';
+            if (!is_dir($qrDir)) {
+                mkdir($qrDir, 0777, true);
+            }
+            +$qrCodePath = sprintf('%s/%s.png', $qrDir, bin2hex(random_bytes(8)));
             $result->saveToFile($qrCodePath);
+            $mailer_password = $this->getParameter('MAILER_PASSWORD');
+
+            if (!$mailer_password) {
+                throw new \Exception('Mailer password not set in parameters.');
+            }
 
             try {
                 $mail = new PHPMailer(true);
@@ -111,7 +119,7 @@ class ReservationHotelController extends AbstractController
                 $mail->Host       = 'smtp.gmail.com';
                 $mail->SMTPAuth   = true;
                 $mail->Username   = 'voyagepidev@gmail.com';
-                $mail->Password   = $_ENV['MAILER_PASSWORD'];
+                $mail->Password   = $mailer_password;
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port       = 587;
                 $mail->setFrom('voyagepidev@gmail.com', 'TRAVELSHARE');
@@ -142,7 +150,7 @@ class ReservationHotelController extends AbstractController
 
             return $this->redirectToRoute('room_details', ['roomId' => $roomId]);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'An error occurred while reserving the room: '.$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['error' => 'An error occurred while reserving the room: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -187,15 +195,16 @@ class ReservationHotelController extends AbstractController
     {
         $latitude = $request->query->get('lat');
         $longitude = $request->query->get('lon');
-
-        if (!$latitude || !$longitude) {
-            return new JsonResponse(['error' => 'Latitude and longitude are required'], 400);
+        if (!is_numeric($latitude) || !is_numeric($longitude)) {
+            return new JsonResponse(['error' => 'Invalid latitude or longitude'], 400);
         }
-
+        $latitude = (float) $latitude;
+        $longitude = (float) $longitude;
         try {
             $response = $this->client->request('GET', 'https://overpass-api.de/api/interpreter', [
                 'query' => [
-                    'data' => '[out:json];node(around:1000,'.$latitude.','.$longitude.')["amenity"~"restaurant|cafe|bar"];out;'],
+                    'data' => '[out:json];node(around:1000,' . $latitude . ',' . $longitude . ')["amenity"~"restaurant|cafe|bar"];out;'
+                ],
             ]);
 
             $data = json_decode($response->getContent(), true);
