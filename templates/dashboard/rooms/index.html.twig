@@ -8,7 +8,7 @@
 	<div class="flex justify-between items-center">
 		<h1 class="text-5xl font-bold">Rooms Management</h1>
 		<a
-			href="{{ path('dashboard_rooms_add', {hotelId: hotelId}) }}"
+			href="{{ path('dashboard_rooms_add', {hotelId: hotel.hotelId}) }}"
 			class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow"
 		>
 			Add Room
@@ -16,7 +16,7 @@
 	</div>
 
 	<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-		{% for room in chambres %}
+		{% for room in rooms %}
 		<div class="bg-white rounded-lg shadow-md p-6">
 			<div class="space-y-2">
 				<h2 class="text-3xl font-semibold">Room Number: {{ room.numeroChambre }}</h2>

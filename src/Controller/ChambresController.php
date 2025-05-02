@@ -21,7 +21,7 @@ class ChambresController extends AbstractController
         HttpClientInterface $httpClient,
         int $id,
     ): Response {
-        $hotel = $hotelsRepository->find($id);
+        $hotel = $hotelsRepository->findOneBy(['hotelId' => $id]);
         if (!$hotel) {
             throw $this->createNotFoundException('Hotel not found');
         }

@@ -29,7 +29,7 @@ final class PromoController extends AbstractController
             $promo = new Promo();
             $promo->setCodepromo($request->request->get('codepromo'));
             try {
-                $promo->setDateexpiration(new \DateTimeImmutable($request->request->get('dateexpiration')));
+                $promo->setDateexpiration(new \DateTime($request->request->get('dateexpiration')));
             } catch (\Exception) {
                 $this->addFlash('error', 'Invalid date format');
 
@@ -46,10 +46,7 @@ final class PromoController extends AbstractController
                 }
                 $this->addFlash('error', implode(', ', $errorMessages));
 
-                return $this->render('dashboard/promo/add.html.twig', [
-                    'promo' => $promo,
-                    'errors' => $errorMessages,
-                ]);
+                return $this->redirectToRoute('app_promo_add');
             }
 
             $promoRepository->add($promo);
