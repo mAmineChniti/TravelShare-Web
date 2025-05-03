@@ -1,218 +1,430 @@
-{% extends 'base.html.twig' %} {% block title %}Hotels{% endblock %} {% block body %} {% set categories = { 'Hotel
-Rating': ['2 Stars', '3 Stars', '4 Stars', '5 Stars', 'Boutique Hotel', 'Luxury Resort'], 'Location Type':
-['Beachfront', 'City Center', 'Countryside', 'Mountain Area', 'Forest Nearby', 'Island'], 'Experience Theme': ['Spa &
-Wellness', 'Adventure & Activities', 'Romantic Getaway', 'Family-Friendly', 'Eco-Friendly', 'Business Hotel'], 'Price
-Range': ['Budget-Friendly', 'Mid-Range', 'Premium', 'Luxury', 'All-Inclusive'] } %}
+{% extends 'base.html.twig' %} {% block title %}Hotels{% endblock %} {% block body %}
 
 <div class="container mx-auto px-4 mt-8 space-y-6">
-	<h1 class="text-5xl font-bold mb-6">Hotels</h1>
-	<div class="flex">
-		<!-- Sidebar for filtering -->
-		<aside class="w-1/4 pr-4 relative">
-			<form method="get" class="space-y-4 bg-white shadow-lg rounded-lg p-6 sticky top-4">
-				<h2 class="text-xl font-semibold mb-4">Filter by Features</h2>
-				<div class="space-y-6">
-					{% for category, features in categories %}
-					<div>
-						<h3 class="text-lg font-semibold">{{ category }}</h3>
-						<div class="space-y-3 mt-2">
-							{% for feature in features %}
-							<label class="flex items-center space-x-3">
-								<input
-									type="checkbox"
-									name="description[]"
-									value="{{ feature }}"
-									{%
-									if
-									feature
-									in
-									filterDescriptions
-									%}checked{%
-									endif
-									%}
-									class="form-checkbox h-5 w-5 text-blue-600 focus:ring focus:ring-blue-300"
-								/>
-								<span class="text-gray-700">{{ feature }}</span>
-							</label>
-							{% endfor %}
-						</div>
-					</div>
-					{% endfor %}
-				</div>
-				<button
-					type="submit"
-					class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow w-full mt-4"
+	<div class="mt-8">
+		<div
+			class="max-w-full bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 p-6"
+		>
+			<h2 class="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
+				<i class="fas fa-star"></i> AI Recommended Highlights
+			</h2>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				{% if recommendation %} {% set recommendations = recommendation|split('/\d+\.\s*/')|filter(v => v is not empty)
+				%} {% for rec in recommendations|slice(0, 3) %}
+				<div
+					class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 transform transition-transform duration-300 hover:scale-105 hover:shadow-lg"
 				>
-					Apply Filters
-				</button>
-			</form>
-		</aside>
-
-		<!-- Main content for hotels -->
-		<main class="w-3/4 ml-6">
-			<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-				{% for hotel in hotels %}
-				<div class="bg-white rounded-lg shadow-md p-6 transform transition duration-300 hover:scale-105">
-					<div class="mb-4">
-						{% if hotel.imageH %}
-						<img
-							src="data:image/jpeg;base64,{{ hotel.base64Image }}"
-							alt="{{ hotel.nom }}"
-							class="w-full h-48 object-cover rounded-lg"
-						/>
-						{% else %}
-						<span class="block text-center text-gray-500">No Image Available</span>
-						{% endif %}
+					<div class="flex items-center mb-4">
+						<div class="h-8 w-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-3">
+							<i class="fas fa-check-circle text-blue-600 dark:text-blue-300"></i>
+						</div>
+						<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Top Pick #{{ loop.index }}</h3>
 					</div>
+					{% set cleaned_rec = rec|trim|replace({' - ': ': ', ':': ': '}) %} {% set parts = cleaned_rec|split(': ', 2)
+					%} {% if parts|length > 1 %}
+					<p class="font-medium text-gray-900 dark:text-white mb-2">{{ parts[0]|trim }}</p>
+					<p class="text-gray-700 dark:text-gray-400">{{ parts[1]|trim|trim('.', 'right') }}</p>
+					{% else %} {% set parts = cleaned_rec|split('. ', 2) %}
+					<p class="font-medium text-gray-900 dark:text-white mb-2">{{ parts[0]|trim }}</p>
+					<p class="text-gray-700 dark:text-gray-400">{{ parts[1:]|join('. ')|trim }}</p>
+					{% endif %}
+				</div>
+				{% endfor %} {% else %} {% for i in 1..3 %}
+				<div
+					class="bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-6 animate-pulse"
+				>
+					<div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mb-4"></div>
 					<div class="space-y-2">
-						<h2 class="text-3xl font-semibold">{{ hotel.nom }}</h2>
-						<p class="text-base text-gray-700"><strong>Address:</strong> {{ hotel.adress }}</p>
-						<p class="text-base text-gray-700"><strong>Phone:</strong> {{ hotel.telephone }}</p>
-						<p class="text-base text-gray-700"><strong>Capacity:</strong> {{ hotel.capaciteTotale }} guests</p>
-						<p class="text-base text-gray-700"><strong>Description:</strong> {{ hotel.description }}</p>
+						<div class="h-3 bg-gray-300 dark:bg-gray-600 rounded w-full"></div>
+						<div class="h-3 bg-gray-300 dark:bg-gray-600 rounded w-5/6"></div>
+						<div class="h-3 bg-gray-300 dark:bg-gray-600 rounded w-4/6"></div>
 					</div>
-					<div class="mt-4 flex space-x-2 items-center">
-						<a
-							href="{{ path('hotel_rooms', { hotelId: hotel.id }) }}"
-							class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow"
-						>
-							View Available Rooms
-						</a>
-						<!-- Share Button -->
+				</div>
+				{% endfor %} {% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="flex flex-wrap md:flex-nowrap gap-6">
+		<aside class="w-full md:w-1/4 pr-4">
+			<div
+				class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 p-6 sticky top-4 mt-16"
+			>
+				<form method="get" class="space-y-4" id="filterForm">
+					<h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+						<i class="fas fa-filter"></i> Filter by Features
+					</h2>
+					<div class="space-y-4" id="accordion-filters">
+						{% for category, features in categories %}
+						<div class="filter-category">
+							<button
+								type="button"
+								class="flex justify-between items-center w-full py-2 px-2 font-medium text-left text-gray-900 bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+								data-accordion-target="#category-{{ loop.index }}"
+								{%
+								set
+								categoryHasSelectedFilters="false"
+								%}
+								{%
+								for
+								feature
+								in
+								features
+								%}
+								{%
+								if
+								feature
+								in
+								filterDescriptions
+								%}
+								{%
+								set
+								categoryHasSelectedFilters="true"
+								%}
+								{%
+								endif
+								%}
+								{%
+								endfor
+								%}
+								aria-expanded="{{ loop.first or categoryHasSelectedFilters ? 'true' : 'false' }}"
+								aria-controls="category-{{ loop.index }}"
+							>
+								<h3 class="text-lg font-semibold">{{ category }}</h3>
+								<svg
+									class="w-5 h-5 {{ loop.first or categoryHasSelectedFilters ? 'rotate-180' : '' }} transition-transform"
+									fill="currentColor"
+									viewBox="0 0 20 20"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										fill-rule="evenodd"
+										d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+										clip-rule="evenodd"
+									></path>
+								</svg>
+							</button>
+							<div
+								id="category-{{ loop.index }}"
+								class="{{ loop.first or categoryHasSelectedFilters ? 'block' : 'hidden' }} space-y-3 mt-2 pl-2 pt-2"
+							>
+								{% for feature in features %}
+								<div class="flex items-center">
+									<input
+										id="{{ feature }}"
+										type="checkbox"
+										name="description[]"
+										value="{{ feature }}"
+										{%
+										if
+										feature
+										in
+										filterDescriptions
+										%}checked{%
+										endif
+										%}
+										class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+									/>
+									<label for="{{ feature }}" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+										>{{ feature }}</label
+									>
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+					<div class="flex gap-2">
 						<button
-							type="button"
-							class="share-btn bg-gray-200 hover:bg-gray-300 text-gray-800 p-2 rounded-full focus:outline-none"
-							data-url="{{ app.request.scheme ~ '://' ~ app.request.httpHost ~ path('hotel_rooms', { hotelId: hotel.id }) }}"
-							data-title="{{ hotel.nom }}"
-							aria-label="Share {{ hotel.nom }}"
+							type="submit"
+							class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-full"
 						>
+							Apply Filters
 							<svg
+								aria-hidden="true"
+								class="w-4 h-4 ml-2 -mr-1"
+								fill="currentColor"
+								viewBox="0 0 20 20"
 								xmlns="http://www.w3.org/2000/svg"
-								class="h-5 w-5"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
 							>
 								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M8 12l8-4m0 0l-8-4m8 4v8m-8-4h8"
-								/>
+									fill-rule="evenodd"
+									d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-8H7a1 1 0 110-2h2V7a1 1 0 112 0v1h2a1 1 0 110 2h-2v2a1 1 0 11-2 0v-2z"
+									clip-rule="evenodd"
+								></path>
 							</svg>
 						</button>
+						<a
+							href="{{ path('app_hotels') }}"
+							class="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-center text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:focus:ring-gray-700 w-full"
+						>
+							<i class="fas fa-times-circle mr-2"></i>
+							Clear Filters
+						</a>
+					</div>
+				</form>
+			</div>
+		</aside>
+
+		<main class="w-full md:w-3/4">
+			<h1 class="text-4xl font-bold mb-6 text-gray-900 dark:text-white"><i class="fas fa-hotel"></i> Hotels</h1>
+			{% if hotels|length == 0 %}
+			<p class="text-lg text-gray-700 dark:text-gray-400">No hotels found. Please adjust your filters.</p>
+			{% endif %}
+			<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+				{% for hotel in hotels %}
+				<div
+					class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 transform transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+				>
+					{% if hotel.imageH %}
+					<img class="rounded-t-lg w-full" src="data:image/jpeg;base64,{{ hotel.base64Image }}" alt="{{ hotel.nom }}" />
+					{% else %}
+					<span class="block text-center text-gray-500 dark:text-gray-400">No Image Available</span>
+					{% endif %}
+					<div class="p-5">
+						<h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+							<i class="fas fa-building"></i> {{ hotel.nom }}
+						</h5>
+						<p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+							<i class="fas fa-map-marker-alt"></i> <strong>Address:</strong> {{ hotel.adress }}
+						</p>
+						<p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+							<i class="fas fa-phone"></i> <strong>Phone:</strong> {{ hotel.telephone }}
+						</p>
+						<p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+							<i class="fas fa-users"></i> <strong>Capacity:</strong> {{ hotel.capaciteTotale }} guests
+						</p>
+						<p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
+							<i class="fas fa-info-circle"></i> <strong>Description:</strong> {{ hotel.description|replace({',': ', '})
+							}}
+						</p>
+						<a
+							href="{{ path('hotel_rooms', { hotelId: hotel.id }) }}"
+							class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+						>
+							<i class="fas fa-door-open"></i> View Available Rooms
+						</a>
+						<button
+							type="button"
+							data-tooltip-target="tooltip-share-{{ hotel.id }}"
+							data-tooltip-placement="top"
+							data-modal-target="share-modal"
+							data-modal-toggle="share-modal"
+							data-url="{{ url('hotel_rooms', { hotelId: hotel.id }) }}"
+							data-title="{{ hotel.nom }}"
+							class="share-btn ml-2 inline-flex items-center justify-center w-10 h-10 text-sm font-medium text-center text-white bg-green-600 rounded-full hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800 transition-transform duration-200 hover:scale-110"
+						>
+							<i class="fas fa-share"></i>
+							<span class="sr-only">Share</span>
+						</button>
+						<div
+							id="tooltip-share-{{ hotel.id }}"
+							role="tooltip"
+							class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
+						>
+							Share this hotel
+							<div class="tooltip-arrow" data-popper-arrow></div>
+						</div>
 					</div>
 				</div>
 				{% endfor %}
 			</div>
 		</main>
 	</div>
+</div>
 
-	<div class="mt-8">
-		<h2 class="text-2xl font-semibold mb-6">AI Recommended Highlights</h2>
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-			{% if recommendation %} {% set recommendations = recommendation|split('/\d+\.\s*/')|filter(v => v is not empty) %}
-			{% for rec in recommendations|slice(0, 3) %}
-			<div class="bg-white rounded-lg shadow-md p-6 transform transition duration-300 hover:scale-[1.02]">
-				<div class="flex items-center mb-4">
-					<div class="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-5 w-5 text-blue-600"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-								clip-rule="evenodd"
-							/>
-						</svg>
-					</div>
-					<h3 class="text-lg font-semibold">Top Pick #{{ loop.index }}</h3>
-				</div>
-				{% set cleaned_rec = rec|trim|replace({' - ': ': ', ':': ': '}) %} {% set parts = cleaned_rec|split(': ', 2) %}
-				{% if parts|length > 1 %}
-				<p class="font-medium text-gray-900 mb-2">{{ parts[0]|trim }}</p>
-				<p class="text-gray-700">{{ parts[1]|trim|trim('.', 'right') }}</p>
-				{% else %} {% set parts = cleaned_rec|split('. ', 2) %}
-				<p class="font-medium text-gray-900 mb-2">{{ parts[0]|trim }}</p>
-				<p class="text-gray-700">{{ parts[1:]|join('. ')|trim }}</p>
-				{% endif %}
-			</div>
-			{% endfor %} {% else %} {% for i in 1..3 %}
-			<div class="bg-gray-100 rounded-lg p-6 animate-pulse">
-				<div class="h-4 bg-gray-300 rounded w-3/4 mb-4"></div>
-				<div class="space-y-2">
-					<div class="h-3 bg-gray-300 rounded w-full"></div>
-					<div class="h-3 bg-gray-300 rounded w-5/6"></div>
-					<div class="h-3 bg-gray-300 rounded w-4/6"></div>
-				</div>
-			</div>
-			{% endfor %} {% endif %}
-		</div>
-	</div>
-
-	<div id="share-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-		<div class="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-sm">
-			<h3 class="text-xl font-semibold mb-4">Share this hotel</h3>
-			<div class="space-y-3">
-				<button id="copy-link" class="w-full text-left py-2 border rounded hover:bg-gray-100">Copy Link</button>
-				<a id="share-email" href="#" class="block py-2 border rounded hover:bg-gray-100">Share via Email</a>
-				<a id="share-whatsapp" href="#" target="_blank" class="block py-2 border rounded hover:bg-gray-100"
-					>Share on WhatsApp</a
+<!-- Flowbite Share Modal -->
+<div
+	id="share-modal"
+	tabindex="-1"
+	aria-hidden="true"
+	class="hidden fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full justify-center items-center"
+>
+	<div class="relative w-full max-w-md max-h-full">
+		<!-- Modal content -->
+		<div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+			<!-- Modal header -->
+			<div class="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
+				<h3 class="text-xl font-semibold text-gray-900 dark:text-white">Share Hotel</h3>
+				<button
+					type="button"
+					id="close-share"
+					data-modal-hide="share-modal"
+					class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
 				>
-				<a id="share-facebook" href="#" target="_blank" class="block py-2 border rounded hover:bg-gray-100"
-					>Share on Facebook</a
-				>
+					<i class="fas fa-times"></i>
+					<span class="sr-only">Close modal</span>
+				</button>
 			</div>
-			<button id="close-share" class="mt-4 text-sm text-gray-500 hover:underline">Close</button>
+			<!-- Modal body -->
+			<div class="p-6 space-y-6">
+				<p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+					Share this hotel with your friends using the options below:
+				</p>
+				<div class="grid grid-cols-3 gap-4 mt-6">
+					<a
+						id="share-email"
+						href="#"
+						class="flex flex-col items-center text-blue-600 dark:text-blue-400 hover:underline"
+					>
+						<i class="fas fa-envelope text-2xl mb-2"></i>
+						<span>Email</span>
+					</a>
+					<a
+						id="share-whatsapp"
+						href="#"
+						class="flex flex-col items-center text-green-600 dark:text-green-400 hover:underline"
+					>
+						<i class="fab fa-whatsapp text-2xl mb-2"></i>
+						<span>WhatsApp</span>
+					</a>
+					<a
+						id="share-facebook"
+						href="#"
+						class="flex flex-col items-center text-blue-800 dark:text-blue-600 hover:underline"
+					>
+						<i class="fab fa-facebook text-2xl mb-2"></i>
+						<span>Facebook</span>
+					</a>
+				</div>
+				<div class="mt-6">
+					<button
+						id="copy-link"
+						class="w-full px-4 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-colors duration-200"
+					>
+						<i class="fas fa-copy mr-2"></i> Copy Link
+					</button>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
+
 <script>
 	document.addEventListener("DOMContentLoaded", () => {
 		const modal = document.getElementById("share-modal");
-		const buttons = document.querySelectorAll(".share-btn");
+		const shareButtons = document.querySelectorAll(".share-btn");
 		const copyBtn = document.getElementById("copy-link");
 		const emailEl = document.getElementById("share-email");
 		const waEl = document.getElementById("share-whatsapp");
 		const fbEl = document.getElementById("share-facebook");
 		const closeEl = document.getElementById("close-share");
 
-		const show = () => modal.classList.remove("hidden");
-		const hide = () => modal.classList.add("hidden");
+		const showModal = () => {
+			modal.classList.remove("hidden");
+			modal.classList.add("flex");
+		};
 
-		buttons.forEach((btn) => {
-			btn.addEventListener("click", async () => {
-				const url = btn.dataset.url;
-				const title = btn.dataset.title;
+		const hideModal = () => {
+			modal.classList.add("hidden");
+			modal.classList.remove("flex");
+		};
+
+		shareButtons.forEach((btn) => {
+			btn.addEventListener("click", (e) => {
+				e.preventDefault();
+				const url = btn.getAttribute("data-url");
+				const title = btn.getAttribute("data-title");
 
 				if (navigator.share) {
 					try {
-						await navigator.share({ title, url });
+						navigator.share({ title, url });
 						return;
-					} catch {} // fallback to modal
+					} catch (err) {
+						console.error("Sharing failed:", err);
+					}
 				}
 
 				copyBtn.onclick = () => {
 					navigator.clipboard
 						.writeText(url)
-						.then(() => alert("Link copied!"))
-						.catch(() => prompt("Copy this link", url));
+						.then(() => {
+							const originalText = copyBtn.innerHTML;
+							copyBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Copied!';
+							copyBtn.classList.add("bg-green-600");
+							setTimeout(() => {
+								copyBtn.innerHTML = originalText;
+								copyBtn.classList.remove("bg-green-600");
+							}, 2000);
+						})
+						.catch(() => prompt("Copy this link:", url));
 				};
 
 				emailEl.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`;
 				waEl.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(title + " " + url)}`;
 				fbEl.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
 
-				closeEl.onclick = hide;
+				closeEl.onclick = hideModal;
 				modal.onclick = (e) => {
-					if (e.target === modal) hide();
+					if (e.target === modal) hideModal();
 				};
 
-				show();
+				showModal();
 			});
+		});
+	});
+</script>
+
+<script>
+	// Filter accordion functionality
+	document.addEventListener("DOMContentLoaded", () => {
+		const accordionButtons = document.querySelectorAll("[data-accordion-target]");
+
+		accordionButtons.forEach((button) => {
+			button.addEventListener("click", (event) => {
+				// Prevent the event from bubbling up and submitting the form
+				event.preventDefault();
+				event.stopPropagation();
+
+				const targetId = button.getAttribute("data-accordion-target");
+				const target = document.querySelector(targetId);
+				const arrowIcon = button.querySelector("svg");
+
+				// Get all accordion content elements
+				const allContentElements = document.querySelectorAll('[id^="category-"]');
+				const allArrowIcons = document.querySelectorAll("[data-accordion-target] svg");
+
+				// Close all accordion items first
+				allContentElements.forEach((el) => {
+					if (el.id !== targetId.substring(1)) {
+						el.classList.add("hidden");
+						el.classList.remove("block");
+					}
+				});
+
+				// Reset all arrow icons
+				allArrowIcons.forEach((icon) => {
+					if (icon !== arrowIcon) {
+						icon.classList.remove("rotate-180");
+					}
+				});
+
+				// Toggle current accordion item
+				if (target.classList.contains("hidden")) {
+					target.classList.remove("hidden");
+					target.classList.add("block");
+					arrowIcon.classList.add("rotate-180");
+					button.setAttribute("aria-expanded", "true");
+				} else {
+					target.classList.add("hidden");
+					target.classList.remove("block");
+					arrowIcon.classList.remove("rotate-180");
+					button.setAttribute("aria-expanded", "false");
+				}
+			});
+		});
+	});
+
+	// Clear filters functionality
+	document.addEventListener("DOMContentLoaded", () => {
+		const clearFiltersButton = document.getElementById("clearFilters");
+		const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+		clearFiltersButton.addEventListener("click", () => {
+			checkboxes.forEach((checkbox) => {
+				checkbox.checked = false;
+			});
+			// Redirect to app_hotels route after clearing filters
+			window.location.href = "{{ path('app_hotels') }}";
 		});
 	});
 </script>

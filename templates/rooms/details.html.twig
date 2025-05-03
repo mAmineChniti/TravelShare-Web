@@ -1,148 +1,118 @@
 {% extends 'base.html.twig' %} {% block title %}Room Details{% endblock %} {% block body %}
 <div class="container mx-auto px-4 mt-8 space-y-6">
-	<h1 class="text-5xl font-bold mb-6">Room {{ room.numeroChambre }} Details</h1>
+	<h1 class="text-5xl font-bold mb-6 text-gray-900 dark:text-white">Room {{ room.numeroChambre }} Details</h1>
 
-	<div class="bg-white rounded-lg shadow-md p-6">
+	<!-- Room Details Section -->
+	<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+		<h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Room Details</h2>
 		<div class="grid gap-6 md:grid-cols-2">
-			<div>
-				<p class="text-base text-gray-700 mb-2 font-medium">Price:</p>
-				<p class="text-base text-gray-700 mb-4">{{ room.prixParNuit }} per night</p>
+			<div class="flex items-center space-x-4">
+				<i class="fa fa-tag text-blue-500 text-2xl"></i>
+				<div>
+					<p class="text-sm text-gray-500 dark:text-gray-400">Price</p>
+					<p class="text-lg font-medium text-gray-900 dark:text-white">{{ room.prixParNuit }} per night</p>
+				</div>
 			</div>
-			<div>
-				<p class="text-base text-gray-700 mb-2 font-medium">Type:</p>
-				<p class="text-base text-gray-700 mb-4">{{ room.typeEnu }}</p>
+			<div class="flex items-center space-x-4">
+				<i class="fa fa-bed text-green-500 text-2xl"></i>
+				<div>
+					<p class="text-sm text-gray-500 dark:text-gray-400">Type</p>
+					<p class="text-lg font-medium text-gray-900 dark:text-white">{{ room.typeEnu|capitalize }}</p>
+				</div>
 			</div>
-			<div>
-				<p class="text-base text-gray-700 mb-2 font-medium">Available:</p>
-				<p class="text-base text-gray-700 mb-4">{{ room.disponible == 1 ? 'Yes' : 'No' }}</p>
+			<div class="flex items-center space-x-4">
+				<i
+					class="fa {{ room.disponible == 1 ? 'fa-check-circle text-green-500' : 'fa-times-circle text-red-500' }} text-2xl"
+				></i>
+				<div>
+					<p class="text-sm text-gray-500 dark:text-gray-400">Available</p>
+					<p class="text-lg font-medium text-gray-900 dark:text-white">{{ room.disponible == 1 ? 'Yes' : 'No' }}</p>
+				</div>
 			</div>
 		</div>
-		<form method="POST" action="{{ path('room_reserve', {'roomId': room.chambreId }) }}" class="space-y-4">
-			<div>
-				<p class="text-base text-gray-700 mb-2 font-medium">Start Reservation:</p>
+	</div>
+
+	<form
+		method="POST"
+		action="{{ path('room_reserve', {'roomId': room.chambreId }) }}"
+		class="space-y-4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+	>
+		<h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Make a Reservation</h2>
+		<div id="date-range-picker" date-rangepicker class="flex items-center relative z-50">
+			<div class="relative z-1050">
+				<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-60">
+					<i class="fas fa-calendar-alt w-4 h-4 text-blue-500 dark:text-blue-400"></i>
+				</div>
 				<input
-					type="date"
+					type="text"
+					id="startReservation"
 					name="startReservation"
-					class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 ps-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 relative z-50 w-64"
+					placeholder="Start date"
+					data-datepicker-buttons
+					readonly
 				/>
 			</div>
-
-			<div>
-				<p class="text-base text-gray-700 mb-2 font-medium">End Reservation:</p>
+			<span class="mx-4 text-gray-500">to</span>
+			<div class="relative z-1050">
+				<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none z-60">
+					<i class="fas fa-calendar-alt w-4 h-4 text-blue-500 dark:text-blue-400"></i>
+				</div>
 				<input
-					type="date"
+					type="text"
+					id="endReservation"
 					name="endReservation"
-					class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+					class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 ps-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 relative z-50 w-64"
+					placeholder="End date"
+					data-datepicker-buttons
+					readonly
 				/>
 			</div>
-			<div id="error-messages" class="mt-4"></div>
-			{% for message in app.flashes('success') %}
-			<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-				<span class="block sm:inline">{{ message }}</span>
-			</div>
-			{% endfor %} {% for message in app.flashes('info') %}
-			<div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">
-				<span class="block sm:inline">{{ message }}</span>
-			</div>
-			{% endfor %}
-			<div>
-				<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow">
-					Reserve Now
-				</button>
-			</div>
-		</form>
+		</div>
+
+		{% for message in app.flashes('success') %}
+		<div
+			class="bg-green-100 dark:bg-green-900 border border-green-400 text-green-700 dark:text-green-300 px-4 py-3 rounded relative mb-4"
+			role="alert"
+		>
+			<span class="block sm:inline">{{ message }}</span>
+		</div>
+		{% endfor %} {% for message in app.flashes('info') %}
+		<div
+			class="bg-blue-100 dark:bg-blue-900 border border-blue-400 text-blue-700 dark:text-blue-300 px-4 py-3 rounded relative mb-4"
+			role="alert"
+		>
+			<span class="block sm:inline">{{ message }}</span>
+		</div>
+		{% endfor %}
+
+		<div>
+			<button
+				type="submit"
+				class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+			>
+				Reserve Now
+			</button>
+		</div>
+	</form>
+
+	<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+		<h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Location</h2>
+		<div id="map" class="h-96 rounded-lg relative z-0" data-address="{{ room.hotel.adress }}"></div>
 	</div>
 
-	<div class="bg-white rounded-lg shadow-md p-6 mb-6">
-		<h2 class="text-2xl font-semibold mb-4">Location</h2>
-		<div id="map" class="h-96 rounded-lg" data-address="{{ room.hotel.adress }}"></div>
-	</div>
-
-	<div class="bg-white rounded-lg shadow-md p-6 mb-6">
-		<h2 class="text-2xl font-semibold mb-4">Nearby Places</h2>
+	<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+		<h2 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Nearby Places</h2>
 		<ul id="nearby-places" class="space-y-2">
-			<li>Loading nearby places...</li>
+			<li class="text-gray-700 dark:text-gray-300">Loading nearby places...</li>
 		</ul>
 	</div>
 </div>
-<!-- Add Leaflet CSS and JS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
-
-<style>
-	.category-header {
-		font-size: 1.5rem;
-		font-weight: bold;
-		margin-top: 1.5rem;
-		color: #34495e;
-		border-bottom: 2px solid #3498db;
-		padding-bottom: 0.5rem;
-	}
-
-	.category-list {
-		list-style-type: none;
-		padding: 0;
-		margin: 0;
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-		gap: 1rem;
-	}
-
-	.category-list li {
-		background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-		margin: 0;
-		padding: 1rem;
-		border-radius: 0.75rem;
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-		transition:
-			transform 0.3s,
-			box-shadow 0.3s;
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-	}
-
-	.category-list li:hover {
-		transform: translateY(-5px);
-		box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-	}
-
-	.category-list li img {
-		width: 50px;
-		height: 50px;
-		border-radius: 50%;
-		object-fit: cover;
-		border: 2px solid #3498db;
-	}
-
-	.category-list li .place-info {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.category-list li .place-info .place-name {
-		font-size: 1.1rem;
-		font-weight: bold;
-		color: #2c3e50;
-	}
-
-	.category-list li .place-info .place-type {
-		font-size: 0.9rem;
-		color: #7f8c8d;
-	}
-</style>
 
 <script>
 	window.onload = () => {
 		const mapElement = document.getElementById("map");
 		const placesList = document.getElementById("nearby-places");
-		let activeRequests = [];
-
-		const abortActiveRequests = () => {
-			activeRequests.forEach((controller) => controller.abort());
-			activeRequests = [];
-		};
 
 		if (mapElement) {
 			const address = mapElement.dataset.address;
@@ -160,10 +130,7 @@
 				L.marker([lat, lon]).addTo(map).bindPopup("Location of the hotel").openPopup();
 
 				// Fetch nearby places
-				const controller = new AbortController();
-				activeRequests.push(controller);
-
-				fetch(`/nearby-places?lat=${lat}&lon=${lon}`, { signal: controller.signal })
+				fetch(`/nearby-places?lat=${lat}&lon=${lon}`)
 					.then((response) => response.json())
 					.then((places) => {
 						placesList.innerHTML = "";
@@ -184,90 +151,110 @@
 							if (categories[category].length > 0) {
 								const categoryHeader = document.createElement("h3");
 								categoryHeader.textContent = category.charAt(0).toUpperCase() + category.slice(1) + "s";
-								categoryHeader.classList.add("category-header");
+								categoryHeader.classList.add("text-lg", "font-semibold", "text-gray-900", "dark:text-white", "mt-4");
 								placesList.appendChild(categoryHeader);
 
-								const categoryList = document.createElement("ul");
-								categoryList.classList.add("category-list");
+								const categoryGrid = document.createElement("div");
+								categoryGrid.classList.add("grid", "grid-cols-1", "sm:grid-cols-2", "md:grid-cols-3", "gap-4", "mt-2");
 
 								categories[category].forEach((place) => {
-									const listItem = document.createElement("li");
+									const listItem = document.createElement("div");
+									listItem.classList.add(
+										"flex",
+										"items-center",
+										"space-x-4",
+										"text-gray-700",
+										"dark:text-gray-300",
+										"p-2",
+										"rounded-lg",
+										"hover:bg-gray-100",
+										"dark:hover:bg-gray-700",
+										"transition",
+										"duration-300",
+										"transform",
+										"hover:scale-105",
+										"hover:shadow-lg",
+									);
 
-									const placeImage = document.createElement("i");
-									placeImage.classList.add("fas");
+									const icon = document.createElement("i");
+									icon.classList.add("fa");
 									if (place.type === "restaurant") {
-										placeImage.classList.add("fa-utensils");
+										icon.classList.add("fa-utensils");
 									} else if (place.type === "cafe") {
-										placeImage.classList.add("fa-coffee");
+										icon.classList.add("fa-coffee");
 									} else if (place.type === "bar") {
-										placeImage.classList.add("fa-glass-martini-alt");
+										icon.classList.add("fa-glass-martini-alt");
+									} else {
+										icon.classList.add("fa-map-marker-alt");
 									}
-									placeImage.style.fontSize = "24px";
-									placeImage.style.color = "#3498db";
+									icon.style.fontSize = "24px";
+									icon.style.color = "#3498db";
 
 									const placeInfo = document.createElement("div");
-									placeInfo.classList.add("place-info");
+									placeInfo.classList.add("flex-1");
 
-									const placeName = document.createElement("span");
+									const placeName = document.createElement("p");
 									placeName.textContent = place.name;
-									placeName.classList.add("place-name");
+									placeName.classList.add("font-medium", "text-gray-900", "dark:text-white");
 
-									const placeType = document.createElement("span");
+									const placeType = document.createElement("p");
 									placeType.textContent = place.type.charAt(0).toUpperCase() + place.type.slice(1);
-									placeType.classList.add("place-type");
+									placeType.classList.add("text-sm", "text-gray-500", "dark:text-gray-400");
 
 									placeInfo.appendChild(placeName);
 									placeInfo.appendChild(placeType);
 
-									listItem.appendChild(placeImage);
+									listItem.appendChild(icon);
 									listItem.appendChild(placeInfo);
+
+									categoryGrid.appendChild(listItem);
 
 									// Add a marker for each nearby place
 									L.marker([place.lat, place.lon]).addTo(map).bindPopup(`${place.name} (${place.type})`);
-
-									categoryList.appendChild(listItem);
 								});
 
-								placesList.appendChild(categoryList);
+								placesList.appendChild(categoryGrid);
 							}
 						});
 
 						if (places.length === 0) {
-							placesList.innerHTML = "<li>No nearby places found.</li>";
+							placesList.innerHTML = "<li class='text-gray-700 dark:text-gray-300'>No nearby places found.</li>";
 						}
 					})
 					.catch((error) => {
-						if (error.name === "AbortError") {
-							console.log("Request aborted");
-						} else {
-							console.error("Error fetching nearby places:", error);
-							placesList.innerHTML = "<li>Error loading nearby places.</li>";
-						}
+						console.error("Error fetching nearby places:", error);
+						placesList.innerHTML = "<li class='text-gray-700 dark:text-gray-300'>Error loading nearby places.</li>";
 					});
 			};
 
 			// Fetch coordinates from your Symfony backend
-			const controller = new AbortController();
-			activeRequests.push(controller);
-
-			fetch(`/geocode?address=${encodeURIComponent(address)}`, { signal: controller.signal })
+			fetch(`/geocode?address=${encodeURIComponent(address)}`)
 				.then((response) => response.json())
 				.then((data) => {
 					if (data.lat && data.lon) {
-						abortActiveRequests();
 						initializeMap(data.lat, data.lon);
 					} else {
 						console.error("Coordinates not found for the address.");
 					}
 				})
 				.catch((error) => {
-					if (error.name === "AbortError") {
-						console.log("Request aborted");
-					} else {
-						console.error("Error loading map:", error);
-					}
+					console.error("Error loading map:", error);
 				});
 		}
 	};
+
+	document.addEventListener("DOMContentLoaded", function () {
+		const dateRangePickerEl = document.getElementById("date-range-picker");
+		new DateRangePicker(dateRangePickerEl, {
+			buttons: true,
+			autohide: true,
+			theme: document.documentElement.classList.contains("dark") ? "dark" : "light",
+		});
+	});
+
+	document.addEventListener("DOMContentLoaded", function () {
+		document.getElementById("startReservation").value = "";
+		document.getElementById("endReservation").value = "";
+	});
 </script>
 {% endblock %}
