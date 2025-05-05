@@ -93,21 +93,18 @@ Hotel List:\n".implode("\n", $hotelSummaries);
             $recommendation = $data['candidates'][0]['content']['parts'][0]['text'];
         }
 
+        // Define categories that match the template's categories
+        $categories = [
+            'Hotel Rating' => ['2 Stars', '3 Stars', '4 Stars', '5 Stars', 'Boutique Hotel', 'Luxury Resort'],
+            'Location Type' => ['Beachfront', 'City Center', 'Countryside', 'Mountain Area', 'Forest Nearby', 'Island'],
+            'Experience Theme' => ['Spa & Wellness', 'Adventure & Activities', 'Romantic Getaway', 'Family-Friendly', 'Eco-Friendly', 'Business Hotel'],
+            'Price Range' => ['Budget-Friendly', 'Mid-Range', 'Premium', 'Luxury', 'All-Inclusive'],
+        ];
+
         return $this->render('hotels/index.html.twig', [
             'hotels' => $hotels,
             'filterDescriptions' => $filterDescriptions,
-            'descriptionOptions' => [
-                'Always sunny',
-                'Partly cloudy',
-                'Rainy retreat',
-                'Beachfront',
-                'Forest nearby',
-                'Mountain view',
-                'Spa & wellness',
-                'City center',
-                'Budget-friendly',
-                'Family-friendly',
-            ],
+            'categories' => $categories,
             'recommendation' => $recommendation,
         ]);
     }

@@ -10,6 +10,9 @@ import "./bootstrap.js";
 import "./styles/app.css";
 import 'flowbite';
 
+// Import Font Awesome
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 // Ensure Flowbite components are initialized
 import { initFlowbite } from 'flowbite';
 initFlowbite();

@@ -1,123 +1,226 @@
 {% extends 'base.html.twig' %} {% block title %}Flights{% endblock %} {% block body %}
 <div class="container mx-auto px-4 mt-8 space-y-6">
-	<h1 class="text-5xl font-bold mb-6">Available Flights</h1>
+	<h1 class="text-4xl font-bold mb-6 text-gray-900 dark:text-white">
+		<i class="fas fa-plane mr-2"></i>Available Flights
+	</h1>
 
-	<div class="flex items-center space-x-4 mb-6">
-		<form id="search-form" method="get" action="{{ path('app_flights_search') }}" class="flex-grow">
-			<input
-				id="search-input"
-				type="text"
-				name="destination"
-				placeholder="Search by destination"
-				value="{{ app.request.query.get('destination', '') }}"
-				class="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
-			/>
-		</form>
-		<form method="get" action="{{ path('app_flights_filter') }}" class="flex items-center space-x-2">
-			<input
-				type="date"
-				id="departureDate"
-				name="departureDate"
-				placeholder="Departure Date"
-				class="px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
-			/>
-			<input
-				type="date"
-				id="returnDate"
-				name="returnDate"
-				placeholder="Return Date"
-				class="px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
-			/>
-			<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-full shadow">
-				Filter
-			</button>
-		</form>
-		<form id="sort-form" method="get" action="{{ path('app_flights_sort') }}">
-			<select
-				id="sort-select"
-				name="sortBy"
-				class="w-40 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-600"
-			>
-				<option value="">Sort by</option>
-				<option value="price_asc">Price: Low to High</option>
-				<option value="price_desc">Price: High to Low</option>
-				<option value="date">Date</option>
-			</select>
-		</form>
-		<a href="{{ path('app_flights_calendar') }}" class="text-blue-600 hover:underline"> View Calendar </a>
-	</div>
+	<!-- Filter section with separate cards -->
+	<div class="w-full mb-6">
+		<div class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 p-3">
+			<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+				<i class="fas fa-filter mr-2"></i>Filter Options
+			</h2>
 
-	<div id="error-messages" class="mt-4">
-		{% if errors is defined and errors|length > 0 %} {% for error in errors %}
-		<p class="text-sm text-red-600">{{ error }}</p>
-		{% endfor %} {% endif %}
-	</div>
-	<div id="success-messages" class="mt-4">
-		{% if success is defined and success|length > 0 %} {% for message in success %}
-		<p class="text-sm text-green-600">{{ message }}</p>
-		{% endfor %} {% endif %}
-	</div>
+			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+				<!-- Search by destination card -->
+				<div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
+					<label for="search-input" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
+						<i class="fas fa-map-marker-alt mr-2"></i>Destination
+					</label>
+					<form id="search-form" method="get" action="{{ path('app_flights_search') }}" class="flex items-center">
+						<div class="relative w-full">
+							<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+								<i class="fas fa-search text-gray-500 dark:text-gray-400"></i>
+							</div>
+							<input
+								id="search-input"
+								type="text"
+								name="destination"
+								placeholder="Search destination"
+								value="{{ app.request.query.get('destination', '') }}"
+								class="block w-full p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+							/>
+						</div>
+					</form>
+				</div>
 
-	<div id="flash-messages" class="mt-4">
-		{% for label, messages, info in app.flashes %} {% for message in messages %}
-		<p class="text-sm text-{{ label == 'success' ? 'green' : 'red' }}-600">{{ message }}</p>
-		{% endfor %} {% endfor %}
-	</div>
+				<!-- Travel Dates card -->
+				<div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 sm:col-span-2">
+					<label class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
+						<i class="fas fa-calendar-alt mr-2"></i>Travel Dates
+					</label>
+					<form method="get" action="{{ path('app_flights_filter') }}" id="date-filter-form" class="flex items-center">
+						<div id="date-range-picker" date-rangepicker class="flex items-center flex-grow">
+							<div class="relative flex-1">
+								<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+									<i class="fas fa-calendar-alt w-4 h-4 text-gray-500 dark:text-gray-400"></i>
+								</div>
+								<input 
+									id="datepicker-range-start" 
+									name="departureDate" 
+									type="text" 
+									class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+									placeholder="Departure date"
+									value="{{ app.request.query.get('departureDate') ? app.request.query.get('departureDate')|date('m/d/Y') : '' }}"
+									readonly
+								>
+							</div>
+							<span class="mx-2 text-gray-500 dark:text-gray-400">to</span>
+							<div class="relative flex-1">
+								<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+									<i class="fas fa-calendar-alt w-4 h-4 text-gray-500 dark:text-gray-400"></i>
+								</div>
+								<input 
+									id="datepicker-range-end" 
+									name="returnDate" 
+									type="text" 
+									class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+									placeholder="Return date"
+									value="{{ app.request.query.get('returnDate') ? app.request.query.get('returnDate')|date('m/d/Y') : '' }}"
+									readonly
+								>
+							</div>
+							<button type="submit" class="ml-2 px-3 py-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+								<i class="fas fa-filter"></i>
+							</button>
+						</div>
+					</form>
+				</div>
 
-	{% if voyages is not empty %}
-	<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-		{% if voyages|length == 0 or voyages|filter(v => v.placesDisponibles == 0)|length > 0 %}
-		<div class="text-center text-gray-700">
-			<p class="text-base">No flights available at the moment.</p>
-		</div>
-		{% else %} {% for voyage in voyages %} {% if voyage.placesDisponibles > 0 %}
-		<div class="bg-white rounded-lg shadow-md p-6">
-			<div class="space-y-2">
-				<h2 class="text-3xl font-semibold">{{ voyage.titre }}</h2>
-				<p class="text-base text-gray-700">Destination: <span class="font-medium">{{ voyage.destination }}</span></p>
-				<p class="text-base text-gray-700">Price: <span class="font-medium">{{ voyage.prix }} €</span></p>
-				<p class="text-base text-gray-700">
-					Available Places: <span class="font-medium">{{ voyage.placesDisponibles }}</span>
-				</p>
-				<p class="text-base text-gray-700">
-					Departure Date: <span class="font-medium">{{ voyage.dateDepart|date('d-m-Y') }}</span>
-				</p>
-				<p class="text-base text-gray-700">
-					Return Date: <span class="font-medium">{{ voyage.dateRetour|date('d-m-Y') }}</span>
-				</p>
+				<!-- Sort by card -->
+				<div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
+					<label for="sort-select" class="block mb-1 text-sm font-medium text-gray-900 dark:text-white">
+						<i class="fas fa-sort mr-2"></i>Sort By
+					</label>
+					<form id="sort-form" method="get" action="{{ path('app_flights_sort') }}" class="flex items-center">
+						<select
+							id="sort-select"
+							name="sortBy"
+							class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+						>
+							<option value="">Select order</option>
+							<option value="price_asc" {{ app.request.query.get('sortBy') == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
+							<option value="price_desc" {{ app.request.query.get('sortBy') == 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
+							<option value="date" {{ app.request.query.get('sortBy') == 'date' ? 'selected' : '' }}>Departure Date</option>
+						</select>
+					</form>
+				</div>
+				
+				<!-- Action buttons -->
+				<div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 flex items-center">
+					<div class="flex items-center space-x-2">
+						<a href="{{ path('app_flights_calendar') }}" class="inline-flex items-center justify-center font-medium text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 rounded-lg text-sm px-3 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+							<i class="fas fa-calendar-week mr-2"></i> Calendar
+						</a>
+						<a href="{{ path('app_flights') }}" id="clear-filters" class="inline-flex items-center justify-center font-medium text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 rounded-lg text-sm px-3 py-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+							<i class="fas fa-times mr-2"></i> Clear
+						</a>
+					</div>
+				</div>
 			</div>
-			<div class="mt-4">
-				<a
-					href="{{ path('app_flight_details', {id: voyage.offresVoyageId}) }}"
-					class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow block text-center"
-				>
-					View Details
-				</a>
+		</div>
+	</div>
+	
+	<!-- Main content area - flights listing -->
+	<div class="w-full">
+		<!-- Alert/notification messages -->
+		<div id="notifications">
+			{% if errors is defined and errors|length > 0 %} 
+			{% for error in errors %}
+			<div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+				<span class="font-medium"><i class="fas fa-exclamation-circle mr-2"></i>Error!</span> {{ error }}
+			</div>
+			{% endfor %} 
+			{% endif %}
+			
+			{% if success is defined and success|length > 0 %} 
+			{% for message in success %}
+			<div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+				<span class="font-medium"><i class="fas fa-check-circle mr-2"></i>Success!</span> {{ message }}
+			</div>
+			{% endfor %} 
+			{% endif %}
+			
+			{% for label, messages in app.flashes %} 
+			{% for message in messages %}
+			<div class="p-4 mb-4 text-sm text-{{ label == 'success' ? 'green' : 'red' }}-800 rounded-lg bg-{{ label == 'success' ? 'green' : 'red' }}-50 dark:bg-gray-800 dark:text-{{ label == 'success' ? 'green' : 'red' }}-400" role="alert">
+				<span class="font-medium"><i class="fas fa-{{ label == 'success' ? 'check' : 'exclamation' }}-circle mr-2"></i>{{ label|capitalize }}!</span> {{ message }}
+			</div>
+			{% endfor %} 
+			{% endfor %}
+		</div>
+
+		{% if voyages is not empty %}
+		<div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+			{% if voyages|length == 0 or voyages|filter(v => v.placesDisponibles == 0)|length > 0 %}
+			<div class="col-span-full text-center py-8">
+				<i class="fas fa-exclamation-circle text-4xl text-yellow-500 mb-4"></i>
+				<p class="text-lg text-gray-700 dark:text-gray-300">No flights available at the moment.</p>
+			</div>
+			{% else %} 
+			{% for voyage in voyages %} 
+			{% if voyage.placesDisponibles > 0 %}
+			<!-- Flight card with original height -->
+			<div class="bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 transition-transform hover:shadow-xl hover:scale-[1.02] duration-300 h-full flex flex-col">
+				<div class="p-5 flex flex-col h-full">
+					<div class="flex items-center justify-between mb-3">
+						<h2 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white line-clamp-1">{{ voyage.titre }}</h2>
+						<span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+							<i class="fas fa-users mr-1"></i> {{ voyage.placesDisponibles }}
+						</span>
+					</div>
+					
+					<div class="flex items-center mb-3 text-gray-700 dark:text-gray-400">
+						<i class="fas fa-map-marker-alt text-blue-600 dark:text-blue-400 mr-2"></i>
+						<span class="line-clamp-1">{{ voyage.destination }}</span>
+					</div>
+					
+					<div class="grid grid-cols-2 gap-2 mb-3">
+						<div class="flex items-center text-gray-700 dark:text-gray-400">
+							<i class="fas fa-plane-departure text-gray-600 dark:text-gray-400 mr-2"></i>
+							<span class="text-sm">{{ voyage.dateDepart|date('d-m-Y') }}</span>
+						</div>
+						<div class="flex items-center text-gray-700 dark:text-gray-400">
+							<i class="fas fa-plane-arrival text-gray-600 dark:text-gray-400 mr-2"></i>
+							<span class="text-sm">{{ voyage.dateRetour|date('d-m-Y') }}</span>
+						</div>
+					</div>
+					
+					<div class="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+						<span class="text-2xl font-bold text-gray-900 dark:text-white">
+							<i class="fas fa-money-bill-wave text-sm text-green-600 dark:text-green-400 mr-1"></i>{{ voyage.prix }} €
+						</span>
+						<a href="{{ path('app_flight_details', {id: voyage.offresVoyageId}) }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+							Details
+							<i class="fas fa-arrow-right ml-2"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+			{% endif %} 
+			{% endfor %} 
+			{% endif %}
+		</div>
+		{% else %}
+		<div class="p-8 text-center">
+			<i class="fas fa-info-circle text-4xl text-yellow-500 mb-4"></i>
+			<div class="p-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
+				<span class="font-medium">Notice!</span> No flights available at the moment. Please check back later or adjust your search criteria.
 			</div>
 		</div>
-		{% endif %} {% endfor %} {% endif %}
+		{% endif %}
 	</div>
-	{% else %}
-	<p class="text-center text-gray-700">No flights available at the moment.</p>
-	{% endif %}
 </div>
+
 <script>
 	document.addEventListener("DOMContentLoaded", () => {
+		// Search input auto-submission
 		const searchInput = document.getElementById("search-input");
 		const searchForm = document.getElementById("search-form");
 		let searchTimeout;
 
-		searchInput.addEventListener("input", () => {
+		searchInput?.addEventListener("input", () => {
 			clearTimeout(searchTimeout);
 			searchTimeout = setTimeout(() => {
 				searchForm.submit();
 			}, 500);
 		});
 
+		// Sort select auto-submission
 		const sortSelect = document.getElementById("sort-select");
 		const sortForm = document.getElementById("sort-form");
 
-		sortSelect.addEventListener("change", () => {
+		sortSelect?.addEventListener("change", () => {
 			sortForm.submit();
 		});
 	});
