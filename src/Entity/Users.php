@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\UsersRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UsersRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -66,7 +66,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return $this->role === 1 ? ['ROLE_ADMIN'] : ['ROLE_USER'];
+        return 1 === $this->role ? ['ROLE_ADMIN'] : ['ROLE_USER'];
     }
 
     public function getUserIdentifier(): string
@@ -191,6 +191,4 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
-
 }

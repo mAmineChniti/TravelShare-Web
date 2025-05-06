@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Repository\ReclamationsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -12,9 +11,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ReclamationsRepository::class)]
 class Reclamations
 {
-    #[ORM\Column(name: "reclamation_id")]
+    #[ORM\Column(name: 'reclamation_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $reclamationId = null;
 
     #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "reclamations")]
@@ -48,7 +47,7 @@ class Reclamations
     #[Assert\NotBlank(message: 'Please select a date')]
     private ?\DateTimeInterface $dateReclamation = null;
 
-    #[ORM\Column(name: "etat", length: 20, nullable: true, options: ["default" => 'en cours'])]
+    #[ORM\Column(name: 'etat', length: 20, nullable: true, options: ['default' => 'en cours'])]
     private ?string $etat = 'en cours';
 
     public function getReclamationId(): ?int

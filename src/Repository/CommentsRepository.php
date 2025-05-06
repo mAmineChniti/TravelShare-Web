@@ -2,9 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Posts;
 use App\Entity\Comments;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Comments>
@@ -21,28 +22,56 @@ class CommentsRepository extends ServiceEntityRepository
         parent::__construct($registry, Comments::class);
     }
 
-//    /**
-//     * @return Comments[] Returns an array of Comments objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function add(Comments $comment, Posts $post): void
+    {
+        $comment->setPost($post);
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($comment);
+        $entityManager->flush();
+    }
 
-//    public function findOneBySomeField($value): ?Comments
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function update(Comments $comment, Posts $post): void
+    {
+        $entityManager = $this->getEntityManager();
+        $existingComment = $this->find($comment->getCommentId());
+        if (!$existingComment) {
+            throw new \Exception('Comment not found');
+        }
+        $existingComment->setComment($comment->getComment());
+        $existingComment->setUpdatedAt(new \DateTime());
+        $existingComment->setPost($post);
+        $entityManager->flush();
+    }
+
+    public function delete(int $id): void
+    {
+        $entityManager = $this->getEntityManager();
+        $comment = $entityManager->getReference(Comments::class, $id);
+
+        if ($comment) {
+            $entityManager->remove($comment);
+            $entityManager->flush();
+        }
+    }
+
+    public function listAll(): array
+    {
+        return $this->findAll();
+    }
+
+    public function fetchById(int $postId): array
+    {
+        $entityManager = $this->getEntityManager();
+        $query = $entityManager->createQuery(
+            'SELECT c.commentId, c.comment , c.commentedAt, c.updatedAt, 
+                    u.name, u.lastName, c.commenterId
+             FROM App\Entity\Comments c
+             JOIN App\Entity\Users u WITH c.commenterId = u.userId
+             WHERE c.postId = :postId
+             ORDER BY c.commentedAt DESC'
+        )
+            ->setParameter('postId', $postId);
+
+        return $query->getResult();
+    }
 }

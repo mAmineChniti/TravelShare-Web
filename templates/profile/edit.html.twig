@@ -1,6 +1,36 @@
-{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %} {% block title %}Update My Profile{% endblock %} {% block css %}
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<link href="{{ asset('css2/style.css') }}" rel="stylesheet" />
+{% endblock %} {% block body %}
+<div class="container mt-5 mb-5">
+	<div class="row justify-content-center">
+		<div class="col-lg-10">
+			{% for message in app.flashes('success') %}
+			<div class="alert alert-success alert-dismissible fade show">
+				{{ message }}
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			{% endfor %} {% for message in app.flashes('error') %}
+			<div class="alert alert-danger alert-dismissible fade show">
+				{{ message }}
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			{% endfor %}
 
-{% block title %}Update My Profile{% endblock %}
+			<div class="card">
+				<div class="card-header text-center position-relative bg-primary text-white">
+					<div class="position-absolute" style="left: 20px; top: 50%; transform: translateY(-50%)">
+						<a href="{{ path('app_profile') }}" class="btn btn-link text-white p-0">
+							<i class="fas fa-arrow-left fa-lg"></i>
+						</a>
+					</div>
+					<h3 class="d-inline-block m-0">Update My Profile</h3>
+				</div>
 
 {% block css %}
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">

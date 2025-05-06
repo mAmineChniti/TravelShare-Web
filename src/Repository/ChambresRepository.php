@@ -3,8 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Chambres;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Chambres>
@@ -21,28 +21,53 @@ class ChambresRepository extends ServiceEntityRepository
         parent::__construct($registry, Chambres::class);
     }
 
-//    /**
-//     * @return Chambres[] Returns an array of Chambres objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function add(Chambres $chambre): void
+    {
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($chambre);
+        $entityManager->flush();
+    }
 
-//    public function findOneBySomeField($value): ?Chambres
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function update(Chambres $chambre): void
+    {
+        $entityManager = $this->getEntityManager();
+        $existingChambre = $this->find($chambre->getChambreId());
+        if (!$existingChambre) {
+            throw new \Exception('Chambre not found');
+        }
+        $existingChambre->setNumeroChambre($chambre->getNumeroChambre());
+        $existingChambre->setTypeEnu($chambre->getTypeEnu());
+        $existingChambre->setPrixParNuit($chambre->getPrixParNuit());
+        $existingChambre->setDisponible($chambre->getDisponible());
+        $existingChambre->setHotel($chambre->getHotel());
+        $entityManager->flush();
+    }
+
+    public function delete(int $id): void
+    {
+        $entityManager = $this->getEntityManager();
+        $chambre = $this->find($id);
+        if (!$chambre) {
+            throw new \Exception('Chambre not found');
+        }
+        $chambre->setHotel(null);
+        $entityManager->remove($chambre);
+        $entityManager->flush();
+    }
+
+    public function listAll(): array
+    {
+        return $this->findAll();
+    }
+
+    public function listByHotelId(int $hotelId): array
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.hotel', 'h')
+            ->addSelect('h')
+            ->where('c.hotel = :hotelId')
+            ->setParameter('hotelId', $hotelId)
+            ->getQuery()
+            ->getResult();
+    }
 }

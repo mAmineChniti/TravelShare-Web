@@ -1,10 +1,25 @@
-{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %} {% block title %}Log In{% endblock %} {% block css %}
+<!-- MATERIAL DESIGN ICONIC FONT -->
+<link
+	rel="stylesheet"
+	href="{{ asset('fonts2/material-design-iconic-font/css/material-design-iconic-font.min.css') }}"
+/>
 
-{% block title %}Log In{% endblock %}
+<!-- STYLE CSS -->
+<link href="{{ asset('css2/style.css') }}" rel="stylesheet" />
+{% endblock %} {% block body %}
+<div class="wrapper" style="background-image: url('{{ asset('images2/imagett.jpg') }}');">
+	<div class="inner">
+		<div class="image-holder">
+			<img src="{{ asset('images2/agence.png') }}" alt="Logo" />
+			<div class="already-have-account">
+				<a href="{{ path('app_logup') }}">You don't have account ?</a>
+			</div>
+		</div>
 
-{% block css %}
-    <!-- MATERIAL DESIGN ICONIC FONT -->
-    <link rel="stylesheet" href="{{ asset('fonts2/material-design-iconic-font/css/material-design-iconic-font.min.css') }}">
+		<!-- Formulaire de connexion -->
+		<form action="{{ path('app_login') }}" method="post">
+			<h3>Log In</h3>
 
     <!-- STYLE CSS -->
     <link href="{{ asset('css2/style.css') }}" rel="stylesheet">
