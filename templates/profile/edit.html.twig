@@ -1,0 +1,294 @@
+{% extends 'base.html.twig' %} {% block title %}Update My Profile{% endblock %} {% block css %}
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<link href="{{ asset('css2/style.css') }}" rel="stylesheet" />
+{% endblock %} {% block body %}
+<div class="container mt-5 mb-5">
+	<div class="row justify-content-center">
+		<div class="col-lg-10">
+			{% for message in app.flashes('success') %}
+			<div class="alert alert-success alert-dismissible fade show">
+				{{ message }}
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			{% endfor %} {% for message in app.flashes('error') %}
+			<div class="alert alert-danger alert-dismissible fade show">
+				{{ message }}
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			{% endfor %}
+
+			<div class="card">
+				<div class="card-header text-center position-relative bg-primary text-white">
+					<div class="position-absolute" style="left: 20px; top: 50%; transform: translateY(-50%)">
+						<a href="{{ path('app_profile') }}" class="btn btn-link text-white p-0">
+							<i class="fas fa-arrow-left fa-lg"></i>
+						</a>
+					</div>
+					<h3 class="d-inline-block m-0">Update My Profile</h3>
+				</div>
+
+{% block css %}
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="{{ asset('css2/style.css') }}" rel="stylesheet">
+    <style>
+        .section-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+        .avatar-container {
+            position: relative;
+        }
+        .avatar {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #3498db;
+        }
+        .password-match-error {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+            display: none;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card">
+                    <div class="card-header text-center position-relative bg-primary text-white">
+                        <div class="position-absolute" style="left: 20px; top: 50%; transform: translateY(-50%);">
+                            <a href="{{ path('app_profile') }}" class="btn btn-link text-white p-0">
+                                <i class="fas fa-arrow-left fa-lg"></i>
+                            </a>
+                        </div>
+                        <h3 class="d-inline-block m-0">Update My Profile</h3>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Left Column: Photo -->
+                            <div class="col-md-4">
+                                <div class="avatar-container text-center">
+                                    <img src="{{ user.photo ? 'data:image/jpeg;base64,' ~ imageData : asset('images2/default-avatar.png') }}"
+                                         class="avatar img-thumbnail"
+                                         alt="Profile photo"
+                                         id="profileImage">
+
+                                    <label for="{{ form.photo.vars.id }}" class="btn btn-outline-primary mt-3">
+                                        <i class="fas fa-camera mr-2"></i> Change the photo
+                                    </label>
+                                    {{ form_widget(form.photo, {
+                                        'attr': {
+                                            'class': 'd-none',
+                                            'accept': 'image/*'
+                                        }
+                                    }) }}
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Form -->
+                            <div class="col-md-8">
+                                {{ form_start(form, {
+                                    'attr': {
+                                        'id': 'profileForm',
+                                        'enctype': 'multipart/form-data',
+                                        'novalidate': 'novalidate'
+                                    }
+                                }) }}
+
+                                <div class="mb-4">
+                                    <h4 class="section-title">General Information</h4>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {{ form_row(form.name, {
+                                                'label': 'Name',
+                                                'attr': {'class': 'form-control'}
+                                            }) }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_row(form.lastName, {
+                                                'label': 'Last Name',
+                                                'attr': {'class': 'form-control'}
+                                            }) }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {{ form_row(form.phoneNum, {
+                                                'label': 'Phone Num',
+                                                'attr': {'class': 'form-control'}
+                                            }) }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_row(form.address, {
+                                                'label': 'Address',
+                                                'attr': {'class': 'form-control'}
+                                            }) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h4 class="section-title">Account Information</h4>
+                                    {{ form_row(form.email, {
+                                        'label': 'Email',
+                                        'attr': {'class': 'form-control'}
+                                    }) }}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {{ form_row(form.password, {
+                                                'label': 'New Password',
+                                                'attr': {
+                                                    'class': 'form-control',
+                                                    'placeholder': 'Leave blank if unchanged',
+                                                    'autocomplete': 'new-password'
+                                                }
+                                            }) }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ form_row(form.confirm_password, {
+                                                'label': 'Confirmation',
+                                                'attr': {
+                                                    'class': 'form-control',
+                                                    'placeholder': 'Confirm password',
+                                                    'autocomplete': 'new-password'
+                                                }
+                                            }) }}
+                                            <div id="passwordMatchError" class="password-match-error">
+                                                Passwords must match
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Photo upload preview (existant - à conserver)
+            $('#{{ form.photo.vars.id }}').change(function () {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#profileImage').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            // Password validation functions
+            function validatePassword(password) {
+                // Vérifie chaque exigence
+                const hasMinLength = password.length >= 8;
+                const hasUppercase = /[A-Z]/.test(password);
+                const hasLowercase = /[a-z]/.test(password);
+                const hasNumber = /[0-9]/.test(password);
+                const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+                // Met à jour l'affichage des exigences
+                updateRequirement('length', hasMinLength);
+                updateRequirement('uppercase', hasUppercase);
+                updateRequirement('lowercase', hasLowercase);
+                updateRequirement('number', hasNumber);
+                updateRequirement('special', hasSpecialChar);
+
+                // Retourne le statut global
+                return hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSpecialChar;
+            }
+
+            function updateRequirement(type, isValid) {
+                const element = $(`#req-${type}`);
+                element.toggleClass('text-danger', !isValid);
+                element.toggleClass('text-success', isValid);
+                element.html((isValid ? '<i class="fas fa-check"></i> ' : '<i class="fas fa-times"></i> ') + element.text().replace(/^[✓✗] /, ''));
+            }
+
+            // Validation de la correspondance des mots de passe (existant)
+            function validatePasswordMatch() {
+                const password = $('#{{ form.password.vars.id }}').val();
+                const confirmPassword = $('#{{ form.confirm_password.vars.id }}').val();
+                const errorElement = $('#passwordMatchError');
+
+                if (password && confirmPassword && password !== confirmPassword) {
+                    $('#{{ form.confirm_password.vars.id }}').addClass('is-invalid');
+                    errorElement.show();
+                    return false;
+                } else {
+                    $('#{{ form.confirm_password.vars.id }}').removeClass('is-invalid');
+                    errorElement.hide();
+                    return true;
+                }
+            }
+
+            // Validation en temps réel
+            $('#{{ form.password.vars.id }}').on('input', function() {
+                const password = $(this).val();
+
+                if (password) {
+                    const isValid = validatePassword(password);
+                    $(this).toggleClass('is-invalid', !isValid);
+                    $(this).toggleClass('is-valid', isValid);
+                } else {
+                    $(this).removeClass('is-invalid is-valid');
+                    // Réinitialise l'affichage des exigences
+                    $('.password-requirements li').each(function() {
+                        $(this).removeClass('text-success text-danger')
+                            .html($(this).text().replace(/^[✓✗] /, ''));
+                    });
+                }
+
+                validatePasswordMatch();
+            });
+
+            $('#{{ form.confirm_password.vars.id }}').on('input', validatePasswordMatch);
+
+            // Validation à la soumission
+            $('#profileForm').on('submit', function (e) {
+                const password = $('#{{ form.password.vars.id }}').val();
+
+                if (password) {
+                    const requirementsMet = validatePassword(password);
+                    const passwordsMatch = validatePasswordMatch();
+
+                    if (!requirementsMet || !passwordsMatch) {
+                        e.preventDefault();
+                        if (!requirementsMet) {
+                            $('#{{ form.password.vars.id }}').addClass('is-invalid');
+                        }
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            // Fermeture automatique des alertes (existant - à conserver)
+            setTimeout(function () {
+                $('.alert').alert('close');
+            }, 5000);
+        });
+    </script>
+{% endblock %}

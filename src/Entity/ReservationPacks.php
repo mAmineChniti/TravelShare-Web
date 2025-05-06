@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\ReservationPacksRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ReservationPacksRepository;
 
 #[ORM\Table(name: 'reservation_packs')]
 #[ORM\Index(name: 'fk_packs_client_id', columns: ['client_id'])]
@@ -12,24 +12,24 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ReservationPacksRepository::class)]
 class ReservationPacks
 {
-    #[ORM\Column(name: "reservation_packs_id")]
+    #[ORM\Column(name: 'reservation_packs_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $reservationPacksId = null;
 
-    #[ORM\Column(name: "client_id")]
+    #[ORM\Column(name: 'client_id')]
     private ?int $clientId = null;
 
-    #[ORM\Column(name: "pack_id")]
+    #[ORM\Column(name: 'pack_id')]
     private ?int $packId = null;
 
-    #[ORM\Column(name: "date_reservation", type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'date_reservation', type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateReservation = null;
 
-    #[ORM\Column(name: "statut", type: Types::STRING)]
+    #[ORM\Column(name: 'statut', type: Types::STRING)]
     private ?string $statut = null;
 
-    #[ORM\Column(name: "prix_total", type: Types::DECIMAL, precision: 10, scale: 0)]
+    #[ORM\Column(name: 'prix_total', type: Types::DECIMAL, precision: 10, scale: 0)]
     private ?string $prixTotal = null;
 
     public function getReservationPacksId(): ?int

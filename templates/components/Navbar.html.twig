@@ -1,0 +1,96 @@
+<nav class="navbar navbar-expand-lg border-bottom sticky-top">
+	<div class="container">
+		<a href="/" class="navbar-brand d-flex align-items-center">
+			<img
+				src="{{ asset('images/TravelShare-Logo.png') }}"
+				class="me-3"
+				style="height: 3.5rem"
+				alt="TravelShare Logo"
+			/>
+			<span class="fs-4 fw-semibold">TravelShare</span>
+		</a>
+		<button
+			class="navbar-toggler"
+			type="button"
+			data-bs-toggle="collapse"
+			data-bs-target="#navbarNav"
+			aria-controls="navbarNav"
+			aria-expanded="false"
+			aria-label="Toggle navigation"
+		>
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+			<ul class="navbar-nav">
+				<li class="nav-item">
+					<a href="{{ path('app_flights') }}" class="nav-link px-3">Flights</a>
+				</li>
+				<li class="nav-item">
+					<a href="{{ path('app_hotels') }}" class="nav-link px-3">Hotels</a>
+				</li>
+				<li class="nav-item">
+					<a href="{{ path('app_forum') }}" class="nav-link px-3">Forum</a>
+				</li>
+				<li class="nav-item">
+					<a href="{{ path('app_excursions') }}" class="nav-link px-3">Excursions</a>
+				</li>
+			</ul>
+			<div class="d-flex align-items-center">
+				<a href="/login" class="btn btn-outline-secondary me-2">Login</a>
+				<a href="/register" class="btn btn-primary me-2">Register</a>
+				<button class="btn btn-outline-secondary" id="theme-toggle-btn" aria-label="Toggle theme">
+					<i class="fas fa-sun" id="theme-icon"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+</nav>
+
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		const htmlElement = document.documentElement;
+		const themeToggleBtn = document.getElementById("theme-toggle-btn");
+		const themeIcon = document.getElementById("theme-icon");
+
+		// Initialize the theme based on localStorage or system preference
+		const getStoredTheme = () => localStorage.getItem("theme");
+		const getPreferredTheme = () => {
+			const storedTheme = getStoredTheme();
+			if (storedTheme) {
+				return storedTheme;
+			}
+
+			return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+		};
+
+		// Set theme on HTML element
+		const setTheme = (theme) => {
+			htmlElement.setAttribute("data-bs-theme", theme);
+			localStorage.setItem("theme", theme);
+
+			// Update icon based on current theme
+			if (theme === "dark") {
+				themeIcon.className = "fas fa-moon";
+			} else {
+				themeIcon.className = "fas fa-sun";
+			}
+		};
+
+		// Initialize theme on page load
+		setTheme(getPreferredTheme());
+
+		// Toggle theme when button is clicked
+		themeToggleBtn.addEventListener("click", () => {
+			const currentTheme = getStoredTheme() || "light";
+			const newTheme = currentTheme === "light" ? "dark" : "light";
+			setTheme(newTheme);
+		});
+
+		// Listen for system preference changes
+		window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+			if (!getStoredTheme()) {
+				setTheme(matches ? "dark" : "light");
+			}
+		});
+	});
+</script>

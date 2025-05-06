@@ -1,3 +1,4 @@
+<<<<<<< HEAD
    <div class="container-fluid footer py-5">
             <div class="container py-5">
                 <div class="row g-5">
@@ -83,3 +84,49 @@
                 </div>
             </div>
         </div>
+=======
+<footer class="py-4 mt-auto border-top">
+	<div class="container p-4">
+		<div class="row align-items-center">
+			<div class="col-md-6 mb-4 mb-md-0">
+				<a href="/" class="d-flex align-items-center text-decoration-none">
+					<img
+						src="{{ asset('images/TravelShare-Logo.png') }}"
+						class="height-auto"
+						style="height: 4rem"
+						alt="TravelShare Logo"
+					/>
+					<span class="ms-3 fs-4 fw-semibold">TravelShare</span>
+				</a>
+			</div>
+			<div class="col-md-6">
+				<ul class="list-inline mb-4 mb-md-0 text-end">
+					<li class="list-inline-item me-4">
+						<a href="/about" class="text-secondary hover-underline">About</a>
+					</li>
+					<li class="list-inline-item me-4">
+						<a href="/privacy-policy" class="text-secondary hover-underline">Privacy Policy</a>
+					</li>
+					<li class="list-inline-item me-4">
+						<a href="/licensing" class="text-secondary hover-underline">Licensing</a>
+					</li>
+					<li class="list-inline-item">
+						<a href="/contact" class="text-secondary hover-underline">Contact</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="border-top mt-4 pt-4">
+			<div class="text-center text-secondary">
+				© {{ 'now'|date('Y') }} <a href="/" class="text-decoration-none">TravelShare™</a>. All Rights Reserved.
+			</div>
+		</div>
+	</div>
+</footer>
+
+<style>
+	.hover-underline:hover {
+		text-decoration: underline;
+	}
+</style>
+>>>>>>> origin/master

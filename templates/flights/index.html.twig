@@ -1,0 +1,248 @@
+{% extends 'base.html.twig' %} {% block title %}Flights{% endblock %} {% block body %}
+<div class="container mt-5 mb-4">
+	<h1 class="mb-4">
+		<i class="fas fa-plane me-2"></i>Available Flights
+	</h1>
+
+	<!-- Filter section with separate cards -->
+	<div class="mb-4">
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<h2 class="card-title fs-4 mb-3">
+					<i class="fas fa-filter me-2"></i>Filter Options
+				</h2>
+
+				<div class="row g-3">
+					<!-- Search by destination card -->
+					<div class="col-md-3">
+						<div class="card h-100">
+							<div class="card-body">
+								<label for="search-input" class="form-label">
+									<i class="fas fa-map-marker-alt me-2"></i>Destination
+								</label>
+								<form id="search-form" method="get" action="{{ path('app_flights_search') }}">
+									<div class="input-group">
+										<span class="input-group-text">
+											<i class="fas fa-search"></i>
+										</span>
+										<input
+											id="search-input"
+											type="text"
+											name="destination"
+											placeholder="Search destination"
+											value="{{ app.request.query.get('destination', '') }}"
+											class="form-control"
+										/>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+
+					<!-- Travel Dates card -->
+					<div class="col-md-5">
+						<div class="card h-100">
+							<div class="card-body">
+								<label class="form-label">
+									<i class="fas fa-calendar-alt me-2"></i>Travel Dates
+								</label>
+								<form method="get" action="{{ path('app_flights_filter') }}" id="date-filter-form">
+									<div id="date-range-picker" class="d-flex align-items-center">
+										<div class="input-group me-2">
+											<span class="input-group-text">
+												<i class="fas fa-calendar-alt"></i>
+											</span>
+											<input 
+												id="datepicker-range-start" 
+												name="departureDate" 
+												type="text" 
+												class="form-control" 
+												placeholder="Departure date"
+												value="{{ app.request.query.get('departureDate') ? app.request.query.get('departureDate')|date('m/d/Y') : '' }}"
+												readonly
+											>
+										</div>
+										<span class="mx-2">to</span>
+										<div class="input-group me-2">
+											<span class="input-group-text">
+												<i class="fas fa-calendar-alt"></i>
+											</span>
+											<input 
+												id="datepicker-range-end" 
+												name="returnDate" 
+												type="text" 
+												class="form-control" 
+												placeholder="Return date"
+												value="{{ app.request.query.get('returnDate') ? app.request.query.get('returnDate')|date('m/d/Y') : '' }}"
+												readonly
+											>
+										</div>
+										<button type="submit" class="btn btn-primary">
+											<i class="fas fa-filter"></i>
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+
+					<!-- Sort by card -->
+					<div class="col-md-2">
+						<div class="card h-100">
+							<div class="card-body">
+								<label for="sort-select" class="form-label">
+									<i class="fas fa-sort me-2"></i>Sort By
+								</label>
+								<form id="sort-form" method="get" action="{{ path('app_flights_sort') }}">
+									<select
+										id="sort-select"
+										name="sortBy"
+										class="form-select"
+									>
+										<option value="">Select order</option>
+										<option value="price_asc" {{ app.request.query.get('sortBy') == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
+										<option value="price_desc" {{ app.request.query.get('sortBy') == 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
+										<option value="date" {{ app.request.query.get('sortBy') == 'date' ? 'selected' : '' }}>Departure Date</option>
+									</select>
+								</form>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Action buttons -->
+					<div class="col-md-2">
+						<div class="card h-100">
+							<div class="card-body d-flex align-items-center">
+								<div class="d-flex gap-2">
+									<a href="{{ path('app_flights_calendar') }}" class="btn btn-primary">
+										<i class="fas fa-calendar-week me-2"></i> Calendar
+									</a>
+									<a href="{{ path('app_flights') }}" id="clear-filters" class="btn btn-outline-secondary">
+										<i class="fas fa-times me-2"></i> Clear
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Main content area - flights listing -->
+	<div>
+		<!-- Alert/notification messages -->
+		<div id="notifications">
+			{% if errors is defined and errors|length > 0 %} 
+			{% for error in errors %}
+			<div class="alert alert-danger" role="alert">
+				<span class="fw-bold"><i class="fas fa-exclamation-circle me-2"></i>Error!</span> {{ error }}
+			</div>
+			{% endfor %} 
+			{% endif %}
+			
+			{% if success is defined and success|length > 0 %} 
+			{% for message in success %}
+			<div class="alert alert-success" role="alert">
+				<span class="fw-bold"><i class="fas fa-check-circle me-2"></i>Success!</span> {{ message }}
+			</div>
+			{% endfor %} 
+			{% endif %}
+			
+			{% for label, messages in app.flashes %} 
+			{% for message in messages %}
+			<div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }}" role="alert">
+				<span class="fw-bold"><i class="fas fa-{{ label == 'success' ? 'check' : 'exclamation' }}-circle me-2"></i>{{ label|capitalize }}!</span> {{ message }}
+			</div>
+			{% endfor %} 
+			{% endfor %}
+		</div>
+
+		{% if voyages is not empty %}
+		<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+			{% if voyages|length == 0 or voyages|filter(v => v.placesDisponibles == 0)|length > 0 %}
+			<div class="col-12 text-center py-5">
+				<i class="fas fa-exclamation-circle text-warning fs-1 mb-3"></i>
+				<p class="fs-5 text-secondary">No flights available at the moment.</p>
+			</div>
+			{% else %} 
+			{% for voyage in voyages %} 
+			{% if voyage.placesDisponibles > 0 %}
+			<!-- Flight card -->
+			<div class="col">
+				<div class="card h-100 shadow-sm transition">
+					<div class="card-body d-flex flex-column">
+						<div class="d-flex justify-content-between mb-3">
+							<h2 class="card-title fs-5 fw-bold text-truncate">{{ voyage.titre }}</h2>
+							<span class="badge bg-primary">
+								<i class="fas fa-users me-1"></i> {{ voyage.placesDisponibles }}
+							</span>
+						</div>
+						
+						<div class="d-flex align-items-center mb-3">
+							<i class="fas fa-map-marker-alt text-primary me-2"></i>
+							<span class="text-truncate">{{ voyage.destination }}</span>
+						</div>
+						
+						<div class="row g-2 mb-3">
+							<div class="col-6 d-flex align-items-center">
+								<i class="fas fa-plane-departure text-secondary me-2"></i>
+								<span class="small">{{ voyage.dateDepart|date('d-m-Y') }}</span>
+							</div>
+							<div class="col-6 d-flex align-items-center">
+								<i class="fas fa-plane-arrival text-secondary me-2"></i>
+								<span class="small">{{ voyage.dateRetour|date('d-m-Y') }}</span>
+							</div>
+						</div>
+						
+						<div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+							<span class="fs-4 fw-bold">
+								<i class="fas fa-money-bill-wave fs-6 text-success me-1"></i>{{ voyage.prix }} €
+							</span>
+							<a href="{{ path('app_flight_details', {id: voyage.offresVoyageId}) }}" class="btn btn-primary btn-sm">
+								Details
+								<i class="fas fa-arrow-right ms-2"></i>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% endif %} 
+			{% endfor %} 
+			{% endif %}
+		</div>
+		{% else %}
+		<div class="text-center py-5">
+			<i class="fas fa-info-circle text-warning fs-1 mb-3"></i>
+			<div class="alert alert-warning" role="alert">
+				<span class="fw-bold">Notice!</span> No flights available at the moment. Please check back later or adjust your search criteria.
+			</div>
+		</div>
+		{% endif %}
+	</div>
+</div>
+
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		// Search input auto-submission
+		const searchInput = document.getElementById("search-input");
+		const searchForm = document.getElementById("search-form");
+		let searchTimeout;
+
+		searchInput?.addEventListener("input", () => {
+			clearTimeout(searchTimeout);
+			searchTimeout = setTimeout(() => {
+				searchForm.submit();
+			}, 500);
+		});
+
+		// Sort select auto-submission
+		const sortSelect = document.getElementById("sort-select");
+		const sortForm = document.getElementById("sort-form");
+
+		sortSelect?.addEventListener("change", () => {
+			sortForm.submit();
+		});
+	});
+</script>
+{% endblock %}

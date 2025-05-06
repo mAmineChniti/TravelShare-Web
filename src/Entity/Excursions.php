@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Repository\ExcursionsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -13,9 +12,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ExcursionsRepository::class)]
 class Excursions
 {
-    #[ORM\Column(name: "excursion_id")]
+    #[ORM\Column(name: 'excursion_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $excursionId = null;
 
 #[ORM\ManyToOne(targetEntity: Guides::class, inversedBy: "excursions")]

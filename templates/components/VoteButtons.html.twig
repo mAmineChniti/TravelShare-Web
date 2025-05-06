@@ -1,0 +1,22 @@
+<div id="voteButtonsContainer-{{ postId }}" class="flex space-x-2">
+	<form hx-post="{{ path('app_forum_upvote') }}" hx-target="#voteButtonsContainer-{{ postId }}" hx-swap="outerHTML">
+		<input type="hidden" name="postId" value="{{ postId }}" />
+		<button
+			type="submit"
+			class="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg shadow focus:ring-4 focus:outline-none {% if isLiked is same as(true) %} bg-blue-600 hover:bg-blue-700 focus:ring-blue-300 {% else %} bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:focus:ring-gray-500 {% endif %}"
+			title="Upvote this post"
+		>
+			<i class="fas fa-arrow-up mr-2"></i>{{ likesCount }}
+		</button>
+	</form>
+	<form hx-post="{{ path('app_forum_downvote') }}" hx-target="#voteButtonsContainer-{{ postId }}" hx-swap="outerHTML">
+		<input type="hidden" name="postId" value="{{ postId }}" />
+		<button
+			type="submit"
+			class="flex items-center justify-center px-4 py-2 text-sm font-medium text-white rounded-lg shadow focus:ring-4 focus:outline-none {% if isLiked is same as(false) %} bg-red-600 hover:bg-red-700 focus:ring-red-300 {% else %} bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:focus:ring-gray-500 {% endif %}"
+			title="Downvote this post"
+		>
+			<i class="fas fa-arrow-down mr-2"></i>{{ dislikesCount }}
+		</button>
+	</form>
+</div>

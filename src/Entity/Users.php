@@ -2,45 +2,82 @@
 
 namespace App\Entity;
 
-use App\Repository\UsersRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UsersRepository;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Table(name: 'users')]
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
-class Users
+class Users implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[ORM\Column(name: "user_id")]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\Column(name: "user_id", type: "integer")]
     private ?int $userId = null;
 
-    #[ORM\Column(name: "name", length: 50)]
+    #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "First name is required")]
+    #[Assert\Length(min: 2, max: 50)]
     private ?string $name = null;
 
-    #[ORM\Column(name: "last_name", length: 50)]
+    #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "Last name is required")]
+    #[Assert\Length(min: 2, max: 50)]
     private ?string $lastName = null;
 
     #[ORM\Column(name: "email", length: 50)]
+    #[Assert\NotBlank(message: "Email is required")]
+    #[Assert\Email(message: "Please enter a valid email address")]
+    #[Assert\Length(max: 50, maxMessage: "Email cannot exceed {{ limit }} characters")]
     private ?string $email = null;
 
     #[ORM\Column(name: "password", length: 255)]
+    #[Assert\NotBlank(message: "Password is required")]
+    #[Assert\Length(min: 8, max: 255, minMessage: "Password must be at least {{ limit }} characters", maxMessage: "Password cannot exceed {{ limit }} characters")]
+    #[Assert\Regex(pattern: "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/", message: "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character")]
     private ?string $password = null;
 
-    #[ORM\Column(name: "phone_num")]
-    private ?int $phoneNum = null;
+    #[ORM\Column(length: 15)]
+    #[Assert\NotBlank(message: "Phone number is required")]
+    #[Assert\Length(min: 8, max: 15)]
+    private ?string $phoneNum = null;
 
-    #[ORM\Column(name: "address", length: 150)]
+    #[ORM\Column(length: 150)]
+    #[Assert\NotBlank(message: "Address is required")]
+    #[Assert\Length(min: 5, max: 150)]
     private ?string $address = null;
 
-    #[ORM\Column(name: "role", nullable: true, options: ["default" => 0])]
+    #[ORM\Column(options: ["default" => 0])]
     private ?int $role = 0;
 
-    #[ORM\Column(name: "photo", type: Types::BLOB, nullable: true)]
+    #[ORM\Column(type: Types::BLOB, nullable: true)]
+    #[Assert\Image(
+        maxSize: "2M",
+        mimeTypes: ["image/jpeg", "image/png", "image/gif"]
+    )]
     private $photo = null;
 
-    #[ORM\Column(name: "compte", nullable: true, options: ["default" => 0])]
+    #[ORM\Column(options: ["default" => 0])]
     private ?int $compte = 0;
+
+    public function getRoles(): array
+    {
+        return 1 === $this->role ? ['ROLE_ADMIN'] : ['ROLE_USER'];
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function eraseCredentials(): void
+    {
+        // Effacer toute donnée sensible
+    }
 
     public function getUserId(): ?int
     {

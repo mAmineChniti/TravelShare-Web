@@ -1,5 +1,31 @@
-{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %} {% block title %}Welcome to TravelShare{% endblock %} {% block body %}
+<section>
+	<div class="container px-4 py-5">
+		<div class="text-center mx-auto" style="max-width: 800px">
+			<h1 class="mb-4 display-4 fw-bold">
+				<i class="fas fa-globe-americas me-2 text-primary"></i> Discover the World with TravelShare
+			</h1>
+			<p class="mb-5 lead text-secondary px-md-5">
+				Plan your next adventure with ease. Explore flights, hotels, excursions, and more, all in one place.
+			</p>
+			<div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mb-5">
+				<a href="{{ path('app_flights') }}" class="btn btn-primary btn-lg px-4 py-3 d-inline-flex align-items-center">
+					Book Flights
+					<i class="fas fa-plane ms-2"></i>
+				</a>
+				<a
+					href="{{ path('app_hotels') }}"
+					class="btn btn-outline-secondary btn-lg px-4 py-3 d-inline-flex align-items-center"
+				>
+					Find Hotels
+					<i class="fas fa-hotel ms-2"></i>
+				</a>
+			</div>
+		</div>
+	</div>
+</section>
 
+<<<<<<< HEAD
 
 {% block body %}
     {% include 'components/Spinner.html.twig' %}
@@ -20,3 +46,176 @@
     {% include 'components/Copyright.html.twig' %}
 
 {% endblock %}
+=======
+<section class="position-relative">
+	<div id="default-carousel" class="carousel slide" data-bs-ride="carousel">
+		<div class="carousel-inner" style="height: 48rem">
+			{% for slide in slides %}
+			<div class="carousel-item {% if loop.first %}active{% endif %}" style="height: 100%">
+				<img src="{{ asset(slide.image) }}" class="d-block w-100 h-100 object-fit-cover" alt="{{ slide.alt }}" />
+			</div>
+			{% endfor %}
+		</div>
+		<div class="carousel-indicators">
+			{% for slide in slides %}
+			<button
+				type="button"
+				data-bs-target="#default-carousel"
+				data-bs-slide-to="{{ loop.index0 }}"
+				{%
+				if
+				loop.first
+				%}class="active"
+				{%
+				endif
+				%}
+				aria-current="{{ loop.first ? 'true' : 'false' }}"
+				aria-label="Slide {{ loop.index }}"
+			></button>
+			{% endfor %}
+		</div>
+		<button class="carousel-control-prev" type="button" data-bs-target="#default-carousel" data-bs-slide="prev">
+			<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+			<span class="visually-hidden">Previous</span>
+		</button>
+		<button class="carousel-control-next" type="button" data-bs-target="#default-carousel" data-bs-slide="next">
+			<span class="carousel-control-next-icon" aria-hidden="true"></span>
+			<span class="visually-hidden">Next</span>
+		</button>
+	</div>
+</section>
+
+<section class="py-5">
+	<div class="container px-4">
+		<div class="row row-cols-1 row-cols-lg-3 g-4">
+			<div class="col">
+				<div class="card h-100 shadow-sm transition-transform hover-scale">
+					<div class="card-body">
+						<div class="d-flex align-items-center mb-4">
+							<i class="fas fa-hiking text-primary fs-2 me-3"></i>
+							<h3 class="fw-bold mb-0">Excursions</h3>
+						</div>
+						<p class="card-text mb-4 text-secondary">
+							Discover unique experiences and adventures tailored to your interests.
+						</p>
+						<a
+							href="{{ path('app_excursions') }}"
+							class="text-decoration-none text-primary d-inline-flex align-items-center"
+						>
+							Explore Excursions
+							<i class="fas fa-arrow-right ms-2"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card h-100 shadow-sm transition-transform hover-scale">
+					<div class="card-body">
+						<div class="d-flex align-items-center mb-4">
+							<i class="fas fa-comments text-primary fs-2 me-3"></i>
+							<h3 class="fw-bold mb-0">Forum</h3>
+						</div>
+						<p class="card-text mb-4 text-secondary">Connect with fellow travelers, share tips, and get inspired.</p>
+						<a
+							href="{{ path('app_forum') }}"
+							class="text-decoration-none text-primary d-inline-flex align-items-center"
+						>
+							Join the Forum
+							<i class="fas fa-arrow-right ms-2"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+			<div class="col">
+				<div class="card h-100 shadow-sm transition-transform hover-scale">
+					<div class="card-body">
+						<div class="d-flex align-items-center mb-4">
+							<i class="fas fa-plane-departure text-primary fs-2 me-3"></i>
+							<h3 class="fw-bold mb-0">Flights</h3>
+						</div>
+						<p class="card-text mb-4 text-secondary">Find and book flights to your favorite destinations with ease.</p>
+						<a
+							href="{{ path('app_flights') }}"
+							class="text-decoration-none text-primary d-inline-flex align-items-center"
+						>
+							Explore Flights
+							<i class="fas fa-arrow-right ms-2"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="py-5">
+	<div class="container px-4">
+		<h2 class="text-center mb-5 fw-bold fs-1"><i class="fas fa-star text-warning me-2"></i> Why Choose TravelShare?</h2>
+		<div class="row row-cols-1 row-cols-md-4 g-4 text-center">
+			<div class="col">
+				<div class="p-4">
+					<div
+						class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+						style="width: 4rem; height: 4rem"
+					>
+						<i class="fas fa-hand-holding-usd fs-3"></i>
+					</div>
+					<h3 class="fs-4 fw-bold mb-2">Best Prices</h3>
+					<p class="text-secondary">Find the most competitive rates for your travels.</p>
+				</div>
+			</div>
+			<div class="col">
+				<div class="p-4">
+					<div
+						class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+						style="width: 4rem; height: 4rem"
+					>
+						<i class="fas fa-shield-alt fs-3"></i>
+					</div>
+					<h3 class="fs-4 fw-bold mb-2">Secure Booking</h3>
+					<p class="text-secondary">Your transactions are always protected.</p>
+				</div>
+			</div>
+			<div class="col">
+				<div class="p-4">
+					<div
+						class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+						style="width: 4rem; height: 4rem"
+					>
+						<i class="fas fa-headset fs-3"></i>
+					</div>
+					<h3 class="fs-4 fw-bold mb-2">24/7 Support</h3>
+					<p class="text-secondary">Our team is always ready to assist you.</p>
+				</div>
+			</div>
+			<div class="col">
+				<div class="p-4">
+					<div
+						class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+						style="width: 4rem; height: 4rem"
+					>
+						<i class="fas fa-thumbs-up fs-3"></i>
+					</div>
+					<h3 class="fs-4 fw-bold mb-2">User Reviews</h3>
+					<p class="text-secondary">Make informed decisions based on real experiences.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.object-fit-cover {
+		object-fit: cover;
+	}
+
+	.hover-scale {
+		transition: transform 0.3s ease;
+	}
+
+	.hover-scale:hover {
+		transform: scale(1.05);
+	}
+</style>
+{% endblock %}
+>>>>>>> origin/master

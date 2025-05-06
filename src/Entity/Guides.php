@@ -2,8 +2,6 @@
 
 namespace App\Entity;
 
-use App\Repository\GuidesRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -26,7 +24,7 @@ public function __construct()
 
     #[ORM\Column(name: "guide_id")]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $guideId = null;
 
     #[ORM\Column(name: "name", length: 50)]
