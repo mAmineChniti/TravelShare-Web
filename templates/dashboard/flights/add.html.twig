@@ -1,0 +1,182 @@
+{% extends 'base.html.twig' %} {% block title %}Add New Flight{% endblock %} {% block body %}
+<div class="container mx-auto px-4 mt-8 space-y-6">
+	<h1 class="text-5xl font-bold mb-6">Add New Flight</h1>
+	<form method="post" action="{{ path('app_add_flight') }}" class="bg-white rounded-lg shadow-md p-6 space-y-4">
+		<div>
+			<label for="titre" class="block text-base font-medium text-gray-700 mb-2">Title</label>
+			<input
+				type="text"
+				id="titre"
+				name="titre"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+			/>
+		</div>
+		<div>
+			<label for="destination" class="block text-base font-medium text-gray-700 mb-2">Destination</label>
+			<input
+				type="text"
+				id="destination"
+				name="destination"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+			/>
+		</div>
+		<div>
+			<label for="description" class="block text-base font-medium text-gray-700 mb-2">Description</label>
+			<textarea
+				id="description"
+				name="description"
+				rows="4"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+			></textarea>
+		</div>
+		<div>
+			<label for="prix" class="block text-base font-medium text-gray-700 mb-2">Price (€)</label>
+			<input
+				type="number"
+				id="prix"
+				name="prix"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+			/>
+		</div>
+		<div>
+			<label for="placesDisponibles" class="block text-base font-medium text-gray-700 mb-2">Available Places</label>
+			<input
+				type="number"
+				id="placesDisponibles"
+				name="placesDisponibles"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+			/>
+		</div>
+		<div>
+			<label for="dateDepart" class="block text-base font-medium text-gray-700 mb-2">Departure Date</label>
+			<input
+				type="date"
+				id="dateDepart"
+				name="dateDepart"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+			/>
+		</div>
+		<div>
+			<label for="dateRetour" class="block text-base font-medium text-gray-700 mb-2">Return Date</label>
+			<input
+				type="date"
+				id="dateRetour"
+				name="dateRetour"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+			/>
+		</div>
+		<div class="flex justify-between">
+			<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow">
+				Add Flight
+			</button>
+			<a
+				href="{{ path('app_dashboard_flights') }}"
+				class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg"
+			>
+				Cancel
+			</a>
+		</div>
+	</form>
+</div>
+
+<div id="error-messages" class="mt-4">
+	{% if errors is defined and errors|length > 0 %} {% for error in errors %}
+	<p class="text-sm text-red-600">{{ error }}</p>
+	{% endfor %} {% endif %}
+</div>
+<div id="success-messages" class="mt-4">
+	{% if success is defined and success|length > 0 %} {% for message in success %}
+	<p class="text-sm text-green-600">{{ message }}</p>
+	{% endfor %} {% endif %}
+</div>
+
+<script>
+	const FlightApp = (() => {
+		const CONFIG = {
+			MIN_TITLE_LENGTH: 3,
+			MIN_DESCRIPTION_LENGTH: 10,
+			MIN_PRICE: 0,
+			MIN_PLACES: 1,
+		};
+
+		const elements = {
+			titre: document.getElementById("titre"),
+			destination: document.getElementById("destination"),
+			description: document.getElementById("description"),
+			prix: document.getElementById("prix"),
+			placesDisponibles: document.getElementById("placesDisponibles"),
+			dateDepart: document.getElementById("dateDepart"),
+			dateRetour: document.getElementById("dateRetour"),
+			errorMessages: document.getElementById("error-messages"),
+			successMessages: document.getElementById("success-messages"),
+			form: document.querySelector("form"),
+		};
+
+		const Validator = {
+			validateForm() {
+				const errors = [];
+
+				if (!elements.titre.value.trim() || elements.titre.value.length < CONFIG.MIN_TITLE_LENGTH) {
+					errors.push(`Title must be at least ${CONFIG.MIN_TITLE_LENGTH} characters long.`);
+				}
+
+				if (!elements.destination.value.trim()) {
+					errors.push("Destination cannot be empty.");
+				}
+
+				if (!elements.description.value.trim() || elements.description.value.length < CONFIG.MIN_DESCRIPTION_LENGTH) {
+					errors.push(`Description must be at least ${CONFIG.MIN_DESCRIPTION_LENGTH} characters long.`);
+				}
+
+				if (!elements.prix.value || parseFloat(elements.prix.value) < CONFIG.MIN_PRICE) {
+					errors.push("Price must be a non-negative number.");
+				}
+
+				if (!elements.placesDisponibles.value || parseInt(elements.placesDisponibles.value) < CONFIG.MIN_PLACES) {
+					errors.push("Available places must be at least 1.");
+				}
+
+				if (!elements.dateDepart.value) {
+					errors.push("Departure date is required.");
+				}
+
+				if (!elements.dateRetour.value) {
+					errors.push("Return date is required.");
+				} else if (elements.dateDepart.value && elements.dateRetour.value < elements.dateDepart.value) {
+					errors.push("Return date cannot be before departure date.");
+				}
+
+				elements.errorMessages.innerHTML = "";
+				if (errors.length > 0) {
+					elements.errorMessages.innerHTML = errors.map((error) => `<p class='text-red-500'>${error}</p>`).join("");
+					return false;
+				}
+
+				return true;
+			},
+		};
+
+		const FormHandler = {
+			submitForm(event) {
+				if (!Validator.validateForm()) {
+					event.preventDefault();
+				}
+			},
+		};
+
+		const init = () => {
+			elements.form.addEventListener("submit", FormHandler.submitForm);
+		};
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", init);
+		} else {
+			init();
+		}
+
+		return {
+			validateForm: Validator.validateForm,
+		};
+	})();
+</script>
+{% endblock %}

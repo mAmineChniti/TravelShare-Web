@@ -5,6 +5,10 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\OffresVoyageRepository;
+<<<<<<< HEAD
+=======
+use Symfony\Component\Validator\Constraints as Assert;
+>>>>>>> origin/master
 
 #[ORM\Table(name: 'offres_voyage')]
 #[ORM\Entity(repositoryClass: OffresVoyageRepository::class)]
@@ -16,6 +20,7 @@ class OffresVoyage
     private ?int $offresVoyageId = null;
 
     #[ORM\Column(name: 'titre', length: 255)]
+<<<<<<< HEAD
     private ?string $titre = null;
 
     #[ORM\Column(name: 'destination', length: 255)]
@@ -34,6 +39,39 @@ class OffresVoyage
     private ?string $prix = null;
 
     #[ORM\Column(name: 'places_disponibles')]
+=======
+    #[Assert\NotBlank(message: 'Title cannot be empty.')]
+    #[Assert\Length(max: 255, maxMessage: 'Title cannot exceed 255 characters.')]
+    private ?string $titre = null;
+
+    #[ORM\Column(name: 'destination', length: 255)]
+    #[Assert\NotBlank(message: 'Destination cannot be empty.')]
+    #[Assert\Length(max: 255, maxMessage: 'Destination cannot exceed 255 characters.')]
+    private ?string $destination = null;
+
+    #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
+    #[Assert\NotBlank(message: 'Description cannot be empty.')]
+    #[Assert\Length(min: 10, max: 255, minMessage: 'Description must be at least 10 characters long.', maxMessage: 'Description cannot exceed 255 characters.')]
+    private ?string $description = null;
+
+    #[ORM\Column(name: 'date_depart', type: Types::DATE_MUTABLE)]
+    #[Assert\GreaterThanOrEqual('today', message: 'Departure date cannot be in the past.')]
+    private ?\DateTimeInterface $dateDepart = null;
+
+    #[ORM\Column(name: 'date_retour', type: Types::DATE_MUTABLE)]
+    #[Assert\Expression(
+        'this.getDateDepart() === null || value >= this.getDateDepart()',
+        message: 'Return date cannot be before departure date.'
+    )]
+    private ?\DateTimeInterface $dateRetour = null;
+
+    #[ORM\Column(name: 'prix', type: Types::DECIMAL, precision: 10, scale: 0)]
+    #[Assert\GreaterThanOrEqual(0, message: 'Price must be a non-negative number.')]
+    private ?string $prix = null;
+
+    #[ORM\Column(name: 'places_disponibles')]
+    #[Assert\GreaterThanOrEqual(0, message: 'Available places cannot be negative.')]
+>>>>>>> origin/master
     private ?int $placesDisponibles = null;
 
     public function getOffresVoyageId(): ?int

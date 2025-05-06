@@ -21,6 +21,7 @@ class ReservationHotelRepository extends ServiceEntityRepository
         parent::__construct($registry, ReservationHotel::class);
     }
 
+<<<<<<< HEAD
     //    /**
     //     * @return ReservationHotel[] Returns an array of ReservationHotel objects
     //     */
@@ -45,4 +46,41 @@ class ReservationHotelRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+=======
+    public function add(ReservationHotel $reservationHotel): void
+    {
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($reservationHotel);
+        $entityManager->flush();
+    }
+
+    public function update(ReservationHotel $reservationHotel): void
+    {
+        $entityManager = $this->getEntityManager();
+        $existingReservation = $this->find($reservationHotel->getReservationHotelId());
+        if (!$existingReservation) {
+            throw new \Exception('Reservation not found');
+        }
+        $existingReservation->setClientId($reservationHotel->getClientId());
+        $existingReservation->setChambreId($reservationHotel->getChambreId());
+        $existingReservation->setDateDebut($reservationHotel->getDateDebut());
+        $existingReservation->setDateFin($reservationHotel->getDateFin());
+        $existingReservation->setStatusEnu($reservationHotel->getStatusEnu());
+        $existingReservation->setPrixTotale($reservationHotel->getPrixTotale());
+        $entityManager->flush();
+    }
+
+    public function delete(int $id): void
+    {
+        $entityManager = $this->getEntityManager();
+        $reservation = $entityManager->getReference(ReservationHotel::class, $id);
+        $entityManager->remove($reservation);
+        $entityManager->flush();
+    }
+
+    public function listAll(): array
+    {
+        return $this->findAll();
+    }
+>>>>>>> origin/master
 }

@@ -1,0 +1,301 @@
+{% extends 'base.html.twig' %} {% block title %}Flight Details{% endblock %} {% block body %}
+<div class="container my-5">
+	<h1 class="display-4 fw-bold mb-4">Flight Details</h1>
+
+	<!-- Flight Details Section -->
+	<div class="card shadow-sm mb-4">
+		<div class="card-body">
+			<h2 class="fs-3 fw-semibold mb-4">Flight Information</h2>
+			<div class="row g-4">
+				<div class="col-md-6">
+					<div class="d-flex align-items-center">
+						<i class="fa fa-plane text-primary fs-4 me-3"></i>
+						<div>
+							<p class="text-secondary mb-1 small">Title</p>
+							<p class="fs-5 fw-medium mb-0">{{ voyage.titre }}</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="d-flex align-items-center">
+						<i class="fa fa-map-marker-alt text-success fs-4 me-3"></i>
+						<div>
+							<p class="text-secondary mb-1 small">Destination</p>
+							<p class="fs-5 fw-medium mb-0">{{ voyage.destination }}</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="d-flex align-items-center">
+						<i class="fa fa-plane-departure text-warning fs-4 me-3"></i>
+						<div>
+							<p class="text-secondary mb-1 small">Departure Date</p>
+							<p class="fs-5 fw-medium mb-0">{{ voyage.dateDepart|date('d-m-Y') }}</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="d-flex align-items-center">
+						<i class="fa fa-plane-arrival text-info fs-4 me-3"></i>
+						<div>
+							<p class="text-secondary mb-1 small">Return Date</p>
+							<p class="fs-5 fw-medium mb-0">{{ voyage.dateRetour|date('d-m-Y') }}</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="d-flex align-items-center">
+						<i class="fas fa-money-bill-wave text-success fs-4 me-3"></i>
+						<div>
+							<p class="text-secondary mb-1 small">Price</p>
+							<p class="fs-5 fw-medium mb-0">{{ voyage.prix }} €</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="d-flex align-items-center">
+						<i class="fa fa-users text-primary fs-4 me-3"></i>
+						<div>
+							<p class="text-secondary mb-1 small">Available Places</p>
+							<p class="fs-5 fw-medium mb-0">{{ voyage.placesDisponibles }}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Reservation Form Section -->
+	<div class="card shadow-sm mb-4">
+		<div class="card-body">
+			<form method="post" action="{{ path('app_reserve_flight', {id: voyage.offresVoyageId}) }}">
+				<h2 class="fs-3 fw-semibold mb-4">Make a Reservation</h2>
+				<div class="mb-3">
+					<label for="nbrPlace" class="form-label">Number of Seats:</label>
+					<input type="number" id="nbrPlace" name="nbrPlace" class="form-control" />
+				</div>
+				<div class="mb-3">
+					<label for="promoCode" class="form-label">Promo Code:</label>
+					<input type="text" id="promoCode" name="promoCode" class="form-control" />
+				</div>
+				<div id="error-messages" class="text-danger mb-3"></div>
+				{% for message in app.flashes('error') %}
+				<div class="alert alert-danger">{{ message }}</div>
+				{% endfor %} {% for message in app.flashes('success') %}
+				<div class="alert alert-success">{{ message }}</div>
+				{% endfor %} {% for message in app.flashes('info') %}
+				<div class="alert alert-info">{{ message }}</div>
+				{% endfor %}
+				<button type="submit" class="btn btn-primary">Reserve Now</button>
+			</form>
+			{% if reservationId is defined and reservationId is not empty %}
+			<div class="mt-4 pt-4 border-top">
+				<h2 class="fs-5 fw-medium mb-2">Your reservation was successful!</h2>
+				<p class="text-secondary mb-3">
+					You can now download your reservation details as a PDF or email it to yourself.
+				</p>
+				<div class="d-flex gap-3">
+					<form method="post" target="_blank" action="{{ path('app_generate_pdf', {id: reservationId}) }}">
+						<button type="submit" class="btn btn-primary">Download PDF</button>
+					</form>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<!-- Back to Flights Button -->
+	<div>
+		<a href="{{ path('app_flights') }}" class="btn btn-outline-secondary">
+			<i class="fas fa-arrow-left me-2"></i>Back to Flights
+		</a>
+	</div>
+</div>
+<script>
+	const FlightDetailsApp = (() => {
+		const CONFIG = {
+			MIN_SEATS: 1,
+		};
+
+		const elements = {
+			nbrPlace: document.getElementById("nbrPlace"),
+			errorMessages: document.getElementById("error-messages"),
+			form: document.querySelector("form"),
+		};
+
+		const Validator = {
+			validateForm() {
+				const errors = [];
+
+				if (!elements.nbrPlace.value || parseInt(elements.nbrPlace.value) < CONFIG.MIN_SEATS) {
+					errors.push(`Number of seats must be at least ${CONFIG.MIN_SEATS}.`);
+				}
+
+				elements.errorMessages.innerHTML = "";
+				if (errors.length > 0) {
+					elements.errorMessages.innerHTML = errors.map((error) => `<p class="text-danger">${error}</p>`).join("");
+					return false;
+				}
+
+				return true;
+			},
+		};
+
+		const FormHandler = {
+			submitForm(event) {
+				if (!Validator.validateForm()) {
+					event.preventDefault();
+				}
+			},
+		};
+
+		const init = () => {
+			elements.form.addEventListener("submit", FormHandler.submitForm);
+		};
+
+		if (document.readyState === "loading") {
+			document.addEventListener("DOMContentLoaded", init);
+		} else {
+			init();
+		}
+
+		return {
+			validateForm: Validator.validateForm,
+		};
+	})();
+	document.addEventListener("DOMContentLoaded", () => {
+		const fromCurrencySelect = document.getElementById("fromCurrency");
+		const toCurrencySelect = document.getElementById("toCurrency");
+		const fromCurrencyValue = document.getElementById("fromCurrencyValue");
+		const toCurrencyValue = document.getElementById("toCurrencyValue");
+		const convertButton = document.getElementById("convertButton");
+
+		async function fetchCurrencies() {
+			try {
+				const response = await fetch("/api/currencies");
+				if (!response.ok) {
+					console.error("Failed to fetch currencies: ", response.statusText);
+					return;
+				}
+
+				const data = await response.json();
+				const currenciesArray = data.supported_codes;
+
+				currenciesArray.forEach((currencyPair) => {
+					const option = document.createElement("option");
+					option.value = currencyPair[0];
+					option.textContent = `${currencyPair[0]} - ${currencyPair[1]}`;
+					fromCurrencySelect.appendChild(option);
+				});
+			} catch (error) {
+				console.error("Error fetching currencies: ", error);
+			}
+		}
+
+		async function fetchCountryCurrencyCode(country) {
+			if (!country) {
+				console.error("Country is not provided.");
+				return null;
+			}
+
+			console.log("Fetching currency code for country:", country); // Log the country parameter
+
+			try {
+				const response = await fetch("/api/country-currency", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ country }),
+				});
+
+				if (!response.ok) {
+					console.error("Failed to fetch country currency: ", response.statusText);
+					return null;
+				}
+
+				const data = await response.json();
+				return data.currency ? data.currency.code : null;
+			} catch (error) {
+				console.error("Error fetching country currency: ", error);
+				return null;
+			}
+		}
+
+		async function convertCurrency(amount, fromCurrency, toCurrency) {
+			try {
+				const response = await fetch("/api/convert-currency", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ amount, fromCurrency, toCurrency }),
+				});
+
+				if (!response.ok) {
+					console.error("Failed to convert currency: ", response.statusText);
+					return null;
+				}
+
+				const data = await response.json();
+				return data.convertedAmount || null;
+			} catch (error) {
+				console.error("Error converting currency: ", error);
+				return null;
+			}
+		}
+
+		async function initializeCurrencyConverter() {
+			await fetchCurrencies();
+
+			const destination = "{{ voyage.destination }}";
+			if (!destination) {
+				console.error("Destination is not defined.");
+				return;
+			}
+
+			const destinationCurrencyCode = await fetchCountryCurrencyCode(destination);
+			if (destinationCurrencyCode) {
+				const option = document.createElement("option");
+				option.value = destinationCurrencyCode;
+				option.textContent = destinationCurrencyCode;
+				toCurrencySelect.appendChild(option);
+				toCurrencySelect.value = destinationCurrencyCode;
+			}
+		}
+
+		convertButton?.addEventListener("click", async () => {
+			const fromCurrency = fromCurrencySelect?.value;
+			const toCurrency = toCurrencySelect?.value;
+			const amountText = fromCurrencyValue?.value;
+
+			if (!fromCurrency || !toCurrency || !amountText) {
+				if (toCurrencyValue) toCurrencyValue.textContent = "Please enter valid values.";
+				return;
+			}
+
+			try {
+				const amount = parseFloat(amountText);
+				if (isNaN(amount)) {
+					if (toCurrencyValue) toCurrencyValue.textContent = "Invalid amount.";
+					return;
+				}
+
+				const convertedAmount = await convertCurrency(amount, fromCurrency, toCurrency);
+				if (convertedAmount !== null && toCurrencyValue) {
+					toCurrencyValue.textContent = `${convertedAmount.toFixed(2)} ${toCurrency}`;
+				} else if (toCurrencyValue) {
+					toCurrencyValue.textContent = "Conversion failed.";
+				}
+			} catch (error) {
+				if (toCurrencyValue) toCurrencyValue.textContent = "An error occurred.";
+				console.error(error);
+			}
+		});
+
+		if (fromCurrencySelect && toCurrencySelect) {
+			initializeCurrencyConverter();
+		}
+	});
+</script>
+{% endblock %}

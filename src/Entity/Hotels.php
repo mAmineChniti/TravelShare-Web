@@ -5,6 +5,12 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\HotelsRepository;
+<<<<<<< HEAD
+=======
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
+>>>>>>> origin/master
 
 #[ORM\Table(name: 'hotels')]
 #[ORM\Entity(repositoryClass: HotelsRepository::class)]
@@ -16,6 +22,7 @@ class Hotels
     private ?int $hotelId = null;
 
     #[ORM\Column(name: 'nom', length: 255)]
+<<<<<<< HEAD
     private ?string $nom = null;
 
     #[ORM\Column(name: 'adress', type: Types::TEXT, nullable: true)]
@@ -25,10 +32,48 @@ class Hotels
     private ?string $telephone = null;
 
     #[ORM\Column(name: 'capacite_totale')]
+=======
+    #[Assert\NotBlank(message: 'The name cannot be empty.')]
+    #[Assert\Length(max: 255, maxMessage: 'The name cannot exceed 255 characters.')]
+    private ?string $nom = null;
+
+    #[ORM\Column(name: 'adress', type: Types::TEXT, nullable: true)]
+    #[Assert\NotBlank(message: 'The address cannot be empty.')]
+    #[Assert\Length(max: 255, maxMessage: 'The address cannot exceed 255 characters.')]
+    private ?string $adress = null;
+
+    #[ORM\Column(name: 'telephone', length: 255, nullable: true)]
+    #[Assert\NotBlank(message: 'The telephone number cannot be empty.')]
+    #[Assert\Length(min: 8, max: 8, exactMessage: 'The telephone number must be exactly 8 digits.')]
+    #[Assert\Regex(pattern: '/^[0-9]+$/', message: 'Invalid phone number format. Only numbers are allowed.')]
+    private ?string $telephone = null;
+
+    #[ORM\Column(name: 'capacite_totale')]
+    #[Assert\Positive(message: 'The total capacity must be more than 0.')]
+>>>>>>> origin/master
     private ?int $capaciteTotale = null;
 
     #[ORM\Column(name: 'image_h', type: Types::BLOB)]
     private $imageH;
+<<<<<<< HEAD
+=======
+
+    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: Chambres::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
+    private Collection $chambres;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['length' => 65535])]
+    private ?string $description = null;
+
+    public function __construct()
+    {
+        $this->chambres = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->hotelId;
+    }
+>>>>>>> origin/master
 
     public function getHotelId(): ?int
     {
@@ -91,6 +136,44 @@ class Hotels
     public function setImageH($imageH): static
     {
         $this->imageH = $imageH;
+
+        return $this;
+    }
+
+    public function getChambres(): Collection
+    {
+        return $this->chambres;
+    }
+
+    public function addChambre(Chambres $chambre): static
+    {
+        if (!$this->chambres->contains($chambre)) {
+            $this->chambres[] = $chambre;
+            $chambre->setHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChambre(Chambres $chambre): static
+    {
+        if ($this->chambres->removeElement($chambre)) {
+            if ($chambre->getHotel() === $this) {
+                $chambre->setHotel(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

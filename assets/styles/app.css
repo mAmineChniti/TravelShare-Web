@@ -3,41 +3,75 @@
 
 /* Custom styles can go here */
 body {
+<<<<<<< HEAD
 	  min-height: 100vh;
+=======
+  min-height: 100vh;
+>>>>>>> origin/master
 }
 
 /* Keep cursor pointer behavior for buttons */
 button:not(:disabled),
 [role="button"]:not(:disabled) {
+<<<<<<< HEAD
 	  cursor: pointer;
+=======
+  cursor: pointer;
+>>>>>>> origin/master
 }
 
 /* Custom color mode styles */
 [data-bs-theme="dark"] .hover-scale {
+<<<<<<< HEAD
 	  box-shadow: 0 0.125rem 0.25rem rgba(255, 255, 255, 0.075) !important;
+=======
+  box-shadow: 0 0.125rem 0.25rem rgba(255, 255, 255, 0.075) !important;
+>>>>>>> origin/master
 }
 
 /* Ensure proper contrast for text in dark mode */
 [data-bs-theme="dark"] .text-secondary {
+<<<<<<< HEAD
 	  color: #adb5bd !important;
+=======
+  color: #adb5bd !important;
+>>>>>>> origin/master
 }
 
 /* Fix for card backgrounds in dark mode */
 [data-bs-theme="dark"] .card {
+<<<<<<< HEAD
 	  background-color: #2b3035;
+=======
+  background-color: #2b3035;
+>>>>>>> origin/master
 }
 
 /* Fix for hover effects in dark mode */
 [data-bs-theme="dark"] .hover-scale:hover {
+<<<<<<< HEAD
 	  transform: scale(1.05);
 		  box-shadow: 0 0.5rem 1rem rgba(255, 255, 255, 0.1) !important;
+=======
+  transform: scale(1.05);
+  box-shadow: 0 0.5rem 1rem rgba(255, 255, 255, 0.1) !important;
+>>>>>>> origin/master
 }
 
 /* Transition for theme switching */
 html {
+<<<<<<< HEAD
 	  transition: color-scheme 0.3s ease;
 }
 
 html * {
 	  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
+=======
+  transition: color-scheme 0.3s ease;
+}
+
+html * {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+>>>>>>> origin/master

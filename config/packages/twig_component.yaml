@@ -1,5 +1,13 @@
+<<<<<<< HEAD
+=======
+# config/packages/twig_component.yaml
+>>>>>>> origin/master
 twig_component:
     anonymous_template_directory: 'components/'
     defaults:
         # Namespace & directory for components
+<<<<<<< HEAD
         App\Twig\Components\: 'components/'
+=======
+        App\Twig\Components\: 'components/'
+>>>>>>> origin/master

@@ -1,0 +1,282 @@
+{% extends 'base.html.twig' %} {% block title %}Room Details{% endblock %} {% block body %}
+<div class="container my-5">
+	<h1 class="display-4 fw-bold mb-4">Room {{ room.numeroChambre }} Details</h1>
+
+	<!-- Room Details Section -->
+	<div class="card shadow-sm mb-4">
+		<div class="card-body">
+			<h2 class="fs-3 fw-semibold mb-4">Room Details</h2>
+			<div class="row g-4">
+				<div class="col-md-4">
+					<div class="d-flex align-items-center">
+						<i class="fa fa-tag text-primary fs-4 me-3"></i>
+						<div>
+							<p class="text-secondary mb-1 small">Price</p>
+							<p class="fs-5 fw-medium mb-0">{{ room.prixParNuit }} per night</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="d-flex align-items-center">
+						<i class="fa fa-bed text-success fs-4 me-3"></i>
+						<div>
+							<p class="text-secondary mb-1 small">Type</p>
+							<p class="fs-5 fw-medium mb-0">{{ room.typeEnu|capitalize }}</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="d-flex align-items-center">
+						<i
+							class="fa {{ room.disponible == 1 ? 'fa-check-circle text-success' : 'fa-times-circle text-danger' }} fs-4 me-3"
+						></i>
+						<div>
+							<p class="text-secondary mb-1 small">Available</p>
+							<p class="fs-5 fw-medium mb-0">{{ room.disponible == 1 ? 'Yes' : 'No' }}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<form method="POST" action="{{ path('room_reserve', {'roomId': room.chambreId }) }}" class="card shadow-sm mb-4">
+		<div class="card-body">
+			<h2 class="fs-3 fw-semibold mb-4">Make a Reservation</h2>
+			<div id="date-range-picker" class="row align-items-center mb-4">
+				<div class="col-md-5">
+					<div class="input-group">
+						<span class="input-group-text">
+							<i class="fas fa-calendar-alt text-primary"></i>
+						</span>
+						<input
+							type="text"
+							id="startReservation"
+							name="startReservation"
+							class="form-control"
+							placeholder="Start date"
+							data-date-format="mm/dd/yyyy"
+							data-date-container="#date-range-picker"
+							data-provide="datepicker"
+							readonly
+						/>
+					</div>
+				</div>
+				<div class="col-md-2 text-center">
+					<span class="text-secondary">to</span>
+				</div>
+				<div class="col-md-5">
+					<div class="input-group">
+						<span class="input-group-text">
+							<i class="fas fa-calendar-alt text-primary"></i>
+						</span>
+						<input
+							type="text"
+							id="endReservation"
+							name="endReservation"
+							class="form-control"
+							placeholder="End date"
+							data-date-format="mm/dd/yyyy"
+							data-date-container="#date-range-picker"
+							data-provide="datepicker"
+							readonly
+						/>
+					</div>
+				</div>
+			</div>
+
+			{% for message in app.flashes('success') %}
+			<div class="alert alert-success" role="alert">
+				<span class="fw-bold"><i class="fas fa-check-circle me-2"></i>Success!</span> {{ message }}
+			</div>
+			{% endfor %} {% for message in app.flashes('info') %}
+			<div class="alert alert-info" role="alert">
+				<span class="fw-bold"><i class="fas fa-info-circle me-2"></i>Info!</span> {{ message }}
+			</div>
+			{% endfor %}
+
+			<div>
+				<button type="submit" class="btn btn-primary"><i class="fas fa-calendar-check me-2"></i> Reserve Now</button>
+			</div>
+		</div>
+	</form>
+
+	<div class="card shadow-sm mb-4">
+		<div class="card-body">
+			<h2 class="fs-3 fw-semibold mb-4">Location</h2>
+			<div id="map" class="rounded w-100" style="height: 400px" data-address="{{ room.hotel.adress }}"></div>
+		</div>
+	</div>
+
+	<div class="card shadow-sm mb-4">
+		<div class="card-body">
+			<h2 class="fs-3 fw-semibold mb-4">Nearby Places</h2>
+			<ul id="nearby-places" class="list-unstyled">
+				<li class="text-secondary">Loading nearby places...</li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+<script>
+	window.onload = () => {
+		const mapElement = document.getElementById("map");
+		const placesList = document.getElementById("nearby-places");
+
+		if (mapElement) {
+			const address = mapElement.dataset.address;
+
+			const initializeMap = (lat, lon) => {
+				const map = L.map("map").setView([lat, lon], 15);
+
+				// Add OpenStreetMap tiles
+				L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+					maxZoom: 19,
+					attribution: "© OpenStreetMap contributors",
+				}).addTo(map);
+
+				// Add a marker for the location
+				L.marker([lat, lon]).addTo(map).bindPopup("Location of the hotel").openPopup();
+
+				// Fetch nearby places
+				fetch(`/nearby-places?lat=${lat}&lon=${lon}`)
+					.then((response) => response.json())
+					.then((places) => {
+						placesList.innerHTML = "";
+
+						const categories = {
+							restaurant: [],
+							cafe: [],
+							bar: [],
+						};
+
+						places.forEach((place) => {
+							if (categories[place.type]) {
+								categories[place.type].push(place);
+							}
+						});
+
+						Object.keys(categories).forEach((category) => {
+							if (categories[category].length > 0) {
+								const categoryHeader = document.createElement("h3");
+								categoryHeader.textContent = category.charAt(0).toUpperCase() + category.slice(1) + "s";
+								categoryHeader.classList.add("fs-5", "fw-semibold", "mt-4", "mb-3");
+								placesList.appendChild(categoryHeader);
+
+								const categoryGrid = document.createElement("div");
+								categoryGrid.classList.add("row", "row-cols-1", "row-cols-sm-2", "row-cols-md-3", "g-3");
+
+								categories[category].forEach((place) => {
+									const listItem = document.createElement("div");
+									listItem.classList.add("col");
+
+									const card = document.createElement("div");
+									card.classList.add("card", "h-100", "shadow-sm", "transition-transform", "hover-scale");
+
+									const cardBody = document.createElement("div");
+									cardBody.classList.add("card-body", "d-flex", "align-items-center");
+
+									const icon = document.createElement("i");
+									icon.classList.add("fa", "fs-4", "me-3");
+									if (place.type === "restaurant") {
+										icon.classList.add("fa-utensils", "text-danger");
+									} else if (place.type === "cafe") {
+										icon.classList.add("fa-coffee", "text-warning");
+									} else if (place.type === "bar") {
+										icon.classList.add("fa-glass-martini-alt", "text-info");
+									} else {
+										icon.classList.add("fa-map-marker-alt", "text-primary");
+									}
+
+									const placeInfo = document.createElement("div");
+									placeInfo.classList.add("flex-grow-1");
+
+									const placeName = document.createElement("p");
+									placeName.textContent = place.name;
+									placeName.classList.add("fw-medium", "mb-1");
+
+									const placeType = document.createElement("p");
+									placeType.textContent = place.type.charAt(0).toUpperCase() + place.type.slice(1);
+									placeType.classList.add("text-secondary", "small", "mb-0");
+
+									placeInfo.appendChild(placeName);
+									placeInfo.appendChild(placeType);
+
+									cardBody.appendChild(icon);
+									cardBody.appendChild(placeInfo);
+									card.appendChild(cardBody);
+									listItem.appendChild(card);
+
+									categoryGrid.appendChild(listItem);
+
+									// Add a marker for each nearby place
+									L.marker([place.lat, place.lon]).addTo(map).bindPopup(`${place.name} (${place.type})`);
+								});
+
+								placesList.appendChild(categoryGrid);
+							}
+						});
+
+						if (places.length === 0) {
+							placesList.innerHTML = "<li class='text-secondary'>No nearby places found.</li>";
+						}
+					})
+					.catch((error) => {
+						console.error("Error fetching nearby places:", error);
+						placesList.innerHTML =
+							"<li class='text-danger'><i class='fas fa-exclamation-circle me-2'></i>Error loading nearby places.</li>";
+					});
+			};
+
+			// Fetch coordinates from your Symfony backend
+			fetch(`/geocode?address=${encodeURIComponent(address)}`)
+				.then((response) => response.json())
+				.then((data) => {
+					if (data.lat && data.lon) {
+						initializeMap(data.lat, data.lon);
+					} else {
+						console.error("Coordinates not found for the address.");
+					}
+				})
+				.catch((error) => {
+					console.error("Error loading map:", error);
+				});
+		}
+	};
+
+	document.addEventListener("DOMContentLoaded", function () {
+		// Initialize datepickers with Bootstrap
+		$("#startReservation").datepicker({
+			autoclose: true,
+			todayHighlight: true,
+			startDate: new Date(),
+		});
+
+		$("#endReservation").datepicker({
+			autoclose: true,
+			todayHighlight: true,
+			startDate: new Date(),
+		});
+
+		// When start date changes, update end date minimum
+		$("#startReservation").on("changeDate", function (e) {
+			$("#endReservation").datepicker("setStartDate", e.date);
+		});
+
+		// Clear initial values
+		document.getElementById("startReservation").value = "";
+		document.getElementById("endReservation").value = "";
+	});
+</script>
+
+<style>
+	.hover-scale {
+		transition: transform 0.3s ease;
+	}
+
+	.hover-scale:hover {
+		transform: scale(1.03);
+	}
+</style>
+
+{% endblock %}

@@ -5,6 +5,10 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CommentsRepository;
+<<<<<<< HEAD
+=======
+use Symfony\Component\Validator\Constraints as Assert;
+>>>>>>> origin/master
 
 #[ORM\Table(name: 'comments')]
 #[ORM\Index(name: 'fk_commenter_id', columns: ['commenter_id'])]
@@ -18,6 +22,7 @@ class Comments
     private ?int $commentId = null;
 
     #[ORM\Column(name: 'post_id')]
+<<<<<<< HEAD
     private ?int $postId = null;
 
     #[ORM\Column(name: 'commenter_id')]
@@ -30,7 +35,52 @@ class Comments
     private ?\DateTimeInterface $commentedAt = null;
 
     #[ORM\Column(name: 'updated_at', type: Types::DATE_MUTABLE)]
+=======
+    #[Assert\NotBlank(message: 'Post ID cannot be blank.')]
+    #[Assert\Type(type: 'integer', message: 'Post ID must be an integer.')]
+    private ?int $postId = null;
+
+    #[ORM\Column(name: 'commenter_id')]
+    #[Assert\NotBlank(message: 'Commenter ID cannot be blank.')]
+    #[Assert\Type(type: 'integer', message: 'Commenter ID must be an integer.')]
+    private ?int $commenterId = null;
+
+    #[ORM\Column(name: 'comment', length: 255)]
+    #[Assert\NotBlank(message: 'Comment cannot be blank.')]
+    #[Assert\Length(
+        min: 10,
+        max: 255,
+        minMessage: 'Comment must be at least 10 characters long.',
+        maxMessage: 'Comment cannot be longer than 255 characters.'
+    )]
+    private ?string $comment = null;
+
+    #[ORM\Column(name: 'commented_at', type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: 'Commented at date cannot be blank.')]
+    #[Assert\Type(type: \DateTimeInterface::class, message: 'Commented at must be a valid datetime.')]
+    private ?\DateTimeInterface $commentedAt = null;
+
+    #[ORM\Column(name: 'updated_at', type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank(message: 'Updated at date cannot be blank.')]
+    #[Assert\Type(type: \DateTimeInterface::class, message: 'Updated at must be a valid datetime.')]
+>>>>>>> origin/master
     private ?\DateTimeInterface $updatedAt = null;
+
+    #[ORM\ManyToOne(targetEntity: Posts::class, inversedBy: 'comments')]
+    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'Post_id', nullable: false, onDelete: 'CASCADE')]
+    private ?Posts $post = null;
+
+    public function getPost(): ?Posts
+    {
+        return $this->post;
+    }
+
+    public function setPost(?Posts $post): static
+    {
+        $this->post = $post;
+
+        return $this;
+    }
 
     public function getCommentId(): ?int
     {
