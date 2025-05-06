@@ -1,17 +1,9 @@
 knp_snappy:
     pdf:
         enabled:    true
-<<<<<<< HEAD
-        binary:     '%env(WKHTMLTOPDF_PATH)%'
-        options:    []
-    image:
-        enabled:    true
-        binary:     '%env(WKHTMLTOIMAGE_PATH)%'
-=======
         binary:     "\"%env(WKHTMLTOPDF_PATH)%\""
         options:    []
     image:
         enabled:    true
         binary:     "\"%env(WKHTMLTOIMAGE_PATH)%\""
->>>>>>> origin/master
         options:    []

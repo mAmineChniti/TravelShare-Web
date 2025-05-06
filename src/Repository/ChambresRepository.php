@@ -21,32 +21,6 @@ class ChambresRepository extends ServiceEntityRepository
         parent::__construct($registry, Chambres::class);
     }
 
-<<<<<<< HEAD
-    //    /**
-    //     * @return Chambres[] Returns an array of Chambres objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Chambres
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
-=======
     public function add(Chambres $chambre): void
     {
         $entityManager = $this->getEntityManager();
@@ -96,5 +70,4 @@ class ChambresRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
->>>>>>> origin/master
 }

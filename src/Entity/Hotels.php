@@ -5,12 +5,9 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\HotelsRepository;
-<<<<<<< HEAD
-=======
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
->>>>>>> origin/master
 
 #[ORM\Table(name: 'hotels')]
 #[ORM\Entity(repositoryClass: HotelsRepository::class)]
@@ -22,17 +19,6 @@ class Hotels
     private ?int $hotelId = null;
 
     #[ORM\Column(name: 'nom', length: 255)]
-<<<<<<< HEAD
-    private ?string $nom = null;
-
-    #[ORM\Column(name: 'adress', type: Types::TEXT, nullable: true)]
-    private ?string $adress = null;
-
-    #[ORM\Column(name: 'telephone', length: 255, nullable: true)]
-    private ?string $telephone = null;
-
-    #[ORM\Column(name: 'capacite_totale')]
-=======
     #[Assert\NotBlank(message: 'The name cannot be empty.')]
     #[Assert\Length(max: 255, maxMessage: 'The name cannot exceed 255 characters.')]
     private ?string $nom = null;
@@ -50,13 +36,10 @@ class Hotels
 
     #[ORM\Column(name: 'capacite_totale')]
     #[Assert\Positive(message: 'The total capacity must be more than 0.')]
->>>>>>> origin/master
     private ?int $capaciteTotale = null;
 
     #[ORM\Column(name: 'image_h', type: Types::BLOB)]
     private $imageH;
-<<<<<<< HEAD
-=======
 
     #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: Chambres::class, orphanRemoval: true, cascade: ['persist', 'remove'])]
     private Collection $chambres;
@@ -73,7 +56,6 @@ class Hotels
     {
         return $this->hotelId;
     }
->>>>>>> origin/master
 
     public function getHotelId(): ?int
     {

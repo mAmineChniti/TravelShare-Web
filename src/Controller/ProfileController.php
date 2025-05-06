@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-<<<<<<< HEAD
 use App\Entity\Users;
 use App\Form\UserProfileType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -123,19 +122,4 @@ final class ProfileController extends AbstractController
         // $this->addFlash('success', 'Votre compte a été supprimé avec succès.');
         return $this->redirectToRoute('app_logup');
     }
-=======
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-final class ProfileController extends AbstractController
-{
-    #[Route('/profile', name: 'app_profile')]
-    public function index(): Response
-    {
-        return $this->render('profile/index.html.twig', [
-            'controller_name' => 'ProfileController',
-        ]);
-    }
->>>>>>> origin/master
 }

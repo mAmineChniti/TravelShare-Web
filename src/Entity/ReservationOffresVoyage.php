@@ -5,10 +5,7 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ReservationOffresVoyageRepository;
-<<<<<<< HEAD
-=======
 use Symfony\Component\Validator\Constraints as Assert;
->>>>>>> origin/master
 
 #[ORM\Table(name: 'reservation_offres_voyage')]
 #[ORM\Index(name: 'fk_client', columns: ['client_id'])]
@@ -22,17 +19,11 @@ class ReservationOffresVoyage
     private ?int $reservationId = null;
 
     #[ORM\Column(name: 'client_id')]
-<<<<<<< HEAD
-    private ?int $clientId = null;
-
-    #[ORM\Column(name: 'offre_id')]
-=======
     #[Assert\Positive(message: 'Client ID must be a positive integer.')]
     private ?int $clientId = null;
 
     #[ORM\Column(name: 'offre_id')]
     #[Assert\Positive(message: 'Offer ID must be a positive integer.')]
->>>>>>> origin/master
     private ?int $offreId = null;
 
     #[ORM\Column(name: 'date_reserved', type: Types::DATE_MUTABLE)]
@@ -42,17 +33,11 @@ class ReservationOffresVoyage
     private ?int $status = null;
 
     #[ORM\Column(name: 'nbr_place')]
-<<<<<<< HEAD
-    private ?int $nbrPlace = null;
-
-    #[ORM\Column(name: 'prix')]
-=======
     #[Assert\Positive(message: 'Number of places must be positive.')]
     private ?int $nbrPlace = null;
 
     #[ORM\Column(name: 'prix')]
     #[Assert\GreaterThanOrEqual(0, message: 'Price cannot be negative.')]
->>>>>>> origin/master
     private ?float $prix = null;
 
     public function getReservationId(): ?int

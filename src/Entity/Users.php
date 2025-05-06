@@ -5,12 +5,9 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UsersRepository;
-<<<<<<< HEAD
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-=======
->>>>>>> origin/master
 
 #[ORM\Table(name: 'users')]
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
@@ -22,7 +19,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $userId = null;
 
     #[ORM\Column(name: 'name', length: 50)]
-<<<<<<< HEAD
     #[Assert\NotBlank(message: 'Le prénom est obligatoire')]
     #[Assert\Length(min: 2, max: 50, minMessage: 'Le prénom doit contenir au moins {{ limit }} caractères', maxMessage: 'Le prénom ne peut pas dépasser {{ limit }} caractères')]
     private ?string $name = null;
@@ -52,33 +48,13 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'address', length: 150)]
     #[Assert\NotBlank(message: "L'adresse est obligatoire")]
     #[Assert\Length(min: 5, max: 150, minMessage: "L'adresse doit contenir au moins {{ limit }} caractères", maxMessage: "L'adresse ne peut pas dépasser {{ limit }} caractères")]
-=======
-    private ?string $name = null;
-
-    #[ORM\Column(name: 'last_name', length: 50)]
-    private ?string $lastName = null;
-
-    #[ORM\Column(name: 'email', length: 50)]
-    private ?string $email = null;
-
-    #[ORM\Column(name: 'password', length: 255)]
-    private ?string $password = null;
-
-    #[ORM\Column(name: 'phone_num')]
-    private ?int $phoneNum = null;
-
-    #[ORM\Column(name: 'address', length: 150)]
->>>>>>> origin/master
     private ?string $address = null;
 
     #[ORM\Column(name: 'role', nullable: true, options: ['default' => 0])]
     private ?int $role = 0;
 
     #[ORM\Column(name: 'photo', type: Types::BLOB, nullable: true)]
-<<<<<<< HEAD
     #[Assert\Image(maxSize: '2M', mimeTypes: ['image/jpeg', 'image/png', 'image/gif'], mimeTypesMessage: 'Veuillez uploader une image valide (JPEG, PNG ou GIF)')]
-=======
->>>>>>> origin/master
     private $photo;
 
     #[ORM\Column(name: 'compte', nullable: true, options: ['default' => 0])]

@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
-<<<<<<< HEAD
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -34,18 +33,4 @@ class LoginController extends AbstractController
     {
         // L'action de déconnexion est gérée par Symfony, cette méthode peut être vide
     }
-=======
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-final class LoginController extends AbstractController
-{
-    #[Route('/login', name: 'app_login')]
-    public function index(): Response
-    {
-        return $this->render('login/index.html.twig', [
-            'controller_name' => 'LoginController',
-        ]);
-    }
->>>>>>> origin/master
 }

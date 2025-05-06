@@ -5,13 +5,10 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PostsRepository;
-<<<<<<< HEAD
-=======
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
->>>>>>> origin/master
 
 #[ORM\Table(name: 'posts')]
 #[ORM\Index(name: 'fk_owner_id', columns: ['Owner_id'])]
@@ -24,17 +21,6 @@ class Posts
     private ?int $postId = null;
 
     #[ORM\Column(name: 'Owner_id')]
-<<<<<<< HEAD
-    private ?int $ownerId = null;
-
-    #[ORM\Column(name: 'created_at', type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
-
-    #[ORM\Column(name: 'updated_at', type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $updatedAt = null;
-
-    #[ORM\Column(name: 'text_content', length: 255)]
-=======
     #[Assert\NotBlank(message: 'Owner ID cannot be blank.')]
     #[Assert\Type(type: 'integer', message: 'Owner ID must be an integer.')]
     private ?int $ownerId = null;
@@ -57,7 +43,6 @@ class Posts
         minMessage: 'Text content must be at least 15 characters long.',
         maxMessage: 'Text content cannot be longer than 255 characters.'
     )]
->>>>>>> origin/master
     private ?string $textContent = null;
 
     #[ORM\Column(length: 255)]

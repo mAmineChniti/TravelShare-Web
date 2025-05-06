@@ -47,15 +47,6 @@ when@prod:
         type: pool
         pool: doctrine.result_cache_pool
 
-<<<<<<< HEAD
-    framework:
-        cache:
-            pools:
-                doctrine.result_cache_pool:
-                    adapter: cache.app
-                doctrine.system_cache_pool:
-                    adapter: cache.system
-=======
   framework:
     cache:
       pools:
@@ -69,4 +60,3 @@ stof_doctrine_extensions:
   orm:
     default:
       sluggable: true
->>>>>>> origin/master

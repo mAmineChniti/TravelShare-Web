@@ -5,10 +5,7 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ChambresRepository;
-<<<<<<< HEAD
-=======
 use Symfony\Component\Validator\Constraints as Assert;
->>>>>>> origin/master
 
 #[ORM\Table(name: 'chambres')]
 #[ORM\Index(name: 'fk_hotel_id', columns: ['hotel_id'])]
@@ -20,21 +17,6 @@ class Chambres
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $chambreId = null;
 
-<<<<<<< HEAD
-    #[ORM\Column(name: 'hotel_id')]
-    private ?int $hotelId = null;
-
-    #[ORM\Column(name: 'numero_chambre', length: 255)]
-    private ?string $numeroChambre = null;
-
-    #[ORM\Column(name: 'type_enu', type: Types::STRING)]
-    private ?string $typeEnu = null;
-
-    #[ORM\Column(name: 'prix_par_nuit', type: Types::DECIMAL, precision: 10, scale: 0)]
-    private ?string $prixParNuit = null;
-
-    #[ORM\Column(name: 'disponible')]
-=======
     #[ORM\ManyToOne(targetEntity: Hotels::class, inversedBy: 'chambres')]
     #[ORM\JoinColumn(name: 'hotel_id', referencedColumnName: 'hotel_id', nullable: false)]
     private ?Hotels $hotel = null;
@@ -53,7 +35,6 @@ class Chambres
 
     #[ORM\Column(name: 'disponible')]
     #[Assert\Choice(choices: [0, 1], message: 'Availability must be either 0 (No) or 1 (Yes).')]
->>>>>>> origin/master
     private ?int $disponible = null;
 
     public function getChambreId(): ?int

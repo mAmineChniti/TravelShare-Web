@@ -13,32 +13,6 @@ class OffresVoyageRepository extends ServiceEntityRepository
         parent::__construct($registry, OffresVoyage::class);
     }
 
-<<<<<<< HEAD
-    //    /**
-    //     * @return OffresVoyage[] Returns an array of OffresVoyage objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?OffresVoyage
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
-=======
     public function add(OffresVoyage $offresVoyage): void
     {
         $entityManager = $this->getEntityManager();
@@ -103,5 +77,4 @@ class OffresVoyageRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
->>>>>>> origin/master
 }

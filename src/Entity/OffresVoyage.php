@@ -5,10 +5,7 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\OffresVoyageRepository;
-<<<<<<< HEAD
-=======
 use Symfony\Component\Validator\Constraints as Assert;
->>>>>>> origin/master
 
 #[ORM\Table(name: 'offres_voyage')]
 #[ORM\Entity(repositoryClass: OffresVoyageRepository::class)]
@@ -20,26 +17,6 @@ class OffresVoyage
     private ?int $offresVoyageId = null;
 
     #[ORM\Column(name: 'titre', length: 255)]
-<<<<<<< HEAD
-    private ?string $titre = null;
-
-    #[ORM\Column(name: 'destination', length: 255)]
-    private ?string $destination = null;
-
-    #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
-    private ?string $description = null;
-
-    #[ORM\Column(name: 'date_depart', type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $dateDepart = null;
-
-    #[ORM\Column(name: 'date_retour', type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $dateRetour = null;
-
-    #[ORM\Column(name: 'prix', type: Types::DECIMAL, precision: 10, scale: 0)]
-    private ?string $prix = null;
-
-    #[ORM\Column(name: 'places_disponibles')]
-=======
     #[Assert\NotBlank(message: 'Title cannot be empty.')]
     #[Assert\Length(max: 255, maxMessage: 'Title cannot exceed 255 characters.')]
     private ?string $titre = null;
@@ -71,7 +48,6 @@ class OffresVoyage
 
     #[ORM\Column(name: 'places_disponibles')]
     #[Assert\GreaterThanOrEqual(0, message: 'Available places cannot be negative.')]
->>>>>>> origin/master
     private ?int $placesDisponibles = null;
 
     public function getOffresVoyageId(): ?int

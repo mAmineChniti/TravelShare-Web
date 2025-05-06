@@ -13,32 +13,6 @@ class PostsRepository extends ServiceEntityRepository
         parent::__construct($registry, Posts::class);
     }
 
-<<<<<<< HEAD
-    //    /**
-    //     * @return Posts[] Returns an array of Posts objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Posts
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
-=======
     public function add(Posts $post): void
     {
         $entityManager = $this->getEntityManager();
@@ -163,5 +137,4 @@ class PostsRepository extends ServiceEntityRepository
 
         return $query->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
->>>>>>> origin/master
 }

@@ -5,10 +5,7 @@ namespace App\Repository;
 use App\Entity\Promo;
 use App\Entity\OffresVoyage;
 use App\Entity\ReservationOffresVoyage;
-<<<<<<< HEAD
-=======
 use Doctrine\ORM\EntityManagerInterface;
->>>>>>> origin/master
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -22,32 +19,6 @@ class ReservationOffresVoyageRepository extends ServiceEntityRepository
         $this->entityManager = $entityManager;
     }
 
-<<<<<<< HEAD
-    //    /**
-    //     * @return ReservationOffresVoyage[] Returns an array of ReservationOffresVoyage objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?ReservationOffresVoyage
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
-=======
     public function add(ReservationOffresVoyage $reservation, string $promoCode): int
     {
         $offre = $this->entityManager->getRepository(OffresVoyage::class)->find($reservation->getOffreId());
@@ -122,5 +93,4 @@ class ReservationOffresVoyageRepository extends ServiceEntityRepository
     {
         return $this->findAll();
     }
->>>>>>> origin/master
 }

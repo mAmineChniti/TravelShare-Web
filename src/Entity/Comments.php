@@ -5,10 +5,7 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CommentsRepository;
-<<<<<<< HEAD
-=======
 use Symfony\Component\Validator\Constraints as Assert;
->>>>>>> origin/master
 
 #[ORM\Table(name: 'comments')]
 #[ORM\Index(name: 'fk_commenter_id', columns: ['commenter_id'])]
@@ -22,20 +19,6 @@ class Comments
     private ?int $commentId = null;
 
     #[ORM\Column(name: 'post_id')]
-<<<<<<< HEAD
-    private ?int $postId = null;
-
-    #[ORM\Column(name: 'commenter_id')]
-    private ?int $commenterId = null;
-
-    #[ORM\Column(name: 'comment', length: 255)]
-    private ?string $comment = null;
-
-    #[ORM\Column(name: 'commented_at', type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $commentedAt = null;
-
-    #[ORM\Column(name: 'updated_at', type: Types::DATE_MUTABLE)]
-=======
     #[Assert\NotBlank(message: 'Post ID cannot be blank.')]
     #[Assert\Type(type: 'integer', message: 'Post ID must be an integer.')]
     private ?int $postId = null;
@@ -63,7 +46,6 @@ class Comments
     #[ORM\Column(name: 'updated_at', type: Types::DATE_MUTABLE)]
     #[Assert\NotBlank(message: 'Updated at date cannot be blank.')]
     #[Assert\Type(type: \DateTimeInterface::class, message: 'Updated at must be a valid datetime.')]
->>>>>>> origin/master
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\ManyToOne(targetEntity: Posts::class, inversedBy: 'comments')]

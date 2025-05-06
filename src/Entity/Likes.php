@@ -4,10 +4,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\LikesRepository;
-<<<<<<< HEAD
-=======
 use Symfony\Component\Validator\Constraints as Assert;
->>>>>>> origin/master
 
 #[ORM\Table(name: 'likes')]
 #[ORM\Index(name: 'liker_id', columns: ['liker_id'])]
@@ -15,21 +12,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Likes
 {
     #[ORM\Column(name: 'post_id')]
-<<<<<<< HEAD
-=======
     #[Assert\NotBlank(message: 'Post ID cannot be blank.')]
     #[Assert\Type(type: 'integer', message: 'Post ID must be an integer.')]
->>>>>>> origin/master
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'NONE')]
     private ?int $postId = null;
 
     #[ORM\Column(name: 'liker_id')]
-<<<<<<< HEAD
-=======
     #[Assert\NotBlank(message: 'Liker ID cannot be blank.')]
     #[Assert\Type(type: 'integer', message: 'Liker ID must be an integer.')]
->>>>>>> origin/master
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'NONE')]
     private ?int $likerId = null;
