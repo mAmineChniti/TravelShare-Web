@@ -39,19 +39,17 @@
 		<script src="lib/owlcarousel/owl.carousel.min.js"></script>
 		<script src="lib/lightbox/js/lightbox.min.js"></script>
 		<script src="{{ asset('js/main.js') }}"></script>
-				{% block stylesheets %} {{ encore_entry_link_tags('app') }} {% endblock %} {% block javascripts %} {{
-						encore_entry_script_tags('app') }} {% endblock %} {% block css%}
-		{% endblock%}
+		{% block stylesheets %} {{ encore_entry_link_tags('app') }} {% endblock %} {% block javascripts %} {{
+		encore_entry_script_tags('app') }} {% endblock %} {% block css%} {% endblock%}
 	</head>
 
 	<body class="min-vh-100">
-			<nav class="sticky-top">
-						<twig:Navbar />
-								</nav>
-										<main class="pt-5 pb-3 w-100">{% block body %}{% endblock %}</main>
-												<footer class="mt-auto">
-															<twig:Footer />
-																	</footer>
-																		</body>
-
+		<nav class="sticky-top">
+			<twig:Navbar />
+		</nav>
+		<main class="pt-5 pb-3 w-100">{% block body %}{% endblock %}</main>
+		<footer class="mt-auto">
+			<twig:Footer />
+		</footer>
+	</body>
 </html>

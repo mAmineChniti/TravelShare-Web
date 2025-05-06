@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\CommentsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CommentsRepository;
 
 #[ORM\Table(name: 'comments')]
 #[ORM\Index(name: 'fk_commenter_id', columns: ['commenter_id'])]
@@ -12,24 +12,24 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CommentsRepository::class)]
 class Comments
 {
-    #[ORM\Column(name: "comment_id")]
+    #[ORM\Column(name: 'comment_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $commentId = null;
 
-    #[ORM\Column(name: "post_id")]
+    #[ORM\Column(name: 'post_id')]
     private ?int $postId = null;
 
-    #[ORM\Column(name: "commenter_id")]
+    #[ORM\Column(name: 'commenter_id')]
     private ?int $commenterId = null;
 
-    #[ORM\Column(name: "comment", length: 255)]
+    #[ORM\Column(name: 'comment', length: 255)]
     private ?string $comment = null;
 
-    #[ORM\Column(name: "commented_at", type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'commented_at', type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $commentedAt = null;
 
-    #[ORM\Column(name: "updated_at", type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'updated_at', type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $updatedAt = null;
 
     public function getCommentId(): ?int

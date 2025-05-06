@@ -5,13 +5,13 @@ namespace App\Controller;
 use App\Entity\Users;
 use App\Form\UserProfileType;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 final class ProfileController extends AbstractController
 {
@@ -38,7 +38,7 @@ final class ProfileController extends AbstractController
     public function updateAccount(
         Request $request,
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHasher,
     ): Response {
         $user = $this->getUser();
         if (!$user instanceof Users) {
@@ -60,6 +60,7 @@ final class ProfileController extends AbstractController
 
             if ($plainPassword && $plainPassword !== $confirmPassword) {
                 $this->addFlash('error', 'Les mots de passe ne correspondent pas.');
+
                 return $this->redirectToRoute('app_update_account');
             }
 
@@ -81,6 +82,7 @@ final class ProfileController extends AbstractController
 
             $entityManager->flush();
             $this->addFlash('success', 'Profil mis à jour avec succès !');
+
             return $this->redirectToRoute('app_profile');
         }
 
@@ -95,7 +97,7 @@ final class ProfileController extends AbstractController
     public function deleteAccount(
         Request $request,
         EntityManagerInterface $entityManager,
-        TokenStorageInterface $tokenStorage
+        TokenStorageInterface $tokenStorage,
     ): Response {
         $user = $this->getUser();
         if (!$user instanceof Users) {
@@ -106,6 +108,7 @@ final class ProfileController extends AbstractController
         $submittedToken = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('delete-account', $submittedToken)) {
             $this->addFlash('error', 'Token CSRF invalide.');
+
             return $this->redirectToRoute('app_profile');
         }
 
@@ -116,7 +119,7 @@ final class ProfileController extends AbstractController
         $tokenStorage->setToken(null);
         $request->getSession()->invalidate();
 
-        //$this->addFlash('success', 'Votre compte a été supprimé avec succès.');
+        // $this->addFlash('success', 'Votre compte a été supprimé avec succès.');
         return $this->redirectToRoute('app_logup');
     }
 }

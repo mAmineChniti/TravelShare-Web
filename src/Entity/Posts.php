@@ -2,30 +2,30 @@
 
 namespace App\Entity;
 
-use App\Repository\PostsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\PostsRepository;
 
 #[ORM\Table(name: 'posts')]
 #[ORM\Index(name: 'fk_owner_id', columns: ['Owner_id'])]
 #[ORM\Entity(repositoryClass: PostsRepository::class)]
 class Posts
 {
-    #[ORM\Column(name: "Post_id")]
+    #[ORM\Column(name: 'Post_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $postId = null;
 
-    #[ORM\Column(name: "Owner_id")]
+    #[ORM\Column(name: 'Owner_id')]
     private ?int $ownerId = null;
 
-    #[ORM\Column(name: "created_at", type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'created_at', type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(name: "updated_at", type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'updated_at', type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $updatedAt = null;
 
-    #[ORM\Column(name: "text_content", length: 255)]
+    #[ORM\Column(name: 'text_content', length: 255)]
     private ?string $textContent = null;
 
     public function getPostId(): ?int
