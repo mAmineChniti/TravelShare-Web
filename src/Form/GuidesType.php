@@ -3,15 +3,13 @@
 namespace App\Form;  // Add this line
 
 use App\Entity\Guides;
+use App\Service\LanguageApiService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use App\Service\LanguageApiService;
-
 
 class GuidesType extends AbstractType
 {
@@ -50,9 +48,8 @@ class GuidesType extends AbstractType
 
     private $languageService;
 
-public function __construct(LanguageApiService $languageService)
-{
-    $this->languageService = $languageService;
-}
-
+    public function __construct(LanguageApiService $languageService)
+    {
+        $this->languageService = $languageService;
+    }
 }

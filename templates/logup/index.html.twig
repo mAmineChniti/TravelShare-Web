@@ -19,406 +19,277 @@
 		{{ form_start(registrationForm, { 'attr': { 'class': 'form-horizontal', 'novalidate': 'novalidate' } }) }} {#
 		Affichage des erreurs globales #} {% if registrationForm.vars.errors|length > 0 %}
 		<div class="alert alert-danger">{{ form_errors(registrationForm) }}</div>
-		{% endif %}
+		{% endif %} {% block css %}
+		<!-- MATERIAL DESIGN ICONIC FONT -->
+		<link
+			rel="stylesheet"
+			href="{{ asset('fonts2/material-design-iconic-font/css/material-design-iconic-font.min.css') }}"
+		/>
+		<!-- STYLE CSS -->
+		<link href="{{ asset('css2/style.css') }}" rel="stylesheet" />
 
-<<<<<<< HEAD
-{% block css %}
-    <!-- MATERIAL DESIGN ICONIC FONT -->
-    <link rel="stylesheet" href="{{ asset('fonts2/material-design-iconic-font/css/material-design-iconic-font.min.css') }}">
-    <!-- STYLE CSS -->
-    <link href="{{ asset('css2/style.css') }}" rel="stylesheet">
+		<style>
+			/* Error styles */
+			.form-control.invalid {
+				border: none;
+				border-bottom: 2px solid #ff3860 !important;
+				background-image: none;
+			}
 
-    <style>
-        /* Error styles */
-        .form-control.invalid {
-            border: none;
-            border-bottom: 2px solid #ff3860 !important;
-            background-image: none;
-        }
+			.error-message {
+				color: #ff3860;
+				font-size: 0.75rem;
+				margin-top: 5px;
+				display: block;
+				padding-left: 5px;
+			}
 
-        .error-message {
-            color: #ff3860;
-            font-size: 0.75rem;
-            margin-top: 5px;
-            display: block;
-            padding-left: 5px;
-        }
+			.form-wrapper {
+				position: relative;
+				margin-bottom: 25px;
+			}
 
-        .form-wrapper {
-            position: relative;
-            margin-bottom: 25px;
-        }
+			.input-icon {
+				position: absolute;
+				right: 10px;
+				top: 50%;
+				transform: translateY(-50%);
+				color: #999;
+			}
 
-        .input-icon {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-        }
+			/* Hide HTML5 validation bubbles */
+			input:invalid,
+			select:invalid {
+				box-shadow: none;
+			}
 
-        /* Hide HTML5 validation bubbles */
-        input:invalid, select:invalid {
-            box-shadow: none;
-        }
+			/* Social buttons */
+			.button-row {
+				display: flex;
+				justify-content: center;
+				gap: 15px;
+				margin: 20px 0;
+			}
 
-        /* Social buttons */
-        .button-row {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-        }
+			.round-button {
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				border: none;
+				background: #f5f5f5;
+				cursor: pointer;
+			}
+		</style>
+		{% endblock %} {% block body %}
+		<div class="wrapper" style="background-image: url('{{ asset('images2/imagett.jpg') }}');">
+			<div class="inner">
+				<div class="image-holder">
+					<img src="{{ asset('images2/agence.png') }}" alt="Logo" />
+					<div class="already-have-account">
+						<a href="{{ path('app_login') }}">Do you have an account?</a>
+					</div>
+				</div>
 
-        .round-button {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            background: #f5f5f5;
-            cursor: pointer;
-        }
-    </style>
-{% endblock %}
+				{{ form_start(registrationForm, { 'attr': { 'class': 'form-horizontal', 'novalidate': 'novalidate', 'id':
+				'registrationForm' } }) }}
 
-{% block body %}
-    <div class="wrapper" style="background-image: url('{{ asset('images2/imagett.jpg') }}');">
-        <div class="inner">
-            <div class="image-holder">
-                <img src="{{ asset('images2/agence.png') }}" alt="Logo">
-                <div class="already-have-account">
-                    <a href="{{ path('app_login') }}">Do you have an account?</a>
-                </div>
-            </div>
+				<h3>Registration Form</h3>
 
-            {{ form_start(registrationForm, {
-                'attr': {
-                    'class': 'form-horizontal',
-                    'novalidate': 'novalidate',
-                    'id': 'registrationForm'
-                }
-            }) }}
+				<!-- First Name -->
+				<div class="form-wrapper">
+					{{ form_widget(registrationForm.name, { 'attr': { 'class': 'form-control', 'placeholder': 'First Name', 'id':
+					'firstName' } }) }}
+					<i class="zmdi zmdi-account input-icon"></i>
+					<div class="error-message">{{ form_errors(registrationForm.name) }}</div>
+				</div>
 
-            <h3>Registration Form</h3>
+				<!-- Last Name -->
+				<div class="form-wrapper">
+					{{ form_widget(registrationForm.last_name, { 'attr': { 'class': 'form-control', 'placeholder': 'Last Name',
+					'id': 'lastName' } }) }}
+					<i class="zmdi zmdi-account input-icon"></i>
+					<div class="error-message">{{ form_errors(registrationForm.last_name) }}</div>
+				</div>
 
-            <!-- First Name -->
-            <div class="form-wrapper">
-                {{ form_widget(registrationForm.name, {
-                    'attr': {
-                        'class': 'form-control',
-                        'placeholder': 'First Name',
-                        'id': 'firstName'
-                    }
-                }) }}
-                <i class="zmdi zmdi-account input-icon"></i>
-                <div class="error-message">
-                    {{ form_errors(registrationForm.name) }}
-                </div>
-            </div>
+				<!-- Email -->
+				<div class="form-wrapper">
+					{{ form_widget(registrationForm.email, { 'attr': { 'class': 'form-control', 'placeholder': 'Email Address',
+					'id': 'email' } }) }}
+					<i class="zmdi zmdi-email input-icon"></i>
+					<div class="error-message">{{ form_errors(registrationForm.email) }}</div>
+				</div>
 
-            <!-- Last Name -->
-            <div class="form-wrapper">
-                {{ form_widget(registrationForm.last_name, {
-                    'attr': {
-                        'class': 'form-control',
-                        'placeholder': 'Last Name',
-                        'id': 'lastName'
-                    }
-                }) }}
-                <i class="zmdi zmdi-account input-icon"></i>
-                <div class="error-message">
-                    {{ form_errors(registrationForm.last_name) }}
-                </div>
-            </div>
+				<!-- Password -->
+				<div class="form-wrapper">
+					{{ form_widget(registrationForm.password.first, { 'attr': { 'class': 'form-control', 'placeholder':
+					'Password', 'id': 'password' } }) }}
+					<i class="zmdi zmdi-lock input-icon"></i>
+					<div class="error-message">{{ form_errors(registrationForm.password.first) }}</div>
+					<div class="password-requirements" id="password-requirements" style="display: none">
+						<small>Password must contain:</small>
+						<ul>
+							<li>• At least 8 characters</li>
+							<li>• 1 uppercase letter</li>
+							<li>• 1 lowercase letter</li>
+							<li>• 1 number</li>
+							<li>• 1 special character (@$!%*?&)</li>
+						</ul>
+					</div>
+				</div>
 
-            <!-- Email -->
-            <div class="form-wrapper">
-                {{ form_widget(registrationForm.email, {
-                    'attr': {
-                        'class': 'form-control',
-                        'placeholder': 'Email Address',
-                        'id': 'email'
-                    }
-                }) }}
-                <i class="zmdi zmdi-email input-icon"></i>
-                <div class="error-message">
-                    {{ form_errors(registrationForm.email) }}
-                </div>
-            </div>
+				<!-- Confirm Password -->
+				<div class="form-wrapper">
+					{{ form_widget(registrationForm.password.second, { 'attr': { 'class': 'form-control', 'placeholder': 'Confirm
+					Password', 'id': 'confirmPassword' } }) }}
+					<i class="zmdi zmdi-lock input-icon"></i>
+					<div class="error-message">{{ form_errors(registrationForm.password.second) }}</div>
+				</div>
 
-            <!-- Password -->
-            <div class="form-wrapper">
-                {{ form_widget(registrationForm.password.first, {
-                    'attr': {
-                        'class': 'form-control',
-                        'placeholder': 'Password',
-                        'id': 'password'
-                    }
-                }) }}
-                <i class="zmdi zmdi-lock input-icon"></i>
-                <div class="error-message">
-                    {{ form_errors(registrationForm.password.first) }}
-                </div>
-                <div class="password-requirements" id="password-requirements" style="display: none;">
-                    <small>Password must contain:</small>
-                    <ul>
-                        <li>• At least 8 characters</li>
-                        <li>• 1 uppercase letter</li>
-                        <li>• 1 lowercase letter</li>
-                        <li>• 1 number</li>
-                        <li>• 1 special character (@$!%*?&)</li>
-                    </ul>
-                </div>
-            </div>
+				<!-- Phone -->
+				<div class="form-wrapper">
+					{{ form_widget(registrationForm.phone_num, { 'attr': { 'class': 'form-control', 'placeholder': 'Phone Number',
+					'id': 'phone' } }) }}
+					<i class="zmdi zmdi-phone input-icon"></i>
+					<div class="error-message">{{ form_errors(registrationForm.phone_num) }}</div>
+				</div>
 
-            <!-- Confirm Password -->
-            <div class="form-wrapper">
-                {{ form_widget(registrationForm.password.second, {
-                    'attr': {
-                        'class': 'form-control',
-                        'placeholder': 'Confirm Password',
-                        'id': 'confirmPassword'
-                    }
-                }) }}
-                <i class="zmdi zmdi-lock input-icon"></i>
-                <div class="error-message">
-                    {{ form_errors(registrationForm.password.second) }}
-                </div>
-            </div>
+				<!-- Address -->
+				<div class="form-wrapper">
+					{{ form_widget(registrationForm.address, { 'attr': { 'class': 'form-control', 'id': 'address' } }) }}
+					<i class="zmdi zmdi-caret-down input-icon"></i>
+					<div class="error-message">{{ form_errors(registrationForm.address) }}</div>
+				</div>
 
-            <!-- Phone -->
-            <div class="form-wrapper">
-                {{ form_widget(registrationForm.phone_num, {
-                    'attr': {
-                        'class': 'form-control',
-                        'placeholder': 'Phone Number',
-                        'id': 'phone'
-                    }
-                }) }}
-                <i class="zmdi zmdi-phone input-icon"></i>
-                <div class="error-message">
-                    {{ form_errors(registrationForm.phone_num) }}
-                </div>
-            </div>
-
-            <!-- Address -->
-            <div class="form-wrapper">
-                {{ form_widget(registrationForm.address, {
-                    'attr': {
-                        'class': 'form-control',
-                        'id': 'address'
-                    }
-                }) }}
-                <i class="zmdi zmdi-caret-down input-icon"></i>
-                <div class="error-message">
-                    {{ form_errors(registrationForm.address) }}
-                </div>
-            </div>
-
-            <!-- Social Buttons -->
-            <div class="button-row">
-                <button type="button" class="round-button">
-                    <img src="{{ asset('images2/google.svg') }}" alt="Google">
-                </button>
-                <button type="button" class="round-button">
-                    <img src="{{ asset('images2/facebook.svg') }}" alt="Facebook">
-                </button>
-                <button type="button" class="round-button">
-                    <img src="{{ asset('images2/twitter.svg') }}" alt="Twitter">
-                </button>
-            </div>
-
-            <button type="submit" class="btn btn-primary">
-                Register
-                <i class="zmdi zmdi-arrow-right"></i>
-            </button>
-
-            {{ form_end(registrationForm) }}
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('registrationForm');
-            const passwordField = document.getElementById('password');
-            const confirmPasswordField = document.getElementById('confirmPassword');
-            const passwordRequirements = document.getElementById('password-requirements');
-            let formSubmitted = false;
-
-            // Afficher les exigences quand le champ password reçoit le focus
-            passwordField.addEventListener('focus', function() {
-                passwordRequirements.style.display = 'block';
-            });
-
-            // Masquer les exigences quand le champ perd le focus (si valide)
-            passwordField.addEventListener('blur', function() {
-                if (this.checkValidity()) {
-                    passwordRequirements.style.display = 'none';
-                }
-            });
-
-            // Fonction pour valider un champ
-            function validateField(field) {
-                const errorElement = field.nextElementSibling.nextElementSibling;
-
-                if (!field.checkValidity()) {
-                    field.classList.add('invalid');
-                    errorElement.style.display = 'block';
-
-                    // Message personnalisé pour le mot de passe
-                    if (field.id === 'password' && field.validity.patternMismatch) {
-                        errorElement.textContent = 'Password does not meet requirements';
-                        passwordRequirements.style.display = 'block';
-                    }
-
-                    return false;
-                } else {
-                    field.classList.remove('invalid');
-                    errorElement.style.display = 'none';
-
-                    // Masquer les exigences si le mot de passe devient valide
-                    if (field.id === 'password') {
-                        passwordRequirements.style.display = 'none';
-                    }
-
-                    return true;
-                }
-            }
-
-            // Validation à la soumission du formulaire
-            form.addEventListener('submit', function(e) {
-                formSubmitted = true;
-                let isValid = true;
-
-                // Valider tous les champs
-                const fields = form.querySelectorAll('input, select');
-                fields.forEach(field => {
-                    if (!validateField(field)) {
-                        if (isValid) {
-                            field.focus(); // Focus sur le premier champ invalide
-                        }
-                        isValid = false;
-                    }
-                });
-
-                // Vérification spéciale pour la correspondance des mots de passe
-                if (passwordField.value !== confirmPasswordField.value) {
-                    confirmPasswordField.classList.add('invalid');
-                    const errorElement = confirmPasswordField.nextElementSibling.nextElementSibling;
-                    errorElement.textContent = 'Passwords must match';
-                    errorElement.style.display = 'block';
-                    isValid = false;
-                }
-
-                if (!isValid) {
-                    e.preventDefault();
-                }
-            });
-
-            // Validation en temps réel après la première soumission
-            const fields = form.querySelectorAll('input, select');
-            fields.forEach(field => {
-                field.addEventListener('input', function() {
-                    if (formSubmitted) {
-                        validateField(field);
-
-                        // Gestion spéciale pour la confirmation du mot de passe
-                        if (field.id === 'password' || field.id === 'confirmPassword') {
-                            if (passwordField.value !== confirmPasswordField.value) {
-                                confirmPasswordField.classList.add('invalid');
-                                const errorElement = confirmPasswordField.nextElementSibling.nextElementSibling;
-                                errorElement.textContent = 'Passwords must match';
-                                errorElement.style.display = 'block';
-                            } else {
-                                confirmPasswordField.classList.remove('invalid');
-                                const errorElement = confirmPasswordField.nextElementSibling.nextElementSibling;
-                                errorElement.style.display = 'none';
-                            }
-                        }
-                    }
-                });
-            });
-
-            // Masquer les exigences au chargement si le champ est vide
-            if (!passwordField.value) {
-                passwordRequirements.style.display = 'none';
-            }
-        });
-    </script>
-{% endblock %}
-=======
-		<h3 class="form-title">Registration Form</h3>
-
-		<div class="form-group">
-			{{ form_widget(registrationForm.name, { 'attr': { 'placeholder': 'First Name', 'class': 'form-control' } }) }} {{
-			form_errors(registrationForm.name) }} {# Affichage des erreurs spécifiques du champ "name" #} {{
-			form_widget(registrationForm.last_name, { 'attr': { 'placeholder': 'Last Name', 'class': 'form-control' } }) }} {{
-			form_errors(registrationForm.last_name) }} {# Affichage des erreurs spécifiques du champ "last_name" #}
-		</div>
-
-		<div class="form-wrapper">
-			{{ form_widget(registrationForm.email, { 'attr': { 'placeholder': 'Email Address', 'class': 'form-control' } }) }}
-			<i class="zmdi zmdi-email input-icon"></i>
-			{{ form_errors(registrationForm.email) }} {# Affichage des erreurs pour l'email #}
-		</div>
-
-		{# Champ mot de passe avec RepeatedType #}
-		<div class="form-wrapper">
-			{{ form_widget(registrationForm.plainPassword.first, { 'attr': { 'placeholder': 'Password', 'class': 'form-control
-			password-input', 'autocomplete': 'new-password' } }) }}
-			<i class="zmdi zmdi-lock input-icon"></i>
-			{{ form_errors(registrationForm.plainPassword.first) }} {# Affichage des erreurs pour le premier champ mot de
-			passe #}
-		</div>
-
-		<div class="form-wrapper">
-			{{ form_widget(registrationForm.plainPassword.second, { 'attr': { 'placeholder': 'Confirm Password', 'class':
-			'form-control password-input' } }) }}
-			<i class="zmdi zmdi-lock input-icon"></i>
-			{{ form_errors(registrationForm.plainPassword.second) }} {# Affichage des erreurs pour le deuxième champ mot de
-			passe #}
-		</div>
-
-		<div class="form-wrapper">
-			{{ form_widget(registrationForm.phone_num, { 'attr': { 'placeholder': 'Phone Number', 'class': 'form-control' } })
-			}}
-			<i class="zmdi zmdi-phone input-icon"></i>
-			{{ form_errors(registrationForm.phone_num) }} {# Affichage des erreurs pour le numéro de téléphone #}
-		</div>
-
-		<div class="form-wrapper">
-			{{ form_widget(registrationForm.address, { 'attr': { 'class': 'form-control select-control' } }) }}
-			<i class="zmdi zmdi-caret-down select-icon" style="font-size: 17px"></i>
-			{{ form_errors(registrationForm.address) }} {# Affichage des erreurs pour l'adresse #}
-		</div>
-
-		<div class="social-buttons">
-			<div class="row button-row">
-				<div>
-					<button type="button" class="round-button" aria-label="Sign up with Google">
-						<img src="{{ asset('images2/google.svg') }}" alt="Google" class="social-icon" />
+				<!-- Social Buttons -->
+				<div class="button-row">
+					<button type="button" class="round-button">
+						<img src="{{ asset('images2/google.svg') }}" alt="Google" />
+					</button>
+					<button type="button" class="round-button">
+						<img src="{{ asset('images2/facebook.svg') }}" alt="Facebook" />
+					</button>
+					<button type="button" class="round-button">
+						<img src="{{ asset('images2/twitter.svg') }}" alt="Twitter" />
 					</button>
 				</div>
-				<div>
-					<button type="button" class="round-button" aria-label="Sign up with Facebook">
-						<img src="{{ asset('images2/facebook.svg') }}" alt="Facebook" class="social-icon" />
-					</button>
-				</div>
-				<div>
-					<button type="button" class="round-button" aria-label="Sign up with Twitter">
-						<img src="{{ asset('images2/twitter.svg') }}" alt="Twitter" class="social-icon" />
-					</button>
-				</div>
+
+				<button type="submit" class="btn btn-primary">
+					Register
+					<i class="zmdi zmdi-arrow-right"></i>
+				</button>
+
+				{{ form_end(registrationForm) }}
 			</div>
 		</div>
 
-		<button type="submit" class="btn btn-submit">
-			Register
-			<i class="zmdi zmdi-arrow-right submit-icon"></i>
-		</button>
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				const form = document.getElementById("registrationForm");
+				const passwordField = document.getElementById("password");
+				const confirmPasswordField = document.getElementById("confirmPassword");
+				const passwordRequirements = document.getElementById("password-requirements");
+				let formSubmitted = false;
 
-		{{ form_end(registrationForm) }}
+				// Afficher les exigences quand le champ password reçoit le focus
+				passwordField.addEventListener("focus", function () {
+					passwordRequirements.style.display = "block";
+				});
+
+				// Masquer les exigences quand le champ perd le focus (si valide)
+				passwordField.addEventListener("blur", function () {
+					if (this.checkValidity()) {
+						passwordRequirements.style.display = "none";
+					}
+				});
+
+				// Fonction pour valider un champ
+				function validateField(field) {
+					const errorElement = field.nextElementSibling.nextElementSibling;
+
+					if (!field.checkValidity()) {
+						field.classList.add("invalid");
+						errorElement.style.display = "block";
+
+						// Message personnalisé pour le mot de passe
+						if (field.id === "password" && field.validity.patternMismatch) {
+							errorElement.textContent = "Password does not meet requirements";
+							passwordRequirements.style.display = "block";
+						}
+
+						return false;
+					} else {
+						field.classList.remove("invalid");
+						errorElement.style.display = "none";
+
+						// Masquer les exigences si le mot de passe devient valide
+						if (field.id === "password") {
+							passwordRequirements.style.display = "none";
+						}
+
+						return true;
+					}
+				}
+
+				// Validation à la soumission du formulaire
+				form.addEventListener("submit", function (e) {
+					formSubmitted = true;
+					let isValid = true;
+
+					// Valider tous les champs
+					const fields = form.querySelectorAll("input, select");
+					fields.forEach((field) => {
+						if (!validateField(field)) {
+							if (isValid) {
+								field.focus(); // Focus sur le premier champ invalide
+							}
+							isValid = false;
+						}
+					});
+
+					// Vérification spéciale pour la correspondance des mots de passe
+					if (passwordField.value !== confirmPasswordField.value) {
+						confirmPasswordField.classList.add("invalid");
+						const errorElement = confirmPasswordField.nextElementSibling.nextElementSibling;
+						errorElement.textContent = "Passwords must match";
+						errorElement.style.display = "block";
+						isValid = false;
+					}
+
+					if (!isValid) {
+						e.preventDefault();
+					}
+				});
+
+				// Validation en temps réel après la première soumission
+				const fields = form.querySelectorAll("input, select");
+				fields.forEach((field) => {
+					field.addEventListener("input", function () {
+						if (formSubmitted) {
+							validateField(field);
+
+							// Gestion spéciale pour la confirmation du mot de passe
+							if (field.id === "password" || field.id === "confirmPassword") {
+								if (passwordField.value !== confirmPasswordField.value) {
+									confirmPasswordField.classList.add("invalid");
+									const errorElement = confirmPasswordField.nextElementSibling.nextElementSibling;
+									errorElement.textContent = "Passwords must match";
+									errorElement.style.display = "block";
+								} else {
+									confirmPasswordField.classList.remove("invalid");
+									const errorElement = confirmPasswordField.nextElementSibling.nextElementSibling;
+									errorElement.style.display = "none";
+								}
+							}
+						}
+					});
+				});
+
+				// Masquer les exigences au chargement si le champ est vide
+				if (!passwordField.value) {
+					passwordRequirements.style.display = "none";
+				}
+			});
+		</script>
+		{% endblock %}
 	</div>
 </div>
-{% endblock %}
->>>>>>> origin/master

@@ -24,6 +24,7 @@ security:
             lazy: true
             # Use the user provider for this firewall
             provider: app_user_provider
+            user_checker: App\Security\UserChecker
 
             # Configuring form login (used for username/password authentication)
             form_login:
@@ -32,12 +33,14 @@ security:
                 default_target_path: app_home  # The default route to redirect to after successful login
                 username_parameter: _email  # Field for username (email in this case)
                 password_parameter: _password  # Field for password
+                success_handler: App\Security\CustomAuthenticationSuccessHandler
                 # If necessary, you can configure the authenticator here
 
             # Configuring logout
             logout:
                 path: app_logout          # Path for logging out
                 target: app_login          # Where to redirect after logout
+
 
     # Access control rules to specify which roles have access to which paths
     access_control:

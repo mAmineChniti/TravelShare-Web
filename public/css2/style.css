@@ -464,4 +464,9 @@ body3 {
 .button1 {
   font-size: 3px;
 }
+.center-submit-btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
 
