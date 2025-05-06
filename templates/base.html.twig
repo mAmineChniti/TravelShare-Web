@@ -41,7 +41,9 @@
 		<script src="{{ asset('js/main.js') }}"></script>
 		
 		{% block stylesheets %} {{ encore_entry_link_tags('app') }} {% endblock %} 
+            {{ encore_entry_link_tags('app') }}
 		{% block javascripts %} {{ encore_entry_script_tags('app') }} {% endblock %}
+            {{ encore_entry_script_tags('app') }}
 		{% block css%} {% endblock%}
 	</head>
 	<body class="min-vh-100">

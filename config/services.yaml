@@ -13,20 +13,27 @@ parameters:
     app.image_profanity_api_key: '%env(IMAGE_PROFANITY_API_KEY)%'
 
 services:
-  # default configuration for services in *this* file
-  _defaults:
-    autowire: true # Automatically injects dependencies in your services.
-    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    Symfony\Contracts\HttpClient\HttpClientInterface:
+        factory: ['Symfony\Component\HttpClient\HttpClient', 'create']
+        arguments:
+            - { max_duration: 10, headers: { 'accept': 'application/json' }, http_version: '1.1' }
 
-  # makes classes in src/ available to be used as services
-  # this creates a service per class whose id is the fully-qualified class name
-  App\:
-    resource: "../src/"
-    exclude:
-      - "../src/DependencyInjection/"
-      - "../src/Entity/"
-      - "../src/Kernel.php"
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-  # add more service definitions when explicit configuration is needed
-  # please note that last definitions always *replace* previous ones
-  App\EventSubscriber\CalendarSubscriber:
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: "../src/"
+        exclude:
+            - "../src/DependencyInjection/"
+            - "../src/Entity/"
+            - "../src/Kernel.php"
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+    App\EventSubscriber\CalendarSubscriber:
+        tags:
+            - { name: 'kernel.event_subscriber' }

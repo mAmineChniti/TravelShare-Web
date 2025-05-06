@@ -3,33 +3,59 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\GuidesRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\Excursions;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'guides')]
 #[ORM\Entity(repositoryClass: GuidesRepository::class)]
 class Guides
 {
-    #[ORM\Column(name: 'guide_id')]
+
+    #[ORM\OneToMany(mappedBy: "guide", targetEntity: Excursions::class, cascade: ["persist", "remove"], orphanRemoval: true)]
+private Collection $excursions;
+
+public function __construct()
+{
+    $this->excursions = new ArrayCollection();
+}
+
+
+    #[ORM\Column(name: "guide_id")]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $guideId = null;
 
-    #[ORM\Column(name: 'name', length: 50)]
+    #[ORM\Column(name: "name", length: 50)]
+    #[Assert\NotBlank(message: "Le prénom ne peut pas être vide.")]
+    #[Assert\Length(max: 50, maxMessage: "Le prénom ne peut pas dépasser 50 caractères.")]
     private ?string $name = null;
 
-    #[ORM\Column(name: 'last_name', length: 50)]
+    #[ORM\Column(name: "last_name", length: 50)]
+    #[Assert\NotBlank(message: "Le nom de famille ne peut pas être vide.")]
+    #[Assert\Length(max: 50, maxMessage: "Le nom de famille ne peut pas dépasser 50 caractères.")]
     private ?string $lastName = null;
 
-    #[ORM\Column(name: 'email', length: 50)]
+    #[ORM\Column(name: "email", length: 50)]
+    #[Assert\NotBlank(message: "L'email ne peut pas être vide.")]
+    #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide.")]
+    #[Assert\Length(max: 50, maxMessage: "L'email ne peut pas dépasser 50 caractères.")]
     private ?string $email = null;
 
-    #[ORM\Column(name: 'phone_num', length: 50)]
+    #[ORM\Column(name: "phone_num", length: 50)]
+    #[Assert\NotBlank(message: "Le numéro de téléphone ne peut pas être vide.")]
+    #[Assert\Length(max: 50, maxMessage: "Le numéro de téléphone ne peut pas dépasser 50 caractères.")]
     private ?string $phoneNum = null;
 
-    #[ORM\Column(name: 'language', length: 50)]
+    #[ORM\Column(name: "language", length: 50)]
+    #[Assert\NotBlank(message: "La langue ne peut pas être vide.")]
+    #[Assert\Length(max: 50, maxMessage: "La langue ne peut pas dépasser 50 caractères.")]
     private ?string $language = null;
 
-    #[ORM\Column(name: 'experience')]
+    #[ORM\Column(name: "experience")]
+    #[Assert\NotBlank(message: "L'expérience ne peut pas être vide.")]
+    #[Assert\GreaterThanOrEqual(0, message: "L'expérience doit être un nombre positif.")]
     private ?int $experience = null;
 
     public function getGuideId(): ?int
@@ -108,4 +134,29 @@ class Guides
 
         return $this;
     }
+
+    public function getExcursions(): Collection
+{
+    return $this->excursions;
+}
+
+public function addExcursion(Excursions $excursion): self
+{
+    if (!$this->excursions->contains($excursion)) {
+        $this->excursions->add($excursion);
+        $excursion->setGuide($this);
+    }
+    return $this;
+}
+
+public function removeExcursion(Excursions $excursion): self
+{
+    if ($this->excursions->removeElement($excursion)) {
+        // set the owning side to null (unless already changed)
+        if ($excursion->getGuide() === $this) {
+            $excursion->setGuide(null);
+        }
+    }
+    return $this;
+}
 }

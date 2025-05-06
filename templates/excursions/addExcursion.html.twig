@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>{% block title %}Add an Excursion | Admin Dashboard{% endblock %}</title>
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport"/>
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ asset('images2/favicon.svg') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('images2/favicon.ico') }}" />
+
+    {% block js %}
+        <!-- Fonts and icons -->
+        <script src="{{ asset('js2/plugin/webfont/webfont.min.js') }}"></script>
+        <script>
+            WebFont.load({
+                google: { families: ["Public Sans:300,400,500,600,700"] },
+                custom: {
+                    families: [
+                        "Font Awesome 5 Solid",
+                        "Font Awesome 5 Regular",
+                        "Font Awesome 5 Brands",
+                        "simple-line-icons",
+                    ],
+                    urls: ["css3/fonts.min.css"],
+                },
+                active: function () {
+                    sessionStorage.fonts = true;
+                },
+            });
+        </script>
+    {% endblock %}
+
+    {% block css %}
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <!-- CSS Files -->
+        <link rel="stylesheet" href="{{ asset('css3/bootstrap.min.css') }}" />
+        <link rel="stylesheet" href="{{ asset('css3/plugins.min.css') }}" />
+        <link rel="stylesheet" href="{{ asset('css3/kaiadmin.min.css') }}" />
+        <link rel="stylesheet" href="{{ asset('css3/demo.css') }}" />
+        
+        <style>
+            .form-excursion-card {
+                max-width: 800px;
+                margin: 0 auto;
+                border-radius: 12px;
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+                border: none;
+            }
+            
+            .form-excursion-card .card-header {
+                background: linear-gradient(135deg, #6777ef 0%, #6777ef 100%);
+                color: white;
+                border-bottom: none;
+                padding: 1.5rem 2rem;
+                border-radius: 12px 12px 0 0 !important;
+            }
+            
+            .form-excursion-card .card-header h4 {
+                font-weight: 600;
+                margin-bottom: 0;
+            }
+            
+            .form-excursion-card .card-body {
+                padding: 2.5rem;
+                background-color: #f8f9fa;
+            }
+            
+            .form-control {
+                border-radius: 6px;
+                border: 1px solid #e0e0e0;
+                height: calc(1.5em + 1.1rem + 2px);
+                padding: 0.6rem 1.2rem;
+                transition: all 0.3s;
+                background-color: #fff;
+                margin-bottom: 0.5rem;
+            }
+            
+            .form-control:focus {
+                border-color: #6777ef;
+                box-shadow: 0 0 0 0.2rem rgba(103, 119, 239, 0.25);
+            }
+            
+            .form-group label {
+                font-weight: 500;
+                margin-bottom: 0.5rem;
+                color: #495057;
+                font-size: 0.9rem;
+            }
+            
+            .btn-primary {
+                background-color: #6777ef;
+                border-color: #6777ef;
+                padding: 0.6rem 1.5rem;
+                border-radius: 6px;
+                font-weight: 500;
+                transition: all 0.3s;
+            }
+            
+            .btn-primary:hover {
+                background-color: #5166ea;
+                border-color: #5166ea;
+                transform: translateY(-2px);
+            }
+            
+            .btn-secondary {
+                padding: 0.6rem 1.5rem;
+                border-radius: 6px;
+                font-weight: 500;
+                transition: all 0.3s;
+            }
+            
+            .btn-secondary:hover {
+                transform: translateY(-2px);
+            }
+            
+            .form-section {
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .form-section h5 {
+                color: #6777ef;
+                font-weight: 600;
+                margin-bottom: 1rem;
+            }
+            
+            .form-actions {
+                background-color: #f8f9fa;
+                padding: 1.5rem;
+                border-top: 1px solid #eee;
+                border-radius: 0 0 12px 12px;
+                display: flex;
+                justify-content: space-between;
+            }
+            
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+            
+            .card {
+                overflow: hidden;
+            }
+            
+            .error-message {
+                color: #dc3545;
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+            }
+            
+            .is-invalid {
+                border-color: #dc3545 !important;
+            }
+            
+            .is-invalid:focus {
+                box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+            }
+            
+            .image-preview-container {
+                margin-top: 10px;
+            }
+            
+            .image-preview {
+                max-width: 200px;
+                max-height: 200px;
+                border-radius: 6px;
+                display: none;
+                border: 1px solid #ddd;
+                margin-top: 10px;
+            }
+            
+            textarea.form-control {
+                min-height: 120px;
+            }
+        </style>
+    {% endblock %}
+</head>
+
+<body>
+<div class="wrapper">
+    <!-- Sidebar -->
+    <!-- ... -->
+
+    <div class="main-panel">
+        <!-- Header -->
+        <!-- ... -->
+
+        <div class="content">
+            <div class="page-inner">
+                <div class="page-header">
+                    <h4 class="page-title">Add an Excursion</h4>
+                    <ul class="breadcrumbs">
+                        <li class="nav-home">
+                            <a href="{{ path('app_accueil_admin') }}">
+                                <i class="flaticon-home"></i>
+                            </a>
+                        </li>
+                        <li class="separator">
+                            <i class="flaticon-right-arrow"></i>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="card form-excursion-card">
+                            <div class="card-header">
+                                <h4 class="card-title"><i class="fas fa-plus-circle mr-2"></i>New Excursion</h4>
+                            </div>
+                            <div class="card-body">
+                                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                                    <!-- Section Informations de base -->
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-info-circle mr-2"></i> Basic information</h5>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.title, "Title") }}
+                                                    {{ form_widget(form.title, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Name of the excursion'
+                                                        }
+                                                    }) }}
+                                                    <div class="error-message">{{ form_errors(form.title) }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.prix, "Price (DT)") }}
+                                                    {{ form_widget(form.prix, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Price',
+                                                            'min': '0',
+                                                            'step': '0.01'
+                                                        }
+                                                    }) }}
+                                                    <div class="error-message">{{ form_errors(form.prix) }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            {{ form_label(form.description, "Description") }}
+                                            {{ form_widget(form.description, {
+                                                'attr': {
+                                                    'class': 'form-control',
+                                                    'rows': 4,
+                                                    'placeholder': 'Detailed description...'
+                                                }
+                                            }) }}
+                                            <div class="error-message">{{ form_errors(form.description) }}</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Section Dates -->
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-calendar-alt mr-2"></i> Dates</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.dateExcursion, "Start date") }}
+                                                    {{ form_widget(form.dateExcursion, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'min': "now"|date("Y-m-d")
+                                                        }
+                                                    }) }}
+                                                    <div class="error-message">{{ form_errors(form.dateExcursion) }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.dateFin, "End date") }}
+                                                    {{ form_widget(form.dateFin, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'min': "now"|date("Y-m-d")
+                                                        }
+                                                    }) }}
+                                                    <div class="error-message">{{ form_errors(form.dateFin) }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Section Image -->
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-image mr-2"></i> Image</h5>
+                                        <div class="form-group">
+                                            {{ form_label(form.image, "Image URL") }}
+                                            {{ form_widget(form.image, {
+                                                'attr': {
+                                                    'class': 'form-control',
+                                                    'placeholder': 'https://example.com/image.jpg'
+                                                }
+                                            }) }}
+                                            <div class="error-message">{{ form_errors(form.image) }}</div>
+                                            <div class="image-preview-container">
+                                                <img id="imagePreview" src="" alt="Preview" class="image-preview">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Section Guide -->
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-user-tie mr-2"></i> Guide</h5>
+                                        <div class="form-group">
+                                            {{ form_label(form.guide, "Guide assigned") }}
+                                            {{ form_widget(form.guide, {
+                                                'attr': {
+                                                    'class': 'form-control'
+                                                }
+                                            }) }}
+                                            <div class="error-message">{{ form_errors(form.guide) }}</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="form-actions">
+                                        <a href="{{ path('app_excursions_read') }}" class="btn btn-secondary">
+                                            <i class="fas fa-arrow-left mr-2"></i> Back to list
+                                        </a>
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fas fa-save mr-2"></i> Save excursion
+                                        </button>
+                                    </div>
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block js2 %}
+    <!-- Core JS Files -->
+    <script src="{{ asset('js2/core/jquery-3.7.1.min.js') }}"></script>
+    <script src="{{ asset('js2/core/popper.min.js') }}"></script>
+    <script src="{{ asset('js2/core/bootstrap.min.js') }}"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Image preview from URL
+            $('#{{ form.image.vars.id }}').on('input', function() {
+                const url = $(this).val();
+                const preview = $('#imagePreview');
+                
+                if (url) {
+                    preview.attr('src', url).show();
+                } else {
+                    preview.hide();
+                }
+            });
+            
+            // Initialize with current value if exists
+            const initialUrl = $('#{{ form.image.vars.id }}').val();
+            if (initialUrl) {
+                $('#imagePreview').attr('src', initialUrl).show();
+            }
+            
+            // Auto-add is-invalid class to fields with errors
+            $('.form-control').each(function() {
+                if ($(this).next('.error-message').text().trim() !== '' || 
+                    $(this).nextAll('.error-message').text().trim() !== '') {
+                    $(this).addClass('is-invalid');
+                }
+            });
+            
+            // Remove error on input
+            $('.form-control').on('input', function() {
+                if ($(this).val().trim() !== '') {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.error-message').text('');
+                    $(this).nextAll('.error-message').text('');
+                }
+            });
+            
+            // Date validation
+            $('form').on('submit', function(e) {
+                let isValid = true;
+
+
+                // Validate title
+            const title = $('#{{ form.title.vars.id }}').val().trim();
+            if (!title) {
+                $('#{{ form.title.vars.id }}').addClass('is-invalid');
+                $('#{{ form.title.vars.id }}').next('.error-message').text('Title is required');
+                isValid = false;
+            }
+
+             // Validate description
+            const description = $('#{{ form.description.vars.id }}').val().trim();
+            if (!description) {
+                $('#{{ form.description.vars.id }}').addClass('is-invalid');
+                $('#{{ form.description.vars.id }}').next('.error-message').text('Description is required');
+                isValid = false;
+            }
+                
+                
+            // Validate image URL
+            const imageUrl = $('#{{ form.image.vars.id }}').val().trim();
+            if (!imageUrl) {
+                $('#{{ form.image.vars.id }}').addClass('is-invalid');
+                $('#{{ form.image.vars.id }}').next('.error-message').text('Image URL is required');
+                isValid = false;
+            } else if (!isValidUrl(imageUrl)) {
+                $('#{{ form.image.vars.id }}').addClass('is-invalid');
+                $('#{{ form.image.vars.id }}').next('.error-message').text('Please enter a valid URL');
+                isValid = false;
+            }
+                // Validate start date
+                const startDate = new Date($('#{{ form.dateExcursion.vars.id }}').val());
+                if (!startDate || isNaN(startDate.getTime())) {
+                    $('#{{ form.dateExcursion.vars.id }}').addClass('is-invalid');
+                    $('#{{ form.dateExcursion.vars.id }}').next('.error-message').text('Invalid date');
+                    isValid = false;
+                }
+                
+                // Validate end date
+                const endDate = new Date($('#{{ form.dateFin.vars.id }}').val());
+                if (!endDate || isNaN(endDate.getTime())) {
+                    $('#{{ form.dateFin.vars.id }}').addClass('is-invalid');
+                    $('#{{ form.dateFin.vars.id }}').next('.error-message').text('Invalid date');
+                    isValid = false;
+                }
+                
+                // Compare dates
+                if (isValid && endDate <= startDate) {
+                    $('#{{ form.dateFin.vars.id }}').addClass('is-invalid');
+                    $('#{{ form.dateFin.vars.id }}').next('.error-message').text('End date must be after start date');
+                    isValid = false;
+                }
+                
+                // Validate price
+                const price = parseFloat($('#{{ form.prix.vars.id }}').val());
+                if (isNaN(price) || price < 0) {
+                    $('#{{ form.prix.vars.id }}').addClass('is-invalid');
+                    $('#{{ form.prix.vars.id }}').next('.error-message').text('Please enter a valid positive number');
+                    isValid = false;
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    $('html, body').animate({
+                        scrollTop: $('.is-invalid').first().offset().top - 100
+                    }, 500);
+                }
+            });
+        });
+    </script>
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,285 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Excursion{% endblock %}
+
+{% block js %}
+    <!-- Fonts and icons -->
+    <script src="{{ asset('js2/plugin/webfont/webfont.min.js') }}"></script>
+    <script>
+        WebFont.load({
+            google: { families: ["Public Sans:300,400,500,600,700"] },
+            custom: {
+                families: [
+                    "Font Awesome 5 Solid",
+                    "Font Awesome 5 Regular",
+                    "Font Awesome 5 Brands",
+                    "simple-line-icons",
+                ],
+                urls: ["css3/fonts.min.css"],
+            },
+            active: function () {
+                sessionStorage.fonts = true;
+            },
+        });
+    </script>
+{% endblock %}
+
+{% block css %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="{{ asset('css3/bootstrap.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css3/plugins.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css3/kaiadmin.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css3/demo.css') }}" />
+    
+    <style>
+        .form-excursion-card {
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+            border: none;
+        }
+        
+        .form-excursion-card .card-header {
+            background: linear-gradient(135deg, #6777ef 0%, #6777ef 100%);
+            color: white;
+            border-bottom: none;
+            padding: 1.5rem 2rem;
+            border-radius: 12px 12px 0 0 !important;
+        }
+        
+        .form-excursion-card .card-header h4 {
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+        
+        .form-excursion-card .card-body {
+            padding: 2.5rem;
+            background-color: #f8f9fa;
+        }
+        
+        .form-control {
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            height: calc(1.5em + 1.1rem + 2px);
+            padding: 0.6rem 1.2rem;
+            transition: all 0.3s;
+            background-color: #fff;
+        }
+        
+        .form-control:focus {
+            border-color: #6777ef;
+            box-shadow: 0 0 0 0.2rem rgba(103, 119, 239, 0.25);
+        }
+        
+        .form-group label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background-color: #6777ef;
+            border-color: #6777ef;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #5166ea;
+            border-color: #5166ea;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+        }
+        
+        .form-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-section h5 {
+            color: #6777ef;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .form-actions {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-top: 1px solid #eee;
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .card {
+            overflow: hidden;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="wrapper">
+    <div class="main-panel">
+        <div class="content">
+            <div class="page-inner">
+                <div class="page-header">
+                    <h4 class="page-title">Edit Excursion</h4>
+                    <ul class="breadcrumbs">
+                        <li class="nav-home">
+                            <a href="{{ path('app_accueil_admin') }}">
+                                <i class="flaticon-home"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="card form-excursion-card">
+                            <div class="card-header">
+                                <h4 class="card-title"><i class="fas fa-edit mr-2"></i>Edit excursion</h4>
+                            </div>
+                            <div class="card-body">
+                                {{ form_start(form) }}
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-info-circle mr-2"></i> Basic information</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.title) }}
+                                                    {{ form_widget(form.title, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Title of the excursion'
+                                                        }
+                                                    }) }}
+                                                    {{ form_errors(form.title) }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.prix) }}
+                                                    {{ form_widget(form.prix, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Price'
+                                                        }
+                                                    }) }}
+                                                    {{ form_errors(form.prix) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            {{ form_label(form.description) }}
+                                            {{ form_widget(form.description, {
+                                                'attr': {
+                                                    'class': 'form-control',
+                                                    'rows': 3,
+                                                    'placeholder': 'Description of the excursion'
+                                                }
+                                            }) }}
+                                            {{ form_errors(form.description) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-calendar-alt mr-2"></i>Dates</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.dateExcursion) }}
+                                                    {{ form_widget(form.dateExcursion, {
+                                                        'attr': {
+                                                            'class': 'form-control'
+                                                        }
+                                                    }) }}
+                                                    {{ form_errors(form.dateExcursion) }}
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.dateFin) }}
+                                                    {{ form_widget(form.dateFin, {
+                                                        'attr': {
+                                                            'class': 'form-control'
+                                                        }
+                                                    }) }}
+                                                    {{ form_errors(form.dateFin) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-image mr-2"></i>Image</h5>
+                                        <div class="form-group">
+                                            {{ form_label(form.image) }}
+                                            {{ form_widget(form.image, {
+                                                'attr': {
+                                                    'class': 'form-control',
+                                                    'placeholder': 'Image URL'
+                                                }
+                                            }) }}
+                                            {{ form_errors(form.image) }}
+                                            {% if form.vars.value.image %}
+                                                <div class="mt-2">
+                                                    <img src="{{ form.vars.value.image }}" alt="Image actuelle" style="max-width: 200px; border-radius: 6px;">
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-user-tie mr-2"></i>Guide</h5>
+                                        <div class="form-group">
+                                            {{ form_label(form.guide) }}
+                                            {{ form_widget(form.guide, {
+                                                'attr': {
+                                                    'class': 'form-control'
+                                                }
+                                            }) }}
+                                            {{ form_errors(form.guide) }}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <a href="{{ path('app_excursions_read') }}" class="btn btn-secondary">
+                                            <i class="fas fa-arrow-left mr-2"></i> Back to list
+                                        </a>
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fas fa-save mr-2"></i> Save changes
+                                        </button>
+                                    </div>
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
