@@ -1,4 +1,4 @@
-<div id="commentText-{{ commentId }}" class="text-sm text-gray-700 dark:text-gray-300 leading-snug truncate">
+<div id="commentText-{{ commentId }}" class="small text-truncate mb-2">
 	<p>{{ comment|markdown }}</p>
 </div>
 
@@ -11,7 +11,7 @@
 		};
 
 		if (elements.editForm) elements.editForm.style.display = "none";
-		if (elements.editButton) elements.editButton.style.display = "inline-flex";
+		if (elements.editButton) elements.editButton.style.display = "inline-block";
 	});
 
 	(function() {
@@ -22,6 +22,6 @@
 		};
 
 		if (elements.editForm) elements.editForm.style.display = "none";
-		if (elements.editButton) elements.editButton.style.display = "inline-flex";
+		if (elements.editButton) elements.editButton.style.display = "inline-block";
 	})();
 </script>

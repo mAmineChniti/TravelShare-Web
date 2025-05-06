@@ -1,59 +1,58 @@
 {% extends 'base.html.twig' %} {% block title %}Admin Dashboard - Hotels{% endblock %} {% block body %}
-<div class="container mx-auto px-4 mt-8 space-y-6">
-	<div class="flex justify-between items-center">
-		<h1 class="text-5xl font-bold">Hotels Management</h1>
-		<a
-			href="{{ path('dashboard_hotels_add') }}"
-			class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow"
-		>
-			Add Hotel
-		</a>
+<div class="container py-5">
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<h1 class="display-4 fw-bold">Hotels Management</h1>
+		<a href="{{ path('dashboard_hotels_add') }}" class="btn btn-primary"> Add Hotel </a>
 	</div>
-	<div id="success-messages" class="mt-4">
+
+	<div id="success-messages" class="mt-3">
 		{% for message in app.flashes('success') %}
-		<p class="text-sm text-green-600">{{ message }}</p>
+		<div class="alert alert-success">
+			<p class="mb-0">{{ message }}</p>
+		</div>
 		{% endfor %}
 	</div>
-	<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+	<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
 		{% for hotel in hotels %}
-		<div class="bg-white rounded-lg shadow-md p-6">
-			<div class="mb-4">
-				{% if hotel.imageH %}
-				<img
-					src="data:image/jpeg;base64,{{ hotel.base64Image }}"
-					alt="{{ hotel.nom }}"
-					class="w-full h-48 object-cover rounded-lg"
-				/>
-				{% else %}
-				<span class="block text-center text-gray-500">No Image Available</span>
-				{% endif %}
-			</div>
-			<div class="space-y-2">
-				<h2 class="text-3xl font-semibold">{{ hotel.nom }}</h2>
-				<p class="text-base text-gray-700"><strong>Address:</strong> {{ hotel.adress }}</p>
-				<p class="text-base text-gray-700"><strong>Phone:</strong> {{ hotel.telephone }}</p>
-				<p class="text-base text-gray-700"><strong>Capacity:</strong> {{ hotel.capaciteTotale }} guests</p>
-			</div>
-			<div class="flex justify-between mt-4">
-				<a
-					href="{{ path('dashboard_hotels_edit', {id: hotel.hotelId}) }}"
-					class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg"
-				>
-					Edit
-				</a>
-				<a
-					href="{{ path('dashboard_hotels_delete', {id: hotel.hotelId}) }}"
-					class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg"
-					onclick="return confirm('Are you sure you want to delete this hotel?');"
-				>
-					Delete
-				</a>
-				<a
-					href="{{ path('dashboard_rooms', {id: hotel.hotelId}) }}"
-					class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow"
-				>
-					Manage Rooms
-				</a>
+		<div class="col">
+			<div class="card h-100 shadow">
+				<div class="card-img-top">
+					{% if hotel.imageH %}
+					<img
+						src="data:image/jpeg;base64,{{ hotel.base64Image }}"
+						alt="{{ hotel.nom }}"
+						class="w-100 object-fit-cover"
+						style="height: 200px"
+					/>
+					{% else %}
+					<div class="text-center text-secondary p-4" style="height: 200px">
+						<i class="fas fa-hotel fa-3x mb-3"></i>
+						<p>No Image Available</p>
+					</div>
+					{% endif %}
+				</div>
+				<div class="card-body">
+					<h2 class="h3 fw-semibold">{{ hotel.nom }}</h2>
+					<p class="mb-1"><strong>Address:</strong> {{ hotel.adress }}</p>
+					<p class="mb-1"><strong>Phone:</strong> {{ hotel.telephone }}</p>
+					<p class="mb-1"><strong>Capacity:</strong> {{ hotel.capaciteTotale }} guests</p>
+				</div>
+				<div class="card-footer bg-transparent">
+					<div class="d-flex justify-content-between">
+						<a href="{{ path('dashboard_hotels_edit', {id: hotel.hotelId}) }}" class="btn btn-outline-secondary">
+							Edit
+						</a>
+						<a
+							href="{{ path('dashboard_hotels_delete', {id: hotel.hotelId}) }}"
+							class="btn btn-danger"
+							onclick="return confirm('Are you sure you want to delete this hotel?');"
+						>
+							Delete
+						</a>
+						<a href="{{ path('dashboard_rooms', {id: hotel.hotelId}) }}" class="btn btn-primary"> Manage Rooms </a>
+					</div>
+				</div>
 			</div>
 		</div>
 		{% endfor %}

@@ -1,106 +1,92 @@
 {% extends 'base.html.twig' %} {% block title %}Edit Flight{% endblock %} {% block body %}
-<div class="container mx-auto px-4 mt-8 space-y-6">
-	<h1 class="text-5xl font-bold mb-6">Edit Flight</h1>
+<div class="container py-5">
+	<h1 class="display-4 fw-bold mb-4">Edit Flight</h1>
 
-	<div id="error-messages" class="mt-4">
-		{% if errors is defined and errors|length > 0 %} {% for error in errors %}
-		<p class="text-sm text-red-600">{{ error }}</p>
-		{% endfor %} {% endif %}
+	<div id="error-messages" class="mt-3">
+		{% if errors is defined and errors|length > 0 %}
+		<div class="alert alert-danger">
+			{% for error in errors %}
+			<p class="mb-0">{{ error }}</p>
+			{% endfor %}
+		</div>
+		{% endif %}
 	</div>
-	<div id="success-messages" class="mt-4">
-		{% if success is defined and success|length > 0 %} {% for message in success %}
-		<p class="text-sm text-green-600">{{ message }}</p>
-		{% endfor %} {% endif %}
+	<div id="success-messages" class="mt-3">
+		{% if success is defined and success|length > 0 %}
+		<div class="alert alert-success">
+			{% for message in success %}
+			<p class="mb-0">{{ message }}</p>
+			{% endfor %}
+		</div>
+		{% endif %}
 	</div>
 
-	<form
-		method="post"
-		action="{{ path('app_edit_flight', {id: voyage.offresVoyageId}) }}"
-		class="bg-white rounded-lg shadow-md p-6 space-y-4"
-	>
-		<div>
-			<label for="titre" class="block text-base font-medium text-gray-700 mb-2">Title</label>
-			<input
-				type="text"
-				id="titre"
-				name="titre"
-				value="{{ voyage.titre }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-		</div>
-		<div>
-			<label for="destination" class="block text-base font-medium text-gray-700 mb-2">Destination</label>
-			<input
-				type="text"
-				id="destination"
-				name="destination"
-				value="{{ voyage.destination }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-		</div>
-		<div>
-			<label for="description" class="block text-base font-medium text-gray-700 mb-2">Description</label>
-			<textarea
-				id="description"
-				name="description"
-				rows="4"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-			>
+	<div class="row">
+		<div class="col-md-12">
+			<form method="post" action="{{ path('app_edit_flight', {id: voyage.offresVoyageId}) }}" class="card shadow">
+				<div class="card-body p-4">
+					<div class="mb-3">
+						<label for="titre" class="form-label">Title</label>
+						<input type="text" id="titre" name="titre" value="{{ voyage.titre }}" class="form-control" />
+					</div>
+					<div class="mb-3">
+						<label for="destination" class="form-label">Destination</label>
+						<input
+							type="text"
+							id="destination"
+							name="destination"
+							value="{{ voyage.destination }}"
+							class="form-control"
+						/>
+					</div>
+					<div class="mb-3">
+						<label for="description" class="form-label">Description</label>
+						<textarea id="description" name="description" rows="4" class="form-control">
 {{ voyage.description }}</textarea
-			>
+						>
+					</div>
+					<div class="mb-3">
+						<label for="prix" class="form-label">Price (€)</label>
+						<input type="number" id="prix" name="prix" value="{{ voyage.prix }}" class="form-control" />
+					</div>
+					<div class="mb-3">
+						<label for="placesDisponibles" class="form-label">Available Places</label>
+						<input
+							type="number"
+							id="placesDisponibles"
+							name="placesDisponibles"
+							value="{{ voyage.placesDisponibles }}"
+							class="form-control"
+						/>
+					</div>
+					<div class="mb-3">
+						<label for="dateDepart" class="form-label">Departure Date</label>
+						<input
+							type="date"
+							id="dateDepart"
+							name="dateDepart"
+							value="{{ voyage.dateDepart|date('Y-m-d') }}"
+							class="form-control"
+						/>
+					</div>
+					<div class="mb-3">
+						<label for="dateRetour" class="form-label">Return Date</label>
+						<input
+							type="date"
+							id="dateRetour"
+							name="dateRetour"
+							value="{{ voyage.dateRetour|date('Y-m-d') }}"
+							class="form-control"
+						/>
+					</div>
+					<div class="d-flex justify-content-between mt-4">
+						<button type="submit" class="btn btn-primary">Update Flight</button>
+						<a href="{{ path('app_dashboard_flights') }}" class="btn btn-outline-secondary"> Cancel </a>
+					</div>
+				</div>
+			</form>
 		</div>
-		<div>
-			<label for="prix" class="block text-base font-medium text-gray-700 mb-2">Price (€)</label>
-			<input
-				type="number"
-				id="prix"
-				name="prix"
-				value="{{ voyage.prix }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-		</div>
-		<div>
-			<label for="placesDisponibles" class="block text-base font-medium text-gray-700 mb-2">Available Places</label>
-			<input
-				type="number"
-				id="placesDisponibles"
-				name="placesDisponibles"
-				value="{{ voyage.placesDisponibles }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-		</div>
-		<div>
-			<label for="dateDepart" class="block text-base font-medium text-gray-700 mb-2">Departure Date</label>
-			<input
-				type="date"
-				id="dateDepart"
-				name="dateDepart"
-				value="{{ voyage.dateDepart|date('Y-m-d') }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-		</div>
-		<div>
-			<label for="dateRetour" class="block text-base font-medium text-gray-700 mb-2">Return Date</label>
-			<input
-				type="date"
-				id="dateRetour"
-				name="dateRetour"
-				value="{{ voyage.dateRetour|date('Y-m-d') }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-		</div>
-		<div class="flex justify-between">
-			<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow">
-				Update Flight
-			</button>
-			<a
-				href="{{ path('app_dashboard_flights') }}"
-				class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg"
-			>
-				Cancel
-			</a>
-		</div>
-	</form>
+	</div>
 </div>
 
 <script>
@@ -161,7 +147,10 @@
 
 				elements.errorMessages.innerHTML = "";
 				if (errors.length > 0) {
-					elements.errorMessages.innerHTML = errors.map((error) => `<p class='text-red-500'>${error}</p>`).join("");
+					const alertDiv = document.createElement("div");
+					alertDiv.className = "alert alert-danger";
+					alertDiv.innerHTML = errors.map((error) => `<p class="mb-0">${error}</p>`).join("");
+					elements.errorMessages.appendChild(alertDiv);
 					return false;
 				}
 

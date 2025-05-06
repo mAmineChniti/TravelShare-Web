@@ -1,10 +1,11 @@
-<nav class="navbar navbar-expand-lg border-bottom sticky-top">
+<nav class="navbar navbar-expand-lg border-bottom sticky-top bg-body">
 	<div class="container">
 		<a href="/" class="navbar-brand d-flex align-items-center">
 			<img
 				src="{{ asset('images/TravelShare-Logo.png') }}"
 				class="me-3"
 				style="height: 3.5rem"
+				id="navbar-logo"
 				alt="TravelShare Logo"
 			/>
 			<span class="fs-4 fw-semibold">TravelShare</span>
@@ -22,6 +23,38 @@
 		</button>
 		<div class="collapse navbar-collapse justify-content-between" id="navbarNav">
 			<ul class="navbar-nav">
+				{% if is_granted('IS_AUTHENTICATED_REMEMBERED') %} {% if is_granted('ROLE_ADMIN') %}
+				<li class="nav-item dropdown">
+					<a
+						class="nav-link dropdown-toggle px-3"
+						href="#"
+						id="dashboardDropdown"
+						role="button"
+						data-bs-toggle="dropdown"
+						aria-expanded="false"
+					>
+						Dashboards
+					</a>
+					<ul class="dropdown-menu" aria-labelledby="dashboardDropdown">
+						<li><a class="dropdown-item" href="{{ path('app_dashboard_forum') }}">Forum Dashboard</a></li>
+						<li><a class="dropdown-item" href="{{ path('app_promo') }}">Promotions</a></li>
+						<li><a class="dropdown-item" href="{{ path('app_dashboard_flights') }}">Flights Dashboard</a></li>
+						<li><a class="dropdown-item" href="{{ path('dashboard_hotels') }}">Hotels Dashboard</a></li>
+					</ul>
+				</li>
+				<li class="nav-item">
+					<a href="{{ path('app_flights') }}" class="nav-link px-3">Flights Admin</a>
+				</li>
+				<li class="nav-item">
+					<a href="{{ path('app_hotels') }}" class="nav-link px-3">Hotels Admin</a>
+				</li>
+				<li class="nav-item">
+					<a href="{{ path('app_forum') }}" class="nav-link px-3">Forum Admin</a>
+				</li>
+				<li class="nav-item">
+					<a href="{{ path('app_excursions') }}" class="nav-link px-3">Excursions Admin</a>
+				</li>
+				{% else %}
 				<li class="nav-item">
 					<a href="{{ path('app_flights') }}" class="nav-link px-3">Flights</a>
 				</li>
@@ -34,11 +67,45 @@
 				<li class="nav-item">
 					<a href="{{ path('app_excursions') }}" class="nav-link px-3">Excursions</a>
 				</li>
+				{% endif %} {% endif %}
 			</ul>
 			<div class="d-flex align-items-center">
-				<a href="/login" class="btn btn-outline-secondary me-2">Login</a>
-				<a href="/register" class="btn btn-primary me-2">Register</a>
-				<button class="btn btn-outline-secondary" id="theme-toggle-btn" aria-label="Toggle theme">
+				{% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+				<a href="{{ path('app_profile') }}" class="btn btn-outline-secondary me-2">Profile</a>
+				<div class="dropdown">
+					<button
+						class="btn btn-secondary dropdown-toggle"
+						type="button"
+						id="userMenuDropdown"
+						data-bs-toggle="dropdown"
+						aria-expanded="false"
+					>
+						{{ app.user.name ?? 'User' }}
+					</button>
+					<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
+						<li>
+							<a class="dropdown-item" href="{{ path('app_profile') }}"><i class="fas fa-user me-2"></i>Profile</a>
+						</li>
+						{% if is_granted('ROLE_ADMIN') %}
+						<li>
+							<a class="dropdown-item" href="{{ path('app_dashboard', {}) }}"
+								><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a
+							>
+						</li>
+						{% endif %}
+						<li><hr class="dropdown-divider" /></li>
+						<li>
+							<a class="dropdown-item" href="{{ path('app_logout') }}"
+								><i class="fas fa-sign-out-alt me-2"></i>Logout</a
+							>
+						</li>
+					</ul>
+				</div>
+				{% else %}
+				<a href="{{ path('app_login') }}" class="btn btn-outline-secondary me-2">Login</a>
+				<a href="{{ path('app_register') }}" class="btn btn-primary me-2">Register</a>
+				{% endif %}
+				<button class="btn btn-outline-secondary ms-2" id="theme-toggle-btn" aria-label="Toggle theme">
 					<i class="fas fa-sun" id="theme-icon"></i>
 				</button>
 			</div>
@@ -51,6 +118,7 @@
 		const htmlElement = document.documentElement;
 		const themeToggleBtn = document.getElementById("theme-toggle-btn");
 		const themeIcon = document.getElementById("theme-icon");
+		const navbarLogo = document.getElementById("navbar-logo");
 
 		// Initialize the theme based on localStorage or system preference
 		const getStoredTheme = () => localStorage.getItem("theme");
@@ -71,8 +139,12 @@
 			// Update icon based on current theme
 			if (theme === "dark") {
 				themeIcon.className = "fas fa-moon";
+				// Invert logo in dark mode to make it visible (since it's a black logo)
+				navbarLogo.style.filter = "invert(100%)";
 			} else {
 				themeIcon.className = "fas fa-sun";
+				// Don't invert in light mode (show original black logo)
+				navbarLogo.style.filter = "none";
 			}
 		};
 
