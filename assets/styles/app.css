@@ -1,12 +1,43 @@
-@import "tailwindcss";
-@import "flowbite/src/themes/default";
-@plugin "flowbite/plugin";
-@source "../../node_modules/flowbite";
-@source "../node_modules/flowbite-datepicker";
-@custom-variant dark (&:where(.dark, .dark *));
-@layer base {
-    button:not(:disabled),
-    [role="button"]:not(:disabled) {
-        cursor: pointer;
-    }
+/* Import Bootstrap CSS */
+@import '~bootstrap/dist/css/bootstrap.min.css';
+
+/* Custom styles can go here */
+body {
+  min-height: 100vh;
+}
+
+/* Keep cursor pointer behavior for buttons */
+button:not(:disabled),
+[role="button"]:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Custom color mode styles */
+[data-bs-theme="dark"] .hover-scale {
+  box-shadow: 0 0.125rem 0.25rem rgba(255, 255, 255, 0.075) !important;
+}
+
+/* Ensure proper contrast for text in dark mode */
+[data-bs-theme="dark"] .text-secondary {
+  color: #adb5bd !important;
+}
+
+/* Fix for card backgrounds in dark mode */
+[data-bs-theme="dark"] .card {
+  background-color: #2b3035;
+}
+
+/* Fix for hover effects in dark mode */
+[data-bs-theme="dark"] .hover-scale:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0.5rem 1rem rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Transition for theme switching */
+html {
+  transition: color-scheme 0.3s ease;
+}
+
+html * {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }

@@ -1,13 +1,13 @@
 <div
 	id="post-{{ post.postId }}"
-	class="bg-white rounded-lg shadow-md p-4 border border-gray-200 max-h-[600px] overflow-hidden"
+	class="bg-white rounded-lg shadow-md p-4 border border-gray-200 max-h-[600px] overflow-hidden dark:bg-gray-800 dark:border-gray-700"
 >
 	<div class="flex justify-between items-center mb-2">
-		<span class="text-blue-600 font-medium truncate">{{ post.name ~ ' ' ~ post.lastName }}</span>
+		<span class="text-blue-600 font-medium truncate dark:text-blue-400">{{ post.name ~ ' ' ~ post.lastName }}</span>
 		<div class="flex space-x-2">
 			<button
 				id="editButton-{{ post.postId }}"
-				class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-1 px-3 rounded-lg"
+				class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-1 px-3 rounded-lg dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
 				onclick="ForumApp.editPost('{{ post.postId }}')"
 				title="Edit post"
 			>
@@ -23,7 +23,7 @@
 			>
 				<button
 					type="submit"
-					class="bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-3 rounded-lg"
+					class="bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-3 rounded-lg dark:bg-red-700 dark:hover:bg-red-800"
 					title="Delete post"
 				>
 					<i class="fas fa-trash"></i>
@@ -58,7 +58,7 @@
 				name="editTitle-{{ post.postId }}"
 				id="editTitle-{{ post.postId }}"
 				value="{{ post.postTitle }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
 				maxlength="255"
 			/>
 		</div>
@@ -66,19 +66,21 @@
 			<textarea
 				name="editTextarea-{{ post.postId }}"
 				id="editTextarea-{{ post.postId }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
 				maxlength="255"
 			>
 {{ post.textContent }}</textarea
 			>
-			<span id="editPostLength-{{ post.postId }}" class="text-sm text-gray-500">{{ post.textContent|length }}/255</span>
+			<span id="editPostLength-{{ post.postId }}" class="text-sm text-gray-500 dark:text-gray-400"
+				>{{ post.textContent|length }}/255</span
+			>
 		</div>
-		<p id="editPostErrorMessage-{{ post.postId }}" class="mt-1 text-sm text-red-600"></p>
+		<p id="editPostErrorMessage-{{ post.postId }}" class="mt-1 text-sm text-red-600 dark:text-red-400"></p>
 		<div class="flex justify-end">
 			<button
 				type="button"
 				onclick="ForumApp.submitEditPostIfValid(this.form, {{ post.postId }})"
-				class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg"
+				class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg dark:bg-blue-700 dark:hover:bg-blue-800"
 				title="Save changes"
 			>
 				<i class="fas fa-save"></i>
@@ -88,7 +90,11 @@
 	{% if post.images is defined and post.images|length > 0 %}
 	<div class="mt-2 grid grid-cols-3 gap-2 overflow-y-auto">
 		{% for image in post.images %}
-		<img src="data:image/jpeg;base64,{{ image }}" alt="Post Image" class="w-full h-auto rounded-lg shadow-md" />
+		<img
+			src="data:image/jpeg;base64,{{ image }}"
+			alt="Post Image"
+			class="w-full h-auto rounded-lg shadow-md dark:shadow-gray-700"
+		/>
 		{% endfor %}
 	</div>
 	{% endif %}
@@ -103,17 +109,17 @@
 			<div>
 				<textarea
 					name="commentText"
-					class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+					class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-500"
 					placeholder="Write a comment..."
 					maxlength="255"
 				></textarea>
-				<span id="newCommentLength-{{ post.postId }}" class="text-sm text-gray-500">0/255</span>
+				<span id="newCommentLength-{{ post.postId }}" class="text-sm text-gray-500 dark:text-gray-400">0/255</span>
 			</div>
-			<p id="commentErrorMessage-{{ post.postId }}" class="mt-1 text-sm text-red-600"></p>
+			<p id="commentErrorMessage-{{ post.postId }}" class="mt-1 text-sm text-red-600 dark:text-red-400"></p>
 			<div class="flex justify-end">
 				<button
 					type="button"
-					class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg"
+					class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg dark:bg-blue-700 dark:hover:bg-blue-800"
 					title="Add comment"
 					onclick="handleAddCommentButtonClick(this);"
 				>
@@ -126,7 +132,7 @@
 	{% if post.comments is defined and post.comments|length > 0 %}
 	<div
 		id="commentsContainer-{{ post.postId }}"
-		class="mt-2 space-y-2 bg-gray-50 p-2 rounded-lg border border-gray-200 max-h-[200px] overflow-y-auto"
+		class="mt-2 space-y-2 bg-gray-50 p-2 rounded-lg border border-gray-200 max-h-[200px] overflow-y-auto dark:bg-gray-700 dark:border-gray-600"
 	>
 		{% for comment in post.comments %}
 		<twig:Comment
