@@ -5,13 +5,11 @@ namespace App\Controller;
 use App\Entity\Reponses;
 use App\Repository\ReponsesRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
-
-
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class ListRepAdminController extends AbstractController
 {
@@ -37,16 +35,16 @@ final class ListRepAdminController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'Réponse supprimée avec succès.');
+
         return $this->redirectToRoute('app_list_rep_admin');
     }
-
 
     #[Route('/reponse/edit/{id}', name: 'reponse_edit', methods: ['POST'])]
     public function edit(Reponses $reponse, Request $request, EntityManagerInterface $em): Response
     {
         $contenu = $request->request->get('contenu');
 
-        if ($contenu !== null) {
+        if (null !== $contenu) {
             $reponse->setContenu($contenu);
             $em->flush();
 
@@ -57,6 +55,4 @@ final class ListRepAdminController extends AbstractController
 
         return $this->redirectToRoute('app_list_rep_admin');
     }
-
-
 }

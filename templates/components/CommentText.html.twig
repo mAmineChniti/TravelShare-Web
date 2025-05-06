@@ -1,0 +1,27 @@
+<div id="commentText-{{ commentId }}" class="text-sm text-gray-700 dark:text-gray-300 leading-snug truncate">
+	<p>{{ comment|markdown }}</p>
+</div>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const commentId = {{ commentId }};
+		const elements = {
+			editForm: document.getElementById(`editCommentForm-${commentId}`),
+			editButton: document.getElementById(`editCommentButton-${commentId}`)
+		};
+
+		if (elements.editForm) elements.editForm.style.display = "none";
+		if (elements.editButton) elements.editButton.style.display = "inline-flex";
+	});
+
+	(function() {
+		const commentId = {{ commentId }};
+		const elements = {
+			editForm: document.getElementById(`editCommentForm-${commentId}`),
+			editButton: document.getElementById(`editCommentButton-${commentId}`)
+		};
+
+		if (elements.editForm) elements.editForm.style.display = "none";
+		if (elements.editButton) elements.editButton.style.display = "inline-flex";
+	})();
+</script>

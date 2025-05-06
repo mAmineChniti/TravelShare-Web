@@ -6,14 +6,11 @@ use App\Entity\Users;
 use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use finfo;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AccueilAdminController extends AbstractController
 {
@@ -36,7 +33,7 @@ class AccueilAdminController extends AbstractController
 
         return $this->render('accueil_admin/index.html.twig', [
             'users' => $users,
-            'current_menu' => 'admin_users'
+            'current_menu' => 'admin_users',
         ]);
     }
 
@@ -63,10 +60,9 @@ class AccueilAdminController extends AbstractController
 
             // En cas de succès
             $success = true;
-
         } catch (\Exception $e) {
             // En cas d'erreur
-            $message = 'An error occurred while processing the request: ' . $e->getMessage();
+            $message = 'An error occurred while processing the request: '.$e->getMessage();
         }
 
         return $this->json([
@@ -74,10 +70,9 @@ class AccueilAdminController extends AbstractController
             'message' => $message,
             'isBlocked' => $user->isBlocked(),
             'newButtonText' => $user->isBlocked() ? 'Débloquer' : 'Bloquer',
-            'newStatusText' => $user->isBlocked() ? 'Bloqué' : 'Actif'
+            'newStatusText' => $user->isBlocked() ? 'Bloqué' : 'Actif',
         ]);
     }
-
 
     #[Route('/user/photo/{id}', name: 'user_photo', methods: ['GET'])]
     public function getUserPhoto(Users $user): Response
@@ -97,7 +92,7 @@ class AccueilAdminController extends AbstractController
             $photoContent = stream_get_contents($photoContent);
         }
 
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($photoContent) ?: 'application/octet-stream';
 
         return new Response(
@@ -105,7 +100,7 @@ class AccueilAdminController extends AbstractController
             200,
             [
                 'Content-Type' => $mimeType,
-                'Content-Disposition' => 'inline; filename="user-'.$user->getId().'"'
+                'Content-Disposition' => 'inline; filename="user-'.$user->getUserId().'"',
             ]
         );
     }

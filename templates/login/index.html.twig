@@ -1,186 +1,219 @@
-{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %} {% block title %}Log In{% endblock %} {% block css %}
+<!-- MATERIAL DESIGN ICONIC FONT -->
+<link
+	rel="stylesheet"
+	href="{{ asset('fonts2/material-design-iconic-font/css/material-design-iconic-font.min.css') }}"
+/>
 
-{% block title %}Log In{% endblock %}
+<!-- STYLE CSS -->
+<link href="{{ asset('css2/style.css') }}" rel="stylesheet" />
+{% endblock %} {% block body %}
+<div class="wrapper" style="background-image: url('{{ asset('images2/imagett.jpg') }}');">
+	<div class="inner">
+		<div class="image-holder">
+			<img src="{{ asset('images2/agence.png') }}" alt="Logo" />
+			<div class="already-have-account">
+				<a href="{{ path('app_logup') }}">You don't have account ?</a>
+			</div>
+		</div>
 
-{% block css %}
-    <link rel="stylesheet" href="{{ asset('fonts2/material-design-iconic-font/css/material-design-iconic-font.min.css') }}">
-    <link href="{{ asset('css2/style.css') }}" rel="stylesheet">
-    <style>
-        .form-group-inline {
-            display: flex;
-            gap: 20px;
-        }
-        .form-group-inline > div {
-            flex: 1;
-        }
-        .text-danger {
-            color: red;
-            font-size: 13px;
-            margin-top: 5px;
-        }
-        .invalid-input {
-            border: 1px solid #ff3860 !important;
-        }
-        .error-message {
-            color: #ff3860;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
-        }
-        .form-wrapper {
-            position: relative;
-            margin-bottom: 15px;
-        }
-        input:invalid {
-            box-shadow: none;
-        }
-    </style>
-{% endblock %}
+		{% block css %}
+		<link
+			rel="stylesheet"
+			href="{{ asset('fonts2/material-design-iconic-font/css/material-design-iconic-font.min.css') }}"
+		/>
+		<!-- STYLE CSS -->
+		<link href="{{ asset('css2/style.css') }}" rel="stylesheet" />
+		<style>
+			.form-group-inline {
+				display: flex;
+				gap: 20px;
+			}
+			.form-group-inline > div {
+				flex: 1;
+			}
+			.text-danger {
+				color: red;
+				font-size: 13px;
+				margin-top: 5px;
+			}
+			.invalid-input {
+				border: 1px solid #ff3860 !important;
+			}
+			.error-message {
+				color: #ff3860;
+				font-size: 12px;
+				margin-top: 5px;
+				display: none;
+			}
+			.form-wrapper {
+				position: relative;
+				margin-bottom: 15px;
+			}
+			input:invalid {
+				box-shadow: none;
+			}
+		</style>
+		{% endblock %} {% block body %}
+		<div class="wrapper" style="background-image: url('{{ asset('images2/imagett.jpg') }}');">
+			<div class="inner">
+				<div class="image-holder">
+					<img src="{{ asset('images2/agence.png') }}" alt="Logo" />
+					<div class="already-have-account">
+						<a href="{{ path('app_logup') }}">You don't have an account?</a>
+					</div>
+				</div>
 
-{% block body %}
-    <div class="wrapper" style="background-image: url('{{ asset('images2/imagett.jpg') }}');">
-        <div class="inner">
-            <div class="image-holder">
-                <img src="{{ asset('images2/agence.png') }}" alt="Logo">
-                <div class="already-have-account">
-                    <a href="{{ path('app_logup') }}">You don't have an account?</a>
-                </div>
-            </div>
+				<form action="{{ path('app_login') }}" method="post" id="loginForm" novalidate>
+					<h3>Log In</h3>
 
-            <form action="{{ path('app_login') }}" method="post" id="loginForm" novalidate>
-                <h3>Log In</h3>
+					{% if error %}
+					<div class="text-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+					{% endif %}
 
-                {% if error %}
-                    <div class="text-danger">
-                        {{ error.messageKey|trans(error.messageData, 'security') }}
-                    </div>
-                {% endif %}
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}" />
 
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+					<div class="form-wrapper">
+						<input
+							type="email"
+							name="_email"
+							id="inputEmail"
+							class="form-control"
+							placeholder="Email Address"
+							value="{{ last_username }}"
+							required
+						/>
+						<i class="zmdi zmdi-email"></i>
+						<div class="error-message" id="emailError">Email is required</div>
+					</div>
 
-                <div class="form-wrapper">
-                    <input type="email"
-                           name="_email"
-                           id="inputEmail"
-                           class="form-control"
-                           placeholder="Email Address"
-                           value="{{ last_username }}"
-                           required>
-                    <i class="zmdi zmdi-email"></i>
-                    <div class="error-message" id="emailError">Email is required</div>
-                </div>
+					<div class="form-wrapper">
+						<input
+							type="password"
+							name="_password"
+							id="inputPassword"
+							class="form-control"
+							placeholder="Password"
+							required
+							minlength="8"
+						/>
+						<i class="zmdi zmdi-lock"></i>
+						<div class="error-message" id="passwordError">Password is required (min 8 characters)</div>
+					</div>
 
-                <div class="form-wrapper">
-                    <input type="password"
-                           name="_password"
-                           id="inputPassword"
-                           class="form-control"
-                           placeholder="Password"
-                           required
-                           minlength="8">
-                    <i class="zmdi zmdi-lock"></i>
-                    <div class="error-message" id="passwordError">Password is required (min 8 characters)</div>
-                </div>
+					<!-- reCAPTCHA -->
+					<div class="form-wrapper">
+						<div class="g-recaptcha" data-sitekey="6LduMSQrAAAAAMilOA0YocwwlbFgxMqgQ2RYoiWm"></div>
+						<div class="error-message" id="recaptchaError">Please verify that you are not a robot</div>
+					</div>
 
-                <!-- reCAPTCHA -->
-                <div class="form-wrapper">
-                    <div class="g-recaptcha" data-sitekey="6LduMSQrAAAAAMilOA0YocwwlbFgxMqgQ2RYoiWm"></div>
-                    <div class="error-message" id="recaptchaError">Please verify that you are not a robot</div>
-                </div>
+					<div class="row button-row">
+						<div>
+							<button type="button" class="round-button">
+								<img src="{{ asset('images2/google.svg') }}" alt="Google" />
+							</button>
+						</div>
+						<div>
+							<button type="button" class="round-button">
+								<img src="{{ asset('images2/facebook.svg') }}" alt="Facebook" />
+							</button>
+						</div>
+						<div>
+							<button type="button" class="round-button">
+								<img src="{{ asset('images2/twitter.svg') }}" alt="Twitter" />
+							</button>
+						</div>
+					</div>
 
-                <div class="row button-row">
-                    <div><button type="button" class="round-button"><img src="{{ asset('images2/google.svg') }}" alt="Google"></button></div>
-                    <div><button type="button" class="round-button"><img src="{{ asset('images2/facebook.svg') }}" alt="Facebook"></button></div>
-                    <div><button type="button" class="round-button"><img src="{{ asset('images2/twitter.svg') }}" alt="Twitter"></button></div>
-                </div>
+					<button type="submit" class="btn btn-primary" id="submitBtn">
+						Connect
+						<i class="zmdi zmdi-arrow-right"></i>
+					</button>
 
-                <button type="submit" class="btn btn-primary" id="submitBtn">
-                    Connect
-                    <i class="zmdi zmdi-arrow-right"></i>
-                </button>
+					<div class="forgot-password">
+						<a href="#">Forgot password?</a>
+					</div>
+				</form>
+			</div>
+		</div>
 
-                <div class="forgot-password">
-                    <a href="#">Forgot password?</a>
-                </div>
-            </form>
-        </div>
-    </div>
+		<!-- Script reCAPTCHA -->
+		<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
-    <!-- Script reCAPTCHA -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+		<!-- Validation JS -->
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				const form = document.getElementById("loginForm");
+				const email = document.getElementById("inputEmail");
+				const password = document.getElementById("inputPassword");
+				const emailError = document.getElementById("emailError");
+				const passwordError = document.getElementById("passwordError");
+				const recaptchaError = document.getElementById("recaptchaError");
+				let formSubmitted = false;
 
-    <!-- Validation JS -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('loginForm');
-            const email = document.getElementById('inputEmail');
-            const password = document.getElementById('inputPassword');
-            const emailError = document.getElementById('emailError');
-            const passwordError = document.getElementById('passwordError');
-            const recaptchaError = document.getElementById('recaptchaError');
-            let formSubmitted = false;
+				function validateEmail() {
+					if (formSubmitted && !email.value) {
+						email.classList.add("invalid-input");
+						emailError.style.display = "block";
+						return false;
+					}
+					email.classList.remove("invalid-input");
+					emailError.style.display = "none";
+					return true;
+				}
 
-            function validateEmail() {
-                if (formSubmitted && !email.value) {
-                    email.classList.add('invalid-input');
-                    emailError.style.display = 'block';
-                    return false;
-                }
-                email.classList.remove('invalid-input');
-                emailError.style.display = 'none';
-                return true;
-            }
+				function validatePassword() {
+					if (formSubmitted && !password.value) {
+						passwordError.textContent = "Password is required";
+						password.classList.add("invalid-input");
+						passwordError.style.display = "block";
+						return false;
+					} else if (formSubmitted && password.value.length < 8) {
+						passwordError.textContent = "Password must be at least 8 characters";
+						password.classList.add("invalid-input");
+						passwordError.style.display = "block";
+						return false;
+					}
+					password.classList.remove("invalid-input");
+					passwordError.style.display = "none";
+					return true;
+				}
 
-            function validatePassword() {
-                if (formSubmitted && !password.value) {
-                    passwordError.textContent = 'Password is required';
-                    password.classList.add('invalid-input');
-                    passwordError.style.display = 'block';
-                    return false;
-                } else if (formSubmitted && password.value.length < 8) {
-                    passwordError.textContent = 'Password must be at least 8 characters';
-                    password.classList.add('invalid-input');
-                    passwordError.style.display = 'block';
-                    return false;
-                }
-                password.classList.remove('invalid-input');
-                passwordError.style.display = 'none';
-                return true;
-            }
+				function validateRecaptcha() {
+					const response = grecaptcha.getResponse();
+					if (formSubmitted && response.length === 0) {
+						recaptchaError.style.display = "block";
+						return false;
+					}
+					recaptchaError.style.display = "none";
+					return true;
+				}
 
-            function validateRecaptcha() {
-                const response = grecaptcha.getResponse();
-                if (formSubmitted && response.length === 0) {
-                    recaptchaError.style.display = 'block';
-                    return false;
-                }
-                recaptchaError.style.display = 'none';
-                return true;
-            }
+				form.addEventListener("submit", function (event) {
+					formSubmitted = true;
+					const isEmailValid = validateEmail();
+					const isPasswordValid = validatePassword();
+					const isRecaptchaValid = validateRecaptcha();
 
-            form.addEventListener('submit', function(event) {
-                formSubmitted = true;
-                const isEmailValid = validateEmail();
-                const isPasswordValid = validatePassword();
-                const isRecaptchaValid = validateRecaptcha();
+					if (!isEmailValid || !isPasswordValid || !isRecaptchaValid) {
+						event.preventDefault();
+						if (!isEmailValid) {
+							email.focus();
+						} else if (!isPasswordValid) {
+							password.focus();
+						}
+					}
+				});
 
-                if (!isEmailValid || !isPasswordValid || !isRecaptchaValid) {
-                    event.preventDefault();
-                    if (!isEmailValid) {
-                        email.focus();
-                    } else if (!isPasswordValid) {
-                        password.focus();
-                    }
-                }
-            });
+				email.addEventListener("input", function () {
+					if (formSubmitted) validateEmail();
+				});
 
-            email.addEventListener('input', function() {
-                if (formSubmitted) validateEmail();
-            });
-
-            password.addEventListener('input', function() {
-                if (formSubmitted) validatePassword();
-            });
-        });
-    </script>
-{% endblock %}
+				password.addEventListener("input", function () {
+					if (formSubmitted) validatePassword();
+				});
+			});
+		</script>
+		{% endblock %}
+	</div>
+</div>
