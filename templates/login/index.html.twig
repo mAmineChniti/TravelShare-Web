@@ -1,76 +1,71 @@
-{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %} {% block title %}Log In{% endblock %} {% block css %}
+<!-- MATERIAL DESIGN ICONIC FONT -->
+<link
+	rel="stylesheet"
+	href="{{ asset('fonts2/material-design-iconic-font/css/material-design-iconic-font.min.css') }}"
+/>
 
-{% block title %}Log In{% endblock %}
+<!-- STYLE CSS -->
+<link href="{{ asset('css2/style.css') }}" rel="stylesheet" />
+{% endblock %} {% block body %}
+<div class="wrapper" style="background-image: url('{{ asset('images2/imagett.jpg') }}');">
+	<div class="inner">
+		<div class="image-holder">
+			<img src="{{ asset('images2/agence.png') }}" alt="Logo" />
+			<div class="already-have-account">
+				<a href="{{ path('app_logup') }}">You don't have account ?</a>
+			</div>
+		</div>
 
-{% block css %}
-    <!-- MATERIAL DESIGN ICONIC FONT -->
-    <link rel="stylesheet" href="{{ asset('fonts2/material-design-iconic-font/css/material-design-iconic-font.min.css') }}">
+		<!-- Formulaire de connexion -->
+		<form action="{{ path('app_login') }}" method="post">
+			<h3>Log In</h3>
 
-    <!-- STYLE CSS -->
-    <link href="{{ asset('css2/style.css') }}" rel="stylesheet">
-{% endblock %}
+			<!-- Affichage des erreurs de connexion -->
+			{% if error %}
+			<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+			{% endif %}
 
-{% block body %}
-    <div class="wrapper" style="background-image: url('{{ asset('images2/imagett.jpg') }}');">
-        <div class="inner">
-            <div class="image-holder">
-                <img src="{{ asset('images2/agence.png') }}" alt="Logo">
-                <div class="already-have-account">
-                    <a href="{{ path('app_logup') }}">You don't have account ?</a>
-                </div>
-            </div>
+			<!-- Champ pour l'email -->
+			<div class="form-wrapper">
+				<input type="text" name="_email" placeholder="Email Address" class="form-control" required />
+				<i class="zmdi zmdi-email"></i>
+			</div>
 
-            <!-- Formulaire de connexion -->
-            <form action="{{ path('app_login') }}" method="post">
-                <h3>Log In</h3>
+			<!-- Champ pour le mot de passe -->
+			<div class="form-wrapper">
+				<input type="password" name="_password" placeholder="Password" class="form-control" required />
+				<i class="zmdi zmdi-lock"></i>
+			</div>
 
-                <!-- Affichage des erreurs de connexion -->
-                {% if error %}
-                    <div class="alert alert-danger">
-                        {{ error.messageKey|trans(error.messageData, 'security') }}
-                    </div>
-                {% endif %}
+			<div class="row button-row">
+				<div>
+					<button type="button" class="round-button">
+						<img src="{{ asset('images2/google.svg') }}" alt="Google" />
+					</button>
+				</div>
+				<div>
+					<button type="button" class="round-button">
+						<img src="{{ asset('images2/facebook.svg') }}" alt="Facebook" />
+					</button>
+				</div>
+				<div>
+					<button type="button" class="round-button">
+						<img src="{{ asset('images2/twitter.svg') }}" alt="Twitter" />
+					</button>
+				</div>
+			</div>
 
-                <!-- Champ pour l'email -->
-                <div class="form-wrapper">
-                    <input type="text" name="_email" placeholder="Email Address" class="form-control" required>
-                    <i class="zmdi zmdi-email"></i>
-                </div>
+			<!-- Bouton de soumission du formulaire -->
+			<button type="submit" class="btn btn-primary">
+				Connect
+				<i class="zmdi zmdi-arrow-right"></i>
+			</button>
 
-                <!-- Champ pour le mot de passe -->
-                <div class="form-wrapper">
-                    <input type="password" name="_password" placeholder="Password" class="form-control" required>
-                    <i class="zmdi zmdi-lock"></i>
-                </div>
-
-                <div class="row button-row">
-                    <div>
-                        <button type="button" class="round-button">
-                            <img src="{{ asset('images2/google.svg') }}" alt="Google">
-                        </button>
-                    </div>
-                    <div>
-                        <button type="button" class="round-button">
-                            <img src="{{ asset('images2/facebook.svg') }}" alt="Facebook">
-                        </button>
-                    </div>
-                    <div>
-                        <button type="button" class="round-button">
-                            <img src="{{ asset('images2/twitter.svg') }}" alt="Twitter">
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Bouton de soumission du formulaire -->
-                <button type="submit" class="btn btn-primary">
-                    Connect
-                    <i class="zmdi zmdi-arrow-right"></i>
-                </button>
-
-                <div class="forgot-password">
-                    <a href="">Forget password ?</a>
-                </div>
-            </form>
-        </div>
-    </div>
+			<div class="forgot-password">
+				<a href="">Forget password ?</a>
+			</div>
+		</form>
+	</div>
+</div>
 {% endblock %}

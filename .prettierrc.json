@@ -1,0 +1,21 @@
+{
+    "useTabs": true,
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": false,
+    "twigSingleQuote": true,
+    "printWidth": 120,
+    "plugins": [
+        "@zackad/prettier-plugin-twig"
+    ],
+    "overrides": [
+        {
+            "files": [
+                "*.html.twig"
+            ],
+            "options": {
+                "parser": "html"
+            }
+        }
+    ]
+}

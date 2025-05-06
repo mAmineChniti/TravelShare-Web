@@ -1,106 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content="TravelShare - Your one-stop destination for travel planning." />
+		<meta name="keywords" content="travel, flights, hotels, excursions, forums" />
+		<title>{% block title %} Welcome! {% endblock %}</title>
+		<link
+			rel="icon"
+			href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>"
+		/>
+		<script
+			src="https://unpkg.com/htmx.org@2.0.4"
+			integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
+			crossorigin="anonymous"
+		></script>
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+		<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600&family=Roboto&display=swap"
+			rel="stylesheet"
+		/>
 
-<head>
-    <meta charset="utf-8">
-    <title>{% block title %}TravelaShare - Tourism Website Template{% endblock %}</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="" name="keywords">
-    <meta content="" name="description">
-    <!-- Lien vers la favicon -->
-    <link rel="icon" href="{{ asset('images2/favicon.svg') }}" type="image/x-icon">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet" />
 
+		<link href="lib/owlcarousel/assets/owl.carousel.css" rel="stylesheet" />
+		<link href="lib/lightbox/css/lightbox.min.css" rel="stylesheet" />
 
-    {% block css%}
-        <!-- Google Web Fonts -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600&family=Roboto&display=swap" rel="stylesheet">
+		<link href="{{ asset('css/style.css') }}" rel="stylesheet" />
 
-        <!-- Icon Font Stylesheet -->
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="lib/easing/easing.min.js"></script>
+		<script src="lib/waypoints/waypoints.min.js"></script>
+		<script src="lib/owlcarousel/owl.carousel.min.js"></script>
+		<script src="lib/lightbox/js/lightbox.min.js"></script>
+		<script src="{{ asset('js/main.js') }}"></script>
+				{% block stylesheets %} {{ encore_entry_link_tags('app') }} {% endblock %} {% block javascripts %} {{
+						encore_entry_script_tags('app') }} {% endblock %} {% block css%}
+		{% endblock%}
+	</head>
 
-        <!-- Libraries Stylesheet -->
-        <link href="lib/owlcarousel/assets/owl.carousel.css" rel="stylesheet">
-        <link href="lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+	<body class="min-vh-100">
+			<nav class="sticky-top">
+						<twig:Navbar />
+								</nav>
+										<main class="pt-5 pb-3 w-100">{% block body %}{% endblock %}</main>
+												<footer class="mt-auto">
+															<twig:Footer />
+																	</footer>
+																		</body>
 
-
-        <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/style.css') }}" rel="stylesheet">
-
-    {% endblock%}
-</head>
-
-{% block body %}
-<body>
-
-<!-- Spinner Start -->
-<!-- Spinner End -->
-
-<!-- Topbar Start -->
-<!-- Topbar End -->
-
-<!-- Navbar & Hero Start -->
-<!-- Navbar & Hero End -->
-
-<!-- About Start -->
-<!-- About End -->
-
-<!-- Services Start -->
-<!-- Services End -->
-
-<!-- Destination Start -->
-<!-- Destination End -->
-
-<!-- Explore Tour Start -->
-<!-- Explore Tour Start -->
-
-<!-- Packages Start -->
-<!-- Packages End -->
-
-<!-- Gallery Start -->
-<!-- Gallery End -->
-
-<!-- Tour Booking Start -->
-<!-- Tour Booking End -->
-
-<!-- Travel Guide Start -->
-<!-- Travel Guide End -->
-
-<!-- Blog Start -->
-<!-- Blog End -->
-
-<!-- Testimonial Start -->
-<!-- Testimonial End -->
-
-<!-- Subscribe Start -->
-<!-- Subscribe End -->
-
-<!-- Footer Start -->
-<!-- Footer End -->
-
-<!-- Copyright Start -->
-<!-- Copyright End -->
-
-<!-- Back to Top -->
-<a href="#" class="btn btn-primary btn-primary-outline-0 btn-md-square back-to-top"><i class="fa fa-arrow-up"></i></a>
-
-{% endblock %}
-
-{% block js%}
-    <!-- JavaScript Libraries -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="lib/easing/easing.min.js"></script>
-    <script src="lib/waypoints/waypoints.min.js"></script>
-    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="lib/lightbox/js/lightbox.min.js"></script>
-
-
-    <!-- Template Javascript -->
-    <script src="{{ asset('js/main.js') }}"></script>
-
-{% endblock %}
-</body>
 </html>
