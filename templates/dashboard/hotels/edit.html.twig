@@ -1,118 +1,121 @@
 {% extends 'base.html.twig' %} {% block title %}Edit Hotel{% endblock %} {% block body %}
-<div class="container mx-auto px-4 mt-8 space-y-6">
-	<h1 class="text-5xl font-bold mb-6">Edit Hotel</h1>
-	<form method="POST" enctype="multipart/form-data" class="bg-white rounded-lg shadow-md p-6 space-y-4">
-		<div>
-			<label for="nom" class="block text-base font-medium text-gray-700 mb-2">Hotel Name</label>
-			<input
-				type="text"
-				id="nom"
-				name="nom"
-				value="{{ hotel.nom }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-		</div>
-		<div>
-			<label for="adress" class="block text-base font-medium text-gray-700 mb-2">Address</label>
-			<input
-				type="text"
-				id="adress"
-				name="adress"
-				value="{{ hotel.adress }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-		</div>
-		<div>
-			<label for="telephone" class="block text-base font-medium text-gray-700 mb-2">Phone</label>
-			<input
-				type="text"
-				id="telephone"
-				name="telephone"
-				value="{{ hotel.telephone }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-		</div>
-		<div>
-			<label for="capaciteTotale" class="block text-base font-medium text-gray-700 mb-2">Total Capacity</label>
-			<input
-				type="number"
-				id="capaciteTotale"
-				name="capaciteTotale"
-				value="{{ hotel.capaciteTotale }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-		</div>
-		<div>
-			<label for="imageH" class="block text-base font-medium text-gray-700 mb-2">Hotel Image</label>
-			<input
-				type="file"
-				id="imageH"
-				name="imageH"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-			{% if hotel.imageH %}
-			<img
-				src="data:image/jpeg;base64,{{ hotel.base64Image }}"
-				alt="Hotel Image"
-				class="w-full h-48 object-cover rounded-lg mt-4"
-			/>
-			{% endif %}
-		</div>
-		{% set categories = {
-    'Hotel Rating': ['2 Stars', '3 Stars', '4 Stars', '5 Stars', 'Boutique Hotel', 'Luxury Resort'],
-    'Location Type': ['Beachfront', 'City Center', 'Countryside', 'Mountain Area', 'Forest Nearby', 'Island'],
-    'Experience Theme': ['Spa & Wellness', 'Adventure & Activities', 'Romantic Getaway', 'Family-Friendly', 'Eco-Friendly', 'Business Hotel'],
-    'Price Range': ['Budget-Friendly', 'Mid-Range', 'Premium', 'Luxury', 'All-Inclusive']
-} %}
+<div class="container py-5">
+	<div class="card shadow mb-4">
+		<div class="card-body p-4">
+			<h1 class="display-4 fw-bold mb-4">Edit Hotel</h1>
+			<form method="POST" enctype="multipart/form-data">
+				<div class="mb-3">
+					<label for="nom" class="form-label">Hotel Name</label>
+					<input
+						type="text"
+						id="nom"
+						name="nom"
+						value="{{ hotel.nom }}"
+						class="form-control"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="adress" class="form-label">Address</label>
+					<input
+						type="text"
+						id="adress"
+						name="adress"
+						value="{{ hotel.adress }}"
+						class="form-control"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="telephone" class="form-label">Phone</label>
+					<input
+						type="text"
+						id="telephone"
+						name="telephone"
+						value="{{ hotel.telephone }}"
+						class="form-control"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="capaciteTotale" class="form-label">Total Capacity</label>
+					<input
+						type="number"
+						id="capaciteTotale"
+						name="capaciteTotale"
+						value="{{ hotel.capaciteTotale }}"
+						class="form-control"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="imageH" class="form-label">Hotel Image</label>
+					<input
+						type="file"
+						id="imageH"
+						name="imageH"
+						class="form-control"
+					/>
+					{% if hotel.imageH %}
+					<div class="mt-3">
+						<img
+							src="data:image/jpeg;base64,{{ hotel.base64Image }}"
+							alt="Hotel Image"
+							class="img-fluid rounded"
+							style="max-height: 200px; object-fit: cover;"
+						/>
+					</div>
+					{% endif %}
+				</div>
+				
+				{% set categories = {
+					'Hotel Rating': ['2 Stars', '3 Stars', '4 Stars', '5 Stars', 'Boutique Hotel', 'Luxury Resort'],
+					'Location Type': ['Beachfront', 'City Center', 'Countryside', 'Mountain Area', 'Forest Nearby', 'Island'],
+					'Experience Theme': ['Spa & Wellness', 'Adventure & Activities', 'Romantic Getaway', 'Family-Friendly', 'Eco-Friendly', 'Business Hotel'],
+					'Price Range': ['Budget-Friendly', 'Mid-Range', 'Premium', 'Luxury', 'All-Inclusive']
+				} %}
 
-<div>
-    <label class="block text-base font-medium text-gray-700 mb-2">Hotel Features</label>
-    <div class="space-y-4">
-        {% for category, features in categories %}
-        <div>
-            <h3 class="text-lg font-semibold">{{ category }}</h3>
-            <div class="flex flex-wrap gap-2 mt-2">
-                {% for feature in features %}
-                <label class="relative cursor-pointer">
-                    <input
-                        type="checkbox"
-                        name="description[]"
-                        value="{{ feature }}"
-                        class="peer sr-only"
-                        {% if hotel.description and feature in hotel.description|split(',') %}checked{% endif %}
-                    >
-                    <div class="flex items-center justify-center px-4 py-2 rounded-full border border-gray-300 
-                                bg-white text-gray-700 transition-all duration-300
-                                peer-checked:bg-blue-500 peer-checked:text-white
-                                peer-checked:underline peer-checked:-translate-y-1">
-                        <span>{{ feature }}</span>
-                        <svg class="w-4 h-4 ml-2 opacity-0 peer-checked:opacity-100 transition-opacity"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5 13l4 4L19 7"/>
-                        </svg>
-                    </div>
-                </label>
-                {% endfor %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-		<div id="error-messages" class="mt-4"></div>
-		<div class="flex justify-between">
-			<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow">
-				Save
-			</button>
-			<a
-				href="{{ path('dashboard_hotels') }}"
-				class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg"
-			>
-				Cancel
-			</a>
+				<div class="mb-3">
+					<label class="form-label">Hotel Features</label>
+					<div class="d-flex flex-column gap-4">
+						{% for category, features in categories %}
+						<div>
+							<h3 class="h5 fw-semibold">{{ category }}</h3>
+							<div class="d-flex flex-wrap gap-2 mt-2">
+								{% for feature in features %}
+								<div class="form-check form-check-inline">
+									<input
+										type="checkbox"
+										name="description[]"
+										value="{{ feature }}"
+										id="feature{{ loop.parent.loop.index }}{{ loop.index }}"
+										class="form-check-input"
+										{% if hotel.description and feature in hotel.description|split(',') %}checked{% endif %}
+									>
+									<label class="form-check-label btn btn-outline-primary btn-sm" for="feature{{ loop.parent.loop.index }}{{ loop.index }}">
+										{{ feature }}
+									</label>
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+				</div>
+				
+				<div id="error-messages" class="mt-3"></div>
+				<div class="d-flex justify-content-between mt-4">
+					<button type="submit" class="btn btn-primary">
+						Save
+					</button>
+					<a
+						href="{{ path('dashboard_hotels') }}"
+						class="btn btn-outline-secondary"
+					>
+						Cancel
+					</a>
+				</div>
+			</form>
 		</div>
-	</form>
+	</div>
 </div>
+
 <script>
 	document.addEventListener("DOMContentLoaded", () => {
 		const form = document.querySelector("form");
@@ -128,6 +131,7 @@
 			const telephone = document.getElementById("telephone").value.trim();
 			const capaciteTotale = document.getElementById("capaciteTotale").value.trim();
 			const imageH = document.getElementById("imageH").files[0];
+			const existingImage = {{ hotel.imageH ? 'true' : 'false' }};
 
 			let isValid = true;
 			let errorMessages = [];
@@ -152,19 +156,24 @@
 				errorMessages.push("Total Capacity must be a positive number.");
 			}
 
-			if (!imageH) {
+			if (!existingImage && !imageH) {
 				isValid = false;
 				errorMessages.push("Hotel Image is required.");
 			}
 
 			if (!isValid) {
 				event.preventDefault();
+				const alertDiv = document.createElement('div');
+				alertDiv.className = 'alert alert-danger';
+				
 				errorMessages.forEach((message) => {
 					const errorElement = document.createElement("p");
 					errorElement.textContent = message;
-					errorElement.classList.add("text-sm", "text-red-600");
-					errorMessagesContainer.appendChild(errorElement);
+					errorElement.className = "mb-0";
+					alertDiv.appendChild(errorElement);
 				});
+				
+				errorMessagesContainer.appendChild(alertDiv);
 			}
 		});
 	});

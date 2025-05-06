@@ -1,18 +1,19 @@
 {% extends 'base.html.twig' %} {% block title %}Post Details{% endblock %} {% block body %}
-<div class="container mx-auto mt-8">
-	<h1 class="text-2xl font-bold mb-4">Post Details</h1>
+<div class="container py-5">
+	<h1 class="display-5 fw-bold mb-4">Post Details</h1>
 
-	<div class="mb-6 max-w-sm bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700">
+	<div class="card shadow mb-4">
 		<twig:Post
 			post="{{ post }}"
 			likesCount="{{ post.likesCount }}"
 			dislikesCount="{{ post.dislikesCount }}"
 			isLiked="{{ post.isLiked }}"
 		/>
-		d
 	</div>
 
-	<a href="{{ path('app_forum') }}" class="text-blue-600 hover:underline">Back to Forum</a>
+	<a href="{{ path('app_forum') }}" class="btn btn-outline-primary">
+		<i class="fas fa-arrow-left me-2"></i>Back to Forum
+	</a>
 </div>
 <script>
 	const ForumApp = (() => {

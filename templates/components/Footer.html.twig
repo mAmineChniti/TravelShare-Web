@@ -6,6 +6,7 @@
 					<img
 						src="{{ asset('images/TravelShare-Logo.png') }}"
 						class="height-auto"
+						id="footer-logo"
 						style="height: 4rem"
 						alt="TravelShare Logo"
 					/>
@@ -42,3 +43,34 @@
 		text-decoration: underline;
 	}
 </style>
+
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		const footerLogo = document.getElementById("footer-logo");
+		const currentTheme =
+			localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+
+		// Set initial logo filter based on current theme
+		if (currentTheme === "dark") {
+			footerLogo.style.filter = "invert(100%)";
+		} else {
+			footerLogo.style.filter = "none";
+		}
+
+		// Listen for theme changes
+		const observer = new MutationObserver((mutations) => {
+			mutations.forEach((mutation) => {
+				if (mutation.attributeName === "data-bs-theme") {
+					const theme = document.documentElement.getAttribute("data-bs-theme");
+					if (theme === "dark") {
+						footerLogo.style.filter = "invert(100%)";
+					} else {
+						footerLogo.style.filter = "none";
+					}
+				}
+			});
+		});
+
+		observer.observe(document.documentElement, { attributes: true });
+	});
+</script>

@@ -1,64 +1,53 @@
 {% extends 'base.html.twig' %} {% block title %}Edit Promo{% endblock %} {% block body %}
-<div class="container mx-auto px-4 mt-8 space-y-6">
-	<h1 class="text-5xl font-bold mb-6">Edit Promo</h1>
-	<form
-		method="post"
-		action="{{ path('app_promo_edit', {id: promo.promoid}) }}"
-		class="bg-white rounded-lg shadow-md p-6 space-y-4"
-	>
-		<div>
-			<label for="codepromo" class="block text-base font-medium text-gray-700 mb-2">Promo Code</label>
-			<input
-				type="text"
-				id="codepromo"
-				name="codepromo"
-				value="{{ promo.codepromo }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
+<div class="container py-5">
+	<h1 class="display-4 fw-bold mb-4">Edit Promo</h1>
+	<div class="row">
+		<div class="col-md-12">
+			<form method="post" action="{{ path('app_promo_edit', {id: promo.promoid}) }}" class="card shadow">
+				<div class="card-body p-4">
+					<div class="mb-3">
+						<label for="codepromo" class="form-label">Promo Code</label>
+						<input type="text" id="codepromo" name="codepromo" value="{{ promo.codepromo }}" class="form-control" />
+					</div>
+					<div class="mb-3">
+						<label for="dateexpiration" class="form-label">Expiration Date</label>
+						<input
+							type="date"
+							id="dateexpiration"
+							name="dateexpiration"
+							value="{{ promo.dateexpiration|date('Y-m-d') }}"
+							class="form-control"
+						/>
+					</div>
+					<div class="mb-3">
+						<label for="pourcentagepromo" class="form-label">Discount (%)</label>
+						<input
+							type="number"
+							id="pourcentagepromo"
+							name="pourcentagepromo"
+							value="{{ promo.pourcentagepromo }}"
+							class="form-control"
+						/>
+					</div>
+					<div class="mb-3">
+						<label for="nombremaxpersonne" class="form-label">Max People</label>
+						<input
+							type="number"
+							id="nombremaxpersonne"
+							name="nombremaxpersonne"
+							value="{{ promo.nombremaxpersonne }}"
+							class="form-control"
+						/>
+					</div>
+					<div id="error-messages" class="mt-3"></div>
+					<div class="d-flex justify-content-between mt-4">
+						<button type="submit" class="btn btn-primary">Update Promo</button>
+						<a href="{{ path('app_promo') }}" class="btn btn-outline-secondary"> Cancel </a>
+					</div>
+				</div>
+			</form>
 		</div>
-		<div>
-			<label for="dateexpiration" class="block text-base font-medium text-gray-700 mb-2">Expiration Date</label>
-			<input
-				type="date"
-				id="dateexpiration"
-				name="dateexpiration"
-				value="{{ promo.dateexpiration|date('Y-m-d') }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-		</div>
-		<div>
-			<label for="pourcentagepromo" class="block text-base font-medium text-gray-700 mb-2">Discount (%)</label>
-			<input
-				type="number"
-				id="pourcentagepromo"
-				name="pourcentagepromo"
-				value="{{ promo.pourcentagepromo }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-		</div>
-		<div>
-			<label for="nombremaxpersonne" class="block text-base font-medium text-gray-700 mb-2">Max People</label>
-			<input
-				type="number"
-				id="nombremaxpersonne"
-				name="nombremaxpersonne"
-				value="{{ promo.nombremaxpersonne }}"
-				class="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-			/>
-		</div>
-		<div class="flex justify-between">
-			<button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow">
-				Update Promo
-			</button>
-			<a
-				href="{{ path('app_promo') }}"
-				class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg"
-			>
-				Cancel
-			</a>
-		</div>
-		<div id="error-messages" class="text-red-500"></div>
-	</form>
+	</div>
 </div>
 <script>
 	const PromoFormValidation = (() => {
@@ -104,7 +93,10 @@
 
 				elements.errorMessages.innerHTML = "";
 				if (errors.length > 0) {
-					elements.errorMessages.innerHTML = errors.map((error) => `<p class='text-red-500'>${error}</p>`).join("");
+					const alertDiv = document.createElement("div");
+					alertDiv.className = "alert alert-danger";
+					alertDiv.innerHTML = errors.map((error) => `<p class="mb-0">${error}</p>`).join("");
+					elements.errorMessages.appendChild(alertDiv);
 					return false;
 				}
 

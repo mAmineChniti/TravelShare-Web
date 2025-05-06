@@ -44,9 +44,21 @@ security:
 
     # Access control rules to specify which roles have access to which paths
     access_control:
-        # Only users with ROLE_USER or higher can access the home page
-        - { path: ^/home, roles: ROLE_USER }
-        # Example for admin path access control
+        # Public routes accessible to everyone (visitors)
+        # - { path: ^/login, roles: PUBLIC_ACCESS }
+        # - { path: ^/register, roles: PUBLIC_ACCESS }
+        # - { path: ^/$, roles: PUBLIC_ACCESS }
+        
+        # User routes - requires authenticated user
+        # - { path: ^/home, roles: ROLE_USER }
+        # - { path: ^/flights, roles: ROLE_USER }
+        # - { path: ^/hotels, roles: ROLE_USER }
+        # - { path: ^/forum, roles: ROLE_USER }
+        # - { path: ^/excursions, roles: ROLE_USER }
+        # - { path: ^/profile, roles: ROLE_USER }
+        
+        # Admin routes - requires admin role
+        # - { path: ^/dashboard, roles: ROLE_ADMIN }
         # - { path: ^/admin, roles: ROLE_ADMIN }
 
 when@test:
