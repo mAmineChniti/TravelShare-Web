@@ -1,133 +1,146 @@
-{% extends 'base.html.twig' %} {% block title %}Forum{% endblock %} {% block body %}
+{% extends 'base.html.twig' %}
+
+{% block title %}Forum{% endblock %}
+
+{% block body %}
 <style>
-	#imagePreviewContainer img {
-		width: 50px;
-		height: 50px;
-		object-fit: cover;
-		border-radius: 4px;
-	}
-	#imagePreviewContainer button {
-		width: 16px;
-		height: 16px;
-		font-size: 10px;
-	}
-	#dropzone.dragover {
-		background-color: rgba(0, 123, 255, 0.1);
-		border-color: #007bff;
-		transition:
-			background-color 0.3s ease,
-			border-color 0.3s ease;
-	}
-	#dropzone.dragover p {
-		color: #007bff;
-		font-weight: bold;
-	}
+    #imagePreviewContainer img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    #imagePreviewContainer button {
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+    }
 </style>
-<div class="container mx-auto px-4 mt-8 space-y-6">
-    <form id="postForm" hx-encoding="multipart/form-data" class="bg-white rounded-lg shadow-md p-6 space-y-4">
-        <div>
-            <label for="postTitle" class="block text-sm font-medium text-gray-700">Title</label>
-            <input
-                type="text"
-                name="postTitle"
-                id="postTitle"
-                class="block w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter a title for your post"
-                maxlength="255"
-            />
-        </div>
-        <div>
-            <label for="postText" class="block text-sm font-medium text-gray-700">Post Content</label>
-            <textarea
-                name="postText"
-                id="postText"
-                class="block w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                placeholder="Write a post…"
-                maxlength="255"
-            ></textarea>
-            <span id="postLength" class="text-sm text-gray-500">0/255</span>
-        </div>
-        <div>
-            <label for="postImages" class="block mb-2 text-sm font-medium text-gray-700">Upload Images</label>
-            <div class="flex items-center justify-center w-full">
-                <label for="postImages" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                        <svg class="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                        </svg>
-                        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
-                    </div>
-                    <input id="postImages" type="file" class="hidden" name="postImages[]" multiple accept="image/*" />
-                </label>
+<div class="container mx-auto px-4 mt-8 space-y-6 max-w-8xl">
+    <form id="postForm" hx-encoding="multipart/form-data" class="w-full bg-white border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700 p-6 space-y-4">
+        <label for="postTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+        <input
+            type="text"
+            name="postTitle"
+            id="postTitle"
+            class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter a title for your post"
+            maxlength="255"
+        />
+
+        <label for="postText" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Post Content</label>
+        <textarea
+            name="postText"
+            id="postText"
+            class="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500 resize-none"
+            placeholder="Write a post…"
+            maxlength="255"
+        ></textarea>
+        <span id="postLength" class="text-sm text-gray-500 dark:text-gray-400">0/255</span>
+
+        <label for="postImages" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Upload Images</label>
+<div class="flex items-center justify-center w-full">
+        <label for="postImages" id="dropzone" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+               <i class="fa-solid fa-cloud-arrow-up text-2xl text-blue-400"></i>
+                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
             </div>
-            <div id="imagePreviewContainer" class="mt-4 flex flex-wrap gap-4"></div>
-        </div>
-        <p id="postErrorMessage" class="mt-1 text-sm text-red-600"></p>
-        <div>
-            <button
-                type="button"
-                onclick="ForumApp.submitPostIfValid()"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow"
-            >
-                Post
-            </button>
-        </div>
+            <input id="postImages" type="file" class="hidden" name="postImages[]" multiple accept="image/*" />
+        </label>
+</div>
+        <div id="imagePreviewContainer" class="mt-4 flex flex-wrap gap-4"></div>
+
+        <p id="postErrorMessage" class="mt-1 text-sm text-red-600 dark:text-red-400"></p>
+
+        <button
+            type="button"
+            onclick="ForumApp.submitPostIfValid()"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow"
+        >
+            Post
+        </button>
     </form>
-    <div class="flex items-center space-x-4 mb-6">
-        <form id="search-form" method="get" action="{{ path('app_forum_search') }}" class="flex-grow">
-            <input
-                id="search-input"
-                type="text"
-                name="q"
-                placeholder="Search posts..."
-                value="{{ app.request.query.get('q', '') }}"
-                class="w-full px-4 py-2 border-gray-300 rounded-full focus:ring-blue-600 focus:border-blue-600"
-            />
-        </form>
-        <form id="sort-form" method="get" action="{{ path('app_forum_sort') }}">
-            <select
-                id="sort-select"
-                name="sortBy"
-                class="w-40 px-4 py-2 border-gray-300 rounded-full focus:ring-blue-600 focus:border-blue-600"
-            >
-                <option value="">Sort by</option>
-                <option value="date_asc" {% if app.request.query.get('sortBy') == 'date_asc' %} selected {% endif %}>Date: Oldest First</option>
-                <option value="date_desc" {% if app.request.query.get('sortBy') == 'date_desc' %} selected {% endif %}>Date: Newest First</option>
-                <option value="hot" {% if app.request.query.get('sortBy') == 'hot' %} selected {% endif %}>Hot</option>
-            </select>
-        </form>
+
+    <div class="w-full mb-6">
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md p-3">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                <i class="fas fa-filter mr-2"></i>Filter Options
+            </h2>
+
+            <div class="flex items-center space-x-4 mb-6">
+                <form id="search-form" method="get" action="{{ path('app_forum_search') }}" class="flex-grow">
+                    <div class="relative">
+                        <input
+                            id="search-input"
+                            type="text"
+                            name="q"
+                            placeholder="Search posts..."
+                            value="{{ app.request.query.get('q', '') }}"
+                            class="block w-full px-4 py-2 text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                        <button
+                            type="submit"
+                            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 dark:text-gray-400"
+                        >
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <form id="sort-form" method="get" action="{{ path('app_forum_sort') }}" class="w-48">
+                    <select
+                        id="sort-select"
+                        name="sortBy"
+                        class="block w-full px-4 py-2 text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value="">Sort by</option>
+                        <option value="date_asc" {% if app.request.query.get('sortBy') == 'date_asc' %} selected {% endif %}>Date: Oldest First</option>
+                        <option value="date_desc" {% if app.request.query.get('sortBy') == 'date_desc' %} selected {% endif %}>Date: Newest First</option>
+                        <option value="hot" {% if app.request.query.get('sortBy') == 'hot' %} selected {% endif %}>Hot</option>
+                    </select>
+                </form>
+
+                <div class="w-48 flex items-center justify-center">
+                    <a href="{{ path('app_forum') }}" id="clear-filters" class="inline-flex items-center justify-center font-medium text-gray-900 dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm px-3 py-2">
+                        <i class="fas fa-times mr-2"></i> Clear
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="container mx-auto px-4 mt-8 space-y-6">
+
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         {% if recommendedPosts is defined and recommendedPosts|length > 0 %}
-        <div class="bg-gray-100 p-6 rounded-lg shadow-md">
-            <h2 class="text-lg font-semibold text-blue-600 border-b border-blue-300 pb-2 mb-4">Recommended Posts</h2>
+        <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h2 class="text-lg font-semibold text-blue-600 dark:text-blue-400 border-b border-blue-300 dark:border-blue-600 pb-2 mb-4">Recommended Posts</h2>
             <div class="space-y-6">
                 {% for post in recommendedPosts %}
                 <twig:Post
-                post="{{ post }}"
-                likesCount="{{ post.likesCount }}"
-                dislikesCount="{{ post.dislikesCount }}"
-                isLiked="{{ post.isLiked }}"
-            />
+                    post="{{ post }}"
+                    likesCount="{{ post.likesCount }}"
+                    dislikesCount="{{ post.dislikesCount }}"
+                    isLiked="{{ post.isLiked }}"
+                />
                 {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-2 mb-4">All Posts</h2>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-white border-b border-gray-300 dark:border-gray-600 pb-2 mb-4">All Posts</h2>
             {% if posts is empty %}
-            <p class="text-sm text-gray-500">No posts available.</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">No posts available.</p>
             {% endif %}
             <div id="postsContainer" class="space-y-6">
             {% if posts is defined and posts|length > 0 %}
                 {% for post in posts %}
-				<twig:Post
-					post="{{ post }}"
-					likesCount="{{ post.likesCount }}"
-					dislikesCount="{{ post.dislikesCount }}"
-					isLiked="{{ post.isLiked }}"/>
+                <twig:Post
+                    post="{{ post }}"
+                    likesCount="{{ post.likesCount }}"
+                    dislikesCount="{{ post.dislikesCount }}"
+                    isLiked="{{ post.isLiked }}"
+                />
                 {% endfor %}
             {% endif %}
             </div>
@@ -136,13 +149,619 @@
 </div>
 
 <div id="error-messages" class="mt-4">
-	{% if errors is defined and errors|length > 0 %} {% for error in errors %}
-	<p class="text-sm text-red-600">{{ error }}</p>
-	{% endfor %} {% endif %}
+    {% if errors is defined and errors|length > 0 %}
+        {% for error in errors %}
+        <p class="text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+        {% endfor %}
+    {% endif %}
 </div>
 <div id="success-messages" class="mt-4">
-	{% if success is defined and success|length > 0 %} {% for message in success %}
-	<p class="text-sm text-green-600">{{ message }}</p>
-	{% endfor %} {% endif %}
+    {% if success is defined and success|length > 0 %}
+        {% for message in success %}
+        <p class="text-sm text-green-600 dark:text-green-400">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
 </div>
+<script>
+	const ForumApp = (() => {
+		const CONFIG = {
+			MAX_LENGTH: 255,
+			MIN_POST_LENGTH: 15,
+			MIN_COMMENT_LENGTH: 10
+		};
+
+		const elements = {
+			postText: document.getElementById('postText'),
+			postLength: document.getElementById('postLength'),
+			postErrorMessage: document.getElementById('postErrorMessage'),
+			postForm: document.getElementById('postForm'),
+			postImages: document.getElementById('imagePreviewContainer'),
+
+		};
+
+		const CharacterCounter = {
+			/**
+			 * Set up a character counter for a textarea
+			 * @param {HTMLElement} textarea - The textarea element
+			 * @param {HTMLElement} counter - The counter element
+			 */
+			setup(textarea, counter) {
+				if (!textarea || !counter) return;
+				counter.textContent = `${textarea.value.length}/${CONFIG.MAX_LENGTH}`;
+
+				textarea.addEventListener('input', () => {
+					if (textarea.value.length > CONFIG.MAX_LENGTH) {
+						textarea.value = textarea.value.slice(0, CONFIG.MAX_LENGTH);
+					}
+					counter.textContent = `${textarea.value.length}/${CONFIG.MAX_LENGTH}`;
+				});
+			},
+
+			initAll() {
+				if (elements.postText && elements.postLength) {
+					this.setup(elements.postText, elements.postLength);
+				}
+
+				document.querySelectorAll("textarea[id^='editTextarea-']").forEach(textarea => {
+					const id = textarea.id.split("editTextarea-")[1];
+					const counter = document.getElementById(`editPostLength-${id}`) ||
+								   document.getElementById(`commentLength-${id}`);
+
+					if (counter) {
+						this.setup(textarea, counter);
+					}
+				});
+
+				document.querySelectorAll("textarea[name='commentText']").forEach(textarea => {
+					const form = textarea.closest("form");
+					if (form) {
+						const postId = form.querySelector("input[name='postId']")?.value;
+						if (postId) {
+							const counter = document.getElementById(`newCommentLength-${postId}`);
+							if (counter) {
+								this.setup(textarea, counter);
+							}
+						}
+					}
+				});
+			}
+		};
+
+		const Validator = {
+			async validatePost() {
+				const text = elements.postText.value.trim();
+
+				if (text === '') {
+					elements.postErrorMessage.textContent = 'Post cannot be empty.';
+					return false;
+				}
+
+				if (text.length < CONFIG.MIN_POST_LENGTH) {
+					elements.postErrorMessage.textContent = `Post must be at least ${CONFIG.MIN_POST_LENGTH} characters.`;
+					return false;
+				}
+
+				const isProfanity = await validateProfanity(text);
+				if (isProfanity) {
+					elements.postErrorMessage.textContent = 'Post contains inappropriate language.';
+					return false;
+				}
+
+				const files = document.getElementById('postImages').files;
+				const isImageProfanity = await validateImageProfanity(files);
+				if (isImageProfanity) {
+					elements.postErrorMessage.textContent = 'Uploaded images contain inappropriate content.';
+					return false;
+				}
+
+				elements.postErrorMessage.textContent = '';
+				return true;
+			},
+
+			/**
+			 * Validate a comment form
+			 * @param {HTMLFormElement} form - The comment form
+			 * @returns {boolean} - Whether the form is valid
+			 */
+			async validateComment(form) {
+				const textarea = form.querySelector("textarea[name='commentText']");
+				if (!textarea) return false;
+
+				const postId = form.querySelector("input[name='postId']")?.value;
+				if (!postId) return false;
+
+				const errorMessage = document.getElementById(`commentErrorMessage-${postId}`);
+				if (!errorMessage) return false;
+
+				const text = textarea.value.trim();
+
+				if (text === '') {
+					errorMessage.textContent = 'Comment cannot be empty.';
+					return false;
+				}
+
+				if (text.length < CONFIG.MIN_COMMENT_LENGTH) {
+					errorMessage.textContent = `Comment must be at least ${CONFIG.MIN_COMMENT_LENGTH} characters.`;
+					return false;
+				}
+
+				const isProfanity = await validateProfanity(text);
+				if (isProfanity) {
+					errorMessage.textContent = 'Comment contains inappropriate language.';
+					return false;
+				}
+
+				errorMessage.textContent = '';
+				return true;
+			},
+
+			/**
+			 * Validate an edited post form
+			 * @param {HTMLFormElement} form - The edit post form
+			 * @param {string} postId - The post ID
+			 * @returns {boolean} - Whether the form is valid
+			 */
+			async validateEditPost(form, postId) {
+				const textarea = form.querySelector(`#editTextarea-${postId}`);
+				if (!textarea) return false;
+
+				const errorMessage = document.getElementById(`editPostErrorMessage-${postId}`);
+				if (!errorMessage) return false;
+
+				const text = textarea.value.trim();
+
+				if (text === '') {
+					errorMessage.textContent = 'Post cannot be empty.';
+					return false;
+				}
+
+				if (text.length < CONFIG.MIN_POST_LENGTH) {
+					errorMessage.textContent = `Post must be at least ${CONFIG.MIN_POST_LENGTH} characters.`;
+					return false;
+				}
+				const isProfanity = await validateProfanity(text);
+				if (isProfanity) {
+					errorMessage.textContent = 'Post contains inappropriate language.';
+					return false;
+				}
+				errorMessage.textContent = '';
+				return true;
+			},
+
+			/**
+			 * Validate an edited comment form
+			 * @param {HTMLFormElement} form - The edit comment form
+			 * @param {string} commentId - The comment ID
+			 * @returns {boolean} - Whether the form is valid
+			 */
+			async validateEditComment(form, commentId) {
+				const textarea = form.querySelector(`#editTextarea-${commentId}`);
+				if (!textarea) return false;
+
+				const errorMessage = document.getElementById(`editCommentErrorMessage-${commentId}`);
+				if (!errorMessage) return false;
+
+				const text = textarea.value.trim();
+
+				if (text === '') {
+					errorMessage.textContent = 'Comment cannot be empty.';
+					return false;
+				}
+
+				if (text.length < CONFIG.MIN_COMMENT_LENGTH) {
+					errorMessage.textContent = `Comment must be at least ${CONFIG.MIN_COMMENT_LENGTH} characters.`;
+					return false;
+				}
+				const isProfanity = await validateProfanity(text);
+				if (isProfanity) {
+					errorMessage.textContent = 'Comment contains inappropriate language.';
+					return false;
+				}
+				errorMessage.textContent = '';
+				return true;
+			}
+		};
+
+		const FormHandler = {
+			async submitPost() {
+				const isValid = await Validator.validatePost();
+				if (!isValid) {
+					return;
+				}
+
+				const formData = new FormData(elements.postForm);
+				htmx.ajax('POST', '{{ path('app_forum_post') }}', {
+					source: elements.postForm,
+					target: '#postsContainer',
+					swap: 'afterbegin',
+					values: Object.fromEntries(formData)
+				}).then(() => {
+					elements.postForm.reset();
+					elements.postImages.innerHTML = '';
+					elements.postLength.textContent = `0/${CONFIG.MAX_LENGTH}`;
+				});
+			},
+
+			/**
+			 * Submit an edited post if valid
+			 * @param {HTMLFormElement} form - The edit post form
+			 * @param {string} postId - The post ID
+			 * @returns {boolean} - Whether the form is valid
+			 */
+			async submitEditPost(form, postId) {
+				const isValid = await Validator.validateEditPost(form, postId);
+				if(!isValid){
+					return;
+				}
+
+				const formData = new FormData(form);
+				const url = form.getAttribute('action') ||
+							`{{ path('app_forum_edit', {'id': '0'}) }}`.replace('0', postId);
+
+				htmx.ajax('POST', url, {
+					source: form,
+					target: `#postContent-${postId}`,
+					swap: 'outerHTML',
+					values: Object.fromEntries(formData)
+				});
+
+				return false;
+			},
+
+			/**
+			 * Submit an edited comment if valid
+			 * @param {HTMLFormElement} form - The edit comment form
+			 * @param {string} commentId - The comment ID
+			 * @returns {boolean} - Whether the form is valid
+			 */
+			async submitEditComment(form, commentId) {
+				const isValid = await Validator.validateEditComment(form, commentId);
+				if(!isValid){
+					return;
+				}
+
+				const formData = new FormData(form);
+				const url = form.getAttribute('action') ||
+							`{{ path('comment_edit', {'id': '0'}) }}`.replace('0', commentId);
+
+				htmx.ajax('POST', url, {
+					source: form,
+					target: `#commentText-${commentId}`,
+					swap: 'outerHTML',
+					values: Object.fromEntries(formData)
+				});
+
+				return false;
+			},
+
+			setupCommentForms() {
+				document.querySelectorAll("form[hx-post*='app_forum_comment']").forEach(form => {
+					const postUrl = form.getAttribute('hx-post');
+					const target = form.getAttribute('hx-target');
+					const swap = form.getAttribute('hx-swap');
+
+					form.removeAttribute('hx-post');
+					form.removeAttribute('hx-target');
+					form.removeAttribute('hx-swap');
+					form.removeAttribute('hx-on::after-request');
+
+					const submitBtn = form.querySelector('button[type="submit"]');
+					if (!submitBtn) return;
+
+					submitBtn.type = 'button';
+					submitBtn.addEventListener('click', () => {
+						if (!Validator.validateComment(form)) return;
+
+						const formData = new FormData(form);
+						htmx.ajax('POST', postUrl, {
+							source: form,
+							target: target,
+							swap: swap,
+							values: Object.fromEntries(formData)
+						}).then(() => {
+							form.reset();
+
+							const textarea = form.querySelector('textarea[name="commentText"]');
+							const postId = form.querySelector("input[name='postId']")?.value;
+							if (textarea && postId) {
+								const counter = document.getElementById(`newCommentLength-${postId}`);
+								if (counter) counter.textContent = `0/${CONFIG.MAX_LENGTH}`;
+							}
+						});
+					});
+				});
+			}
+		};
+
+		const UIHandler = {
+			/**
+			 * Toggle post editing UI
+			 * @param {string} postId - The post ID
+			 */
+			togglePostEdit(postId) {
+				const postContent = document.getElementById(`postContent-${postId}`);
+				const editForm = document.getElementById(`editPostForm-${postId}`);
+				const editTitle = document.getElementById(`editPostTitleForm-${postId}`);
+				const editButton = document.getElementById(`editButton-${postId}`);
+				if( postContent) postContent.style.display = 'none';
+				if (editForm) editForm.style.display = 'block';
+				if (editTitle) editTitle.style.display = 'block';
+				if (editButton) editButton.style.display = 'none';
+			},
+
+			/**
+			 * Toggle comment editing UI
+			 * @param {string} commentId - The comment ID
+			 */
+			toggleCommentEdit(commentId) {
+				const commentText = document.getElementById(`commentText-${commentId}`);
+				const editForm = document.getElementById(`editCommentForm-${commentId}`);
+				const editButton = document.getElementById(`editCommentButton-${commentId}`);
+
+				if (commentText) commentText.style.display = 'none';
+				if (editForm) editForm.style.display = 'block';
+				if (editButton) editButton.style.display = 'none';
+			}
+		};
+
+		const ErrorHandler = {
+			handleErrors(event) {
+				try {
+					const response = JSON.parse(event.detail.xhr.responseText);
+					console.error('HTMX error response:', response);
+
+					if (!response.error) return;
+
+					const targetId = event.detail.target.id;
+					let errorElement;
+
+					if (targetId.startsWith('postText-')) {
+						const postId = targetId.split('-')[1];
+						errorElement = document.getElementById(`editPostErrorMessage-${postId}`);
+					} else if (targetId === 'postsContainer') {
+						errorElement = elements.postErrorMessage;
+					} else if (targetId.startsWith('commentText-')) {
+						const commentId = targetId.split('-')[1];
+						errorElement = document.getElementById(`editCommentErrorMessage-${commentId}`);
+					} else if (targetId.startsWith('commentsContainer-')) {
+						const postId = targetId.split('-')[1];
+						errorElement = document.getElementById(`commentErrorMessage-${postId}`);
+					}
+
+					if (errorElement) {
+						const errorMsg = Array.isArray(response.error)
+							? response.error.join(', ')
+							: response.error;
+						errorElement.textContent = errorMsg;
+					}
+				} catch (e) {
+					console.error('Failed to parse error response:', e);
+					console.error('Raw response:', event.detail.xhr.responseText);
+				}
+			}
+		};
+
+		const init = () => {
+			CharacterCounter.initAll();
+
+			FormHandler.setupCommentForms();
+
+			document.addEventListener('htmx:responseError', ErrorHandler.handleErrors);
+
+			document.addEventListener('htmx:afterSwap', () => {
+				CharacterCounter.initAll();
+				FormHandler.setupCommentForms();
+			});
+		};
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', init);
+		} else {
+			init();
+		}
+
+		return {
+			submitPostIfValid: FormHandler.submitPost,
+			submitEditPostIfValid: FormHandler.submitEditPost,
+			submitEditCommentIfValid: FormHandler.submitEditComment,
+			editPost: UIHandler.togglePostEdit,
+			editComment: UIHandler.toggleCommentEdit,
+			validateComment: Validator.validateComment
+		};
+	})();
+
+	/**
+	 * Global function to validate comment form (called from inline onsubmit)
+	 * @param {HTMLFormElement} form - The comment form
+	 * @returns {boolean} - Whether the form is valid
+	 */
+	function validateCommentForm(form) {
+		return ForumApp.validateComment(form);
+	}
+
+	const postTitleInput = document.getElementById('postTitle');
+	const postErrorMessage = document.getElementById('postErrorMessage');
+
+	postTitleInput.addEventListener('input', () => {
+		const title = postTitleInput.value.trim();
+		if (title.length === 0) {
+			postErrorMessage.textContent = 'Title cannot be empty.';
+		} else if (title.length > 255) {
+			postErrorMessage.textContent = 'Title cannot exceed 255 characters.';
+		} else {
+			postErrorMessage.textContent = '';
+		}
+	});
+
+	function updateImagePreview(files) {
+		const previewContainer = document.getElementById('imagePreviewContainer');
+		previewContainer.innerHTML = '';
+
+		const existingFiles = new Set();
+
+		Array.from(files).forEach((file) => {
+			const fileKey = `${file.name}-${file.size}`;
+			if (existingFiles.has(fileKey)) return;
+			existingFiles.add(fileKey);
+
+			const reader = new FileReader();
+			reader.onload = function (e) {
+				const div = document.createElement('div');
+				div.classList.add('relative', 'w-15', 'h-15', 'overflow-hidden', 'rounded-lg', 'border', 'border-gray-300', 'flex', 'items-center', 'justify-center');
+
+				const img = document.createElement('img');
+				img.src = e.target.result;
+				img.classList.add('w-full', 'h-full', 'object-cover', 'rounded-lg');
+
+				const removeButton = document.createElement('button');
+				removeButton.textContent = 'X';
+				removeButton.classList.add('absolute', 'top-0', 'right-0', 'bg-red-500', 'text-white', 'rounded-full', 'w-6', 'h-6', 'flex', 'items-center', 'justify-center', 'text-xs');
+				removeButton.addEventListener('click', () => {
+					div.remove();
+					const dataTransfer = new DataTransfer();
+					Array.from(document.getElementById('postImages').files).forEach((f) => {
+						if (`${f.name}-${f.size}` !== fileKey) dataTransfer.items.add(f);
+					});
+					document.getElementById('postImages').files = dataTransfer.files;
+				});
+
+				div.appendChild(img);
+				div.appendChild(removeButton);
+				previewContainer.appendChild(div);
+			};
+			reader.readAsDataURL(file);
+		});
+	}
+
+	document.getElementById('dropzone').addEventListener('click', () => {
+		document.getElementById('postImages').click();
+	});
+
+	document.getElementById('dropzone').addEventListener('dragover', (event) => {
+		event.preventDefault();
+		event.stopPropagation();
+		event.currentTarget.classList.add('dragover');
+	});
+
+	document.getElementById('dropzone').addEventListener('dragleave', (event) => {
+		event.preventDefault();
+		event.stopPropagation();
+		event.currentTarget.classList.remove('dragover');
+	});
+
+	document.getElementById('postImages').addEventListener('change', function (event) {
+		updateImagePreview(event.target.files);
+	});
+
+	document.getElementById('dropzone').addEventListener('drop', (event) => {
+		event.preventDefault();
+		event.stopPropagation();
+		event.currentTarget.classList.remove('dragover');
+
+		const files = event.dataTransfer.files;
+		const input = document.getElementById('postImages');
+		const dataTransfer = new DataTransfer();
+
+		Array.from(input.files).forEach(file => dataTransfer.items.add(file));
+		Array.from(files).forEach(file => dataTransfer.items.add(file));
+
+		input.files = dataTransfer.files;
+		updateImagePreview(input.files);
+	});
+
+	document.addEventListener("DOMContentLoaded", () => {
+		const searchInput = document.getElementById("search-input");
+		const searchForm = document.getElementById("search-form");
+		let searchTimeout;
+
+		searchInput.addEventListener("input", () => {
+			clearTimeout(searchTimeout);
+			searchTimeout = setTimeout(() => {
+				searchForm.submit();
+			}, 500);
+		});
+
+		const sortSelect = document.getElementById("sort-select");
+		const sortForm = document.getElementById("sort-form");
+
+		sortSelect.addEventListener("change", () => {
+			sortForm.submit();
+		});
+	});
+	async function validateProfanity(text) {
+		if(!text) return false;
+		if (text.length < 15) return false;
+		if (text.length > 255) return false;
+		console.log(text);
+		const cachedResult = sessionStorage.getItem(`profanity_${btoa(text)}`);
+		if (cachedResult !== null) return JSON.parse(cachedResult);
+		try {
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => {
+				controller.abort();
+			}, 2000);
+			const response = await fetch('https://vector.profanity.dev', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ message: text }),
+				signal: controller.signal
+			});
+
+			clearTimeout(timeoutId);
+
+			if (!response.ok) {
+				throw new Error('Failed to validate profanity');
+				return false;
+			}
+
+			const result = await response.json();
+			sessionStorage.setItem(`profanity_${btoa(text)}`, JSON.stringify(result.isProfanity));
+			console.log(result.isProfanity);
+			return result.isProfanity;
+		} catch (error) {
+			console.error('Error validating profanity:', error);
+			if (error.name === 'AbortError') {
+				console.error('Request timed out');
+			}
+			return false;
+		}
+	}
+
+	async function validateImageProfanity(files) {
+		if (!files || files.length === 0) return false;
+
+		const formData = new FormData();
+		Array.from(files).forEach(file => {
+			formData.append('postImages[]', file);
+		});
+
+		try {
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => {
+				controller.abort();
+			}, 5000);
+
+			const response = await fetch('/forum/validate-image', {
+				method: 'POST',
+				body: formData,
+				signal: controller.signal
+			});
+
+			clearTimeout(timeoutId);
+
+			if (!response.ok) {
+				throw new Error('Failed to validate image profanity');
+			}
+
+			const result = await response.json();
+			return result.isInappropriate;
+		} catch (error) {
+			console.error('Error validating image profanity:', error);
+			if (error.name === 'AbortError') {
+				console.error('Request timed out');
+			}
+			return false;
+		}
+	}
+</script>
 {% endblock %}
