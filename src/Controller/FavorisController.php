@@ -2,17 +2,16 @@
 
 namespace App\Controller;
 
-use App\Entity\ListeFavoris;
 use App\Entity\Excursions;
-use App\Repository\ListeFavorisRepository;
+use App\Entity\ListeFavoris;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Repository\ListeFavorisRepository;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class FavorisController extends AbstractController
 {
@@ -22,21 +21,21 @@ class FavorisController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         Security $security,
-        ListeFavorisRepository $favorisRepo
+        ListeFavorisRepository $favorisRepo,
     ): JsonResponse {
         $user = $security->getUser();
-        
+
         if (!$user) {
             return new JsonResponse(['error' => 'User not authenticated'], 401);
         }
 
         $existingFavori = $favorisRepo->findOneBy([
             'user' => $user,
-            'excursion' => $excursion
+            'excursion' => $excursion,
         ]);
 
         $isFavorite = false;
-        
+
         if ($existingFavori) {
             $em->remove($existingFavori);
             $em->flush();
@@ -44,7 +43,7 @@ class FavorisController extends AbstractController
             $favori = new ListeFavoris();
             $favori->setUser($user);
             $favori->setExcursion($excursion);
-            
+
             $em->persist($favori);
             $em->flush();
             $isFavorite = true;
@@ -52,47 +51,49 @@ class FavorisController extends AbstractController
 
         return new JsonResponse([
             'success' => true,
-            'isFavorite' => $isFavorite
+            'isFavorite' => $isFavorite,
         ]);
     }
+
     #[Route('/favoris/check/{id}', name: 'check_favoris', methods: ['GET'])]
-public function checkFavoris(
-    Excursions $excursion,
-    Security $security,
-    ListeFavorisRepository $favorisRepo
-): JsonResponse {
-    $user = $security->getUser();
-    
-    if (!$user) {
-        return new JsonResponse(['error' => 'User not authenticated'], 401);
+    public function checkFavoris(
+        Excursions $excursion,
+        Security $security,
+        ListeFavorisRepository $favorisRepo,
+    ): JsonResponse {
+        $user = $security->getUser();
+
+        if (!$user) {
+            return new JsonResponse(['error' => 'User not authenticated'], 401);
+        }
+
+        $existingFavori = $favorisRepo->findOneBy([
+            'user' => $user,
+            'excursion' => $excursion,
+        ]);
+
+        return new JsonResponse([
+            'isFavorite' => null !== $existingFavori,
+        ]);
     }
 
-    $existingFavori = $favorisRepo->findOneBy([
-        'user' => $user,
-        'excursion' => $excursion
-    ]);
+    #[Route('/favoris', name: 'app_favoris')]
+    public function listFavoris(Security $security, ListeFavorisRepository $favorisRepo): Response
+    {
+        $user = $security->getUser();
 
-    return new JsonResponse([
-        'isFavorite' => $existingFavori !== null
-    ]);
-}
-#[Route('/favoris', name: 'app_favoris')]
-public function listFavoris(Security $security, ListeFavorisRepository $favorisRepo): Response
-{
-    $user = $security->getUser();
-    
-    if (!$user) {
-        return $this->redirectToRoute('app_login');
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $favoris = $favorisRepo->findBy(['user' => $user]);
+
+        $excursions = array_map(function ($favori) {
+            return $favori->getExcursion();
+        }, $favoris);
+
+        return $this->render('favoris/index.html.twig', [
+            'excursions' => $excursions,
+        ]);
     }
-
-    $favoris = $favorisRepo->findBy(['user' => $user]);
-
-    $excursions = array_map(function($favori) {
-        return $favori->getExcursion();
-    }, $favoris);
-
-    return $this->render('favoris/index.html.twig', [
-        'excursions' => $excursions,
-    ]);
-}
 }

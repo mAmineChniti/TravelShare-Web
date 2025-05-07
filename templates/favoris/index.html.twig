@@ -1,309 +1,328 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Mes Excursions Favorites{% endblock %}
-
-{% block body %}
+{% extends 'base.html.twig' %} {% block title %}Mes Excursions Favorites{% endblock %} {% block body %}
 <!-- Spinner Start -->
-<div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-        <span class="sr-only">Loading...</span>
-    </div>
+<div
+	id="spinner"
+	class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center"
+>
+	<div class="spinner-border text-primary" style="width: 3rem; height: 3rem" role="status">
+		<span class="sr-only">Loading...</span>
+	</div>
 </div>
 <!-- Spinner End -->
 
 <!-- Topbar Start -->
 <div class="container-fluid bg-primary px-5 d-none d-lg-block">
-    <div class="row gx-0">
-        <div class="col-lg-8 text-center text-lg-start mb-2 mb-lg-0">
-            <div class="d-inline-flex align-items-center" style="height: 45px;">
-                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-twitter fw-normal"></i></a>
-                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-facebook-f fw-normal"></i></a>
-                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-linkedin-in fw-normal"></i></a>
-                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-instagram fw-normal"></i></a>
-                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle" href=""><i class="fab fa-youtube fw-normal"></i></a>
-            </div>
-        </div>
-        <div class="col-lg-4 text-center text-lg-end">
-            <div class="d-inline-flex align-items-center" style="height: 45px;">
-                <div class="dropdown">
-                    <a href="#" class="dropdown-toggle text-light" data-bs-toggle="dropdown"><small><i class="fa fa-home me-2"></i> My Dashboard</small></a>
-                    <div class="dropdown-menu rounded">
-                        <a href="" class="dropdown-item">
-                            <i class="fas fa-user-alt me-2"></i> My Profile
-                        </a>
-                        <a href="" class="dropdown-item">
-                            <i class="fas fa-comment-alt me-2"></i> Reclamation
-                        </a>
-                        <a href="" class="dropdown-item">
-                            <i class="fas fa-history"></i> Historique
-                        </a>
-                        <a href="" class="dropdown-item">
-                            <i class="fas fa-power-off me-2"></i> Log Out
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="row gx-0">
+		<div class="col-lg-8 text-center text-lg-start mb-2 mb-lg-0">
+			<div class="d-inline-flex align-items-center" style="height: 45px">
+				<a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""
+					><i class="fab fa-twitter fw-normal"></i
+				></a>
+				<a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""
+					><i class="fab fa-facebook-f fw-normal"></i
+				></a>
+				<a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""
+					><i class="fab fa-linkedin-in fw-normal"></i
+				></a>
+				<a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""
+					><i class="fab fa-instagram fw-normal"></i
+				></a>
+				<a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle" href=""
+					><i class="fab fa-youtube fw-normal"></i
+				></a>
+			</div>
+		</div>
+		<div class="col-lg-4 text-center text-lg-end">
+			<div class="d-inline-flex align-items-center" style="height: 45px">
+				<div class="dropdown">
+					<a href="#" class="dropdown-toggle text-light" data-bs-toggle="dropdown"
+						><small><i class="fa fa-home me-2"></i> My Dashboard</small></a
+					>
+					<div class="dropdown-menu rounded">
+						<a href="" class="dropdown-item"> <i class="fas fa-user-alt me-2"></i> My Profile </a>
+						<a href="" class="dropdown-item"> <i class="fas fa-comment-alt me-2"></i> Reclamation </a>
+						<a href="" class="dropdown-item"> <i class="fas fa-history"></i> Historique </a>
+						<a href="" class="dropdown-item"> <i class="fas fa-power-off me-2"></i> Log Out </a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <!-- Topbar End -->
 
 <!-- Navbar & Hero Start -->
 <div class="container-fluid position-relative p-0">
-    <nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
-        <a href="" class="navbar-brand p-0">
-            <h1 class="m-0"><i class="fa fa-map-marker-alt me-3"></i>TravelaShare</h1>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-            <span class="fa fa-bars"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-            <div class="navbar-nav ms-auto py-0">
-                <a href="{{ path('app_home') }}" class="nav-item nav-link">Home</a>
-                <a href="" class="nav-item nav-link">About</a>
-                <a href="" class="nav-item nav-link">Services</a>
-                <a href="" class="nav-item nav-link">Packages</a>
-                <a href="" class="nav-item nav-link">Blog</a>
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">Pages</a>
-                    <div class="dropdown-menu m-0">
-                        <a href="{{ path('app_excursions_client') }}" class="dropdown-item">Excursions</a>
-                        <a href="" class="dropdown-item">Explore Tour</a>
-                        <a href="" class="dropdown-item">Travel Booking</a>
-                        <a href="" class="dropdown-item">Our Gallery</a>
-                         <a href="" class="dropdown-item">Travel Guides</a>
-                        <a href="" class="dropdown-item">Testimonial</a>
-                         <a href="{{ path('app_favoris') }}"  class="dropdown-item">Favoris List</a>
-                    </div>
-                </div>
-                <a href="" class="nav-item nav-link">Contact</a>
-            </div>
-            <a href="" class="btn btn-primary rounded-pill py-2 px-4 ms-lg-4">Book Now</a>
-        </div>
-    </nav>
+	<nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
+		<a href="" class="navbar-brand p-0">
+			<h1 class="m-0"><i class="fa fa-map-marker-alt me-3"></i>TravelaShare</h1>
+		</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+			<span class="fa fa-bars"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarCollapse">
+			<div class="navbar-nav ms-auto py-0">
+				<a href="{{ path('app_home') }}" class="nav-item nav-link">Home</a>
+				<a href="" class="nav-item nav-link">About</a>
+				<a href="" class="nav-item nav-link">Services</a>
+				<a href="" class="nav-item nav-link">Packages</a>
+				<a href="" class="nav-item nav-link">Blog</a>
+				<div class="nav-item dropdown">
+					<a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">Pages</a>
+					<div class="dropdown-menu m-0">
+						<a href="{{ path('app_excursions_client') }}" class="dropdown-item">Excursions</a>
+						<a href="" class="dropdown-item">Explore Tour</a>
+						<a href="" class="dropdown-item">Travel Booking</a>
+						<a href="" class="dropdown-item">Our Gallery</a>
+						<a href="" class="dropdown-item">Travel Guides</a>
+						<a href="" class="dropdown-item">Testimonial</a>
+						<a href="{{ path('app_favoris') }}" class="dropdown-item">Favoris List</a>
+					</div>
+				</div>
+				<a href="" class="nav-item nav-link">Contact</a>
+			</div>
+			<a href="" class="btn btn-primary rounded-pill py-2 px-4 ms-lg-4">Book Now</a>
+		</div>
+	</nav>
 </div>
 <!-- Navbar & Hero End -->
 
 <!-- Header Start -->
 <div class="container-fluid bg-breadcrumb">
-    <div class="container text-center py-5" style="max-width: 900px;">
-        <h1 class="text-white display-3 mb-4">Mes Favoris</h1>
-        <ol class="breadcrumb justify-content-center mb-0">
-            <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
-            <li class="breadcrumb-item active text-white">Favoris</li>
-        </ol>
-    </div>
+	<div class="container text-center py-5" style="max-width: 900px">
+		<h1 class="text-white display-3 mb-4">Mes Favoris</h1>
+		<ol class="breadcrumb justify-content-center mb-0">
+			<li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+			<li class="breadcrumb-item active text-white">Favoris</li>
+		</ol>
+	</div>
 </div>
 <!-- Header End -->
 
 <!-- Excursions Favorites Start -->
 <div class="container-fluid py-5">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="d-inline-block text-primary text-uppercase border-bottom border-5">Mes Excursions Favorites</h2>
-        </div>
-        
-        <div class="row g-5">
-            {% for excursion in excursions %}
-            <div class="col-lg-4 col-md-6">
-                <div class="package-item bg-white rounded overflow-hidden">
-                    <div class="position-relative">
-                        {% if excursion.image %}
-                        <img class="img-fluid w-100" src="{{ excursion.image }}" alt="{{ excursion.title }}">
-                        {% else %}
-                        <img class="img-fluid w-100" src="{{ asset('images/default-excursion.jpg') }}" alt="Excursion par défaut">
-                        {% endif %}
-                        
-                        <div class="p-4">
-                            <div class="d-flex justify-content-between mb-3">
-                                <small class="m-0"><i class="far fa-calendar-alt text-primary me-2"></i>{{ excursion.dateExcursion|date('d/m/Y') }}</small>
-                                <small class="m-0"><i class="fas fa-wallet text-primary me-2"></i>{{ excursion.prix }} DT</small>
-                            </div>
-                            <h5 class="mb-3">{{ excursion.title }}</h5>
-                            <p>{{ excursion.description|slice(0, 100) }}...</p>
-                            <div class="d-flex justify-content-between border-top mt-4 pt-4">
-                                <div class="d-flex align-items-center">
-                                    {% if excursion.guide %}
-                                    <small><i class="fas fa-user text-primary me-2"></i>{{ excursion.guide.name }} {{ excursion.guide.lastName }}</small>
-                                    {% else %}
-                                    <small><i class="fas fa-user text-primary me-2"></i>No guide</small>
-                                    {% endif %}
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <button class="excursion-favorite-btn btn btn-sm btn-primary" data-excursion-id="{{ excursion.excursionId }}">
-                                        <i class="fas fa-heart me-1"></i> Retirer
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% else %}
-            <div class="col-12">
-                <div class="text-center py-5">
-                    <i class="fas fa-heart-broken fa-4x text-primary mb-4"></i>
-                    <h3 class="text-primary">Aucune excursion favorite</h3>
-                    <p class="mb-4">Vous n'avez pas encore ajouté d'excursion à vos favoris</p>
-                    <a href="{{ path('app_excursions_client') }}" class="btn btn-primary py-2 px-4">
-                        <i class="fas fa-umbrella-beach me-2"></i>Explorer les excursions
-                    </a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
+	<div class="container">
+		<div class="text-center mb-5">
+			<h2 class="d-inline-block text-primary text-uppercase border-bottom border-5">Mes Excursions Favorites</h2>
+		</div>
+
+		<div class="row g-5">
+			{% for excursion in excursions %}
+			<div class="col-lg-4 col-md-6">
+				<div class="package-item bg-white rounded overflow-hidden">
+					<div class="position-relative">
+						{% if excursion.image %}
+						<img class="img-fluid w-100" src="{{ excursion.image }}" alt="{{ excursion.title }}" />
+						{% else %}
+						<img class="img-fluid w-100" src="{{ asset('images/default-excursion.jpg') }}" alt="Excursion par défaut" />
+						{% endif %}
+
+						<div class="p-4">
+							<div class="d-flex justify-content-between mb-3">
+								<small class="m-0"
+									><i class="far fa-calendar-alt text-primary me-2"></i>{{ excursion.dateExcursion|date('d/m/Y')
+									}}</small
+								>
+								<small class="m-0"><i class="fas fa-wallet text-primary me-2"></i>{{ excursion.prix }} DT</small>
+							</div>
+							<h5 class="mb-3">{{ excursion.title }}</h5>
+							<p>{{ excursion.description|slice(0, 100) }}...</p>
+							<div class="d-flex justify-content-between border-top mt-4 pt-4">
+								<div class="d-flex align-items-center">
+									{% if excursion.guide %}
+									<small
+										><i class="fas fa-user text-primary me-2"></i>{{ excursion.guide.name }} {{ excursion.guide.lastName
+										}}</small
+									>
+									{% else %}
+									<small><i class="fas fa-user text-primary me-2"></i>No guide</small>
+									{% endif %}
+								</div>
+								<div class="d-flex align-items-center">
+									<button
+										class="excursion-favorite-btn btn btn-sm btn-primary"
+										data-excursion-id="{{ excursion.excursionId }}"
+									>
+										<i class="fas fa-heart me-1"></i> Retirer
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% else %}
+			<div class="col-12">
+				<div class="text-center py-5">
+					<i class="fas fa-heart-broken fa-4x text-primary mb-4"></i>
+					<h3 class="text-primary">Aucune excursion favorite</h3>
+					<p class="mb-4">Vous n'avez pas encore ajouté d'excursion à vos favoris</p>
+					<a href="{{ path('app_excursions_client') }}" class="btn btn-primary py-2 px-4">
+						<i class="fas fa-umbrella-beach me-2"></i>Explorer les excursions
+					</a>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
 </div>
 <!-- Excursions Favorites End -->
 
 <!-- Subscribe Start -->
 <div class="container-fluid subscribe py-5">
-    <div class="container text-center py-5">
-        <div class="mx-auto text-center" style="max-width: 900px;">
-            <h5 class="subscribe-title px-3">Subscribe</h5>
-            <h1 class="text-white mb-4">Our Newsletter</h1>
-            <p class="text-white mb-5">Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum tempore nam, architecto doloremque velit explicabo? Voluptate sunt eveniet fuga eligendi! Expedita laudantium fugiat corrupti eum cum repellat a laborum quasi.
-            </p>
-            <div class="position-relative mx-auto">
-                <input class="form-control border-primary rounded-pill w-100 py-3 ps-4 pe-5" type="text" placeholder="Your email">
-                <button type="button" class="btn btn-primary rounded-pill position-absolute top-0 end-0 py-2 px-4 mt-2 me-2">Subscribe</button>
-            </div>
-        </div>
-    </div>
+	<div class="container text-center py-5">
+		<div class="mx-auto text-center" style="max-width: 900px">
+			<h5 class="subscribe-title px-3">Subscribe</h5>
+			<h1 class="text-white mb-4">Our Newsletter</h1>
+			<p class="text-white mb-5">
+				Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum tempore nam, architecto doloremque velit
+				explicabo? Voluptate sunt eveniet fuga eligendi! Expedita laudantium fugiat corrupti eum cum repellat a laborum
+				quasi.
+			</p>
+			<div class="position-relative mx-auto">
+				<input
+					class="form-control border-primary rounded-pill w-100 py-3 ps-4 pe-5"
+					type="text"
+					placeholder="Your email"
+				/>
+				<button type="button" class="btn btn-primary rounded-pill position-absolute top-0 end-0 py-2 px-4 mt-2 me-2">
+					Subscribe
+				</button>
+			</div>
+		</div>
+	</div>
 </div>
 <!-- Subscribe End -->
 
 <!-- Footer Start -->
 <div class="container-fluid footer py-5">
-    <div class="container py-5">
-        <div class="row g-5">
-            <div class="col-md-6 col-lg-6 col-xl-3">
-                <div class="footer-item d-flex flex-column">
-                    <h4 class="mb-4 text-white">Get In Touch</h4>
-                    <a href=""><i class="fas fa-home me-2"></i> 123 Street, New York, USA</a>
-                    <a href=""><i class="fas fa-envelope me-2"></i> info@example.com</a>
-                    <a href=""><i class="fas fa-phone me-2"></i> +012 345 67890</a>
-                    <a href="" class="mb-3"><i class="fas fa-print me-2"></i> +012 345 67890</a>
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-share fa-2x text-white me-2"></i>
-                        <a class="btn-square btn btn-primary rounded-circle mx-1" href=""><i class="fab fa-facebook-f"></i></a>
-                        <a class="btn-square btn btn-primary rounded-circle mx-1" href=""><i class="fab fa-twitter"></i></a>
-                        <a class="btn-square btn btn-primary rounded-circle mx-1" href=""><i class="fab fa-instagram"></i></a>
-                        <a class="btn-square btn btn-primary rounded-circle mx-1" href=""><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-6 col-xl-3">
-                <div class="footer-item d-flex flex-column">
-                    <h4 class="mb-4 text-white">Company</h4>
-                    <a href=""><i class="fas fa-angle-right me-2"></i> About</a>
-                    <a href=""><i class="fas fa-angle-right me-2"></i> Careers</a>
-                    <a href=""><i class="fas fa-angle-right me-2"></i> Blog</a>
-                    <a href=""><i class="fas fa-angle-right me-2"></i> Press</a>
-                    <a href=""><i class="fas fa-angle-right me-2"></i> Gift Cards</a>
-                    <a href=""><i class="fas fa-angle-right me-2"></i> Magazine</a>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-6 col-xl-3">
-                <div class="footer-item d-flex flex-column">
-                    <h4 class="mb-4 text-white">Support</h4>
-                    <a href=""><i class="fas fa-angle-right me-2"></i> Contact</a>
-                    <a href=""><i class="fas fa-angle-right me-2"></i> Legal Notice</a>
-                    <a href=""><i class="fas fa-angle-right me-2"></i> Privacy Policy</a>
-                    <a href=""><i class="fas fa-angle-right me-2"></i> Terms and Conditions</a>
-                    <a href=""><i class="fas fa-angle-right me-2"></i> Sitemap</a>
-                    <a href=""><i class="fas fa-angle-right me-2"></i> Cookie policy</a>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-6 col-xl-3">
-                <div class="footer-item">
-                    <div class="row gy-3 gx-2 mb-4">
-                        <div class="col-xl-6">
-                            <form>
-                                <div class="form-floating">
-                                    <select class="form-select bg-dark border" id="select1">
-                                        <option value="1">Arabic</option>
-                                        <option value="2">German</option>
-                                        <option value="3">Greek</option>
-                                        <option value="3">New York</option>
-                                    </select>
-                                    <label for="select1">English</label>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="col-xl-6">
-                            <form>
-                                <div class="form-floating">
-                                    <select class="form-select bg-dark border" id="select1">
-                                        <option value="1">USD</option>
-                                        <option value="2">EUR</option>
-                                        <option value="3">INR</option>
-                                        <option value="3">GBP</option>
-                                    </select>
-                                    <label for="select1">$</label>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <h4 class="text-white mb-3">Payments</h4>
-                    <div class="footer-bank-card">
-                        <a href="#" class="text-white me-2"><i class="fab fa-cc-amex fa-2x"></i></a>
-                        <a href="#" class="text-white me-2"><i class="fab fa-cc-visa fa-2x"></i></a>
-                        <a href="#" class="text-white me-2"><i class="fas fa-credit-card fa-2x"></i></a>
-                        <a href="#" class="text-white me-2"><i class="fab fa-cc-mastercard fa-2x"></i></a>
-                        <a href="#" class="text-white me-2"><i class="fab fa-cc-paypal fa-2x"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-cc-discover fa-2x"></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="container py-5">
+		<div class="row g-5">
+			<div class="col-md-6 col-lg-6 col-xl-3">
+				<div class="footer-item d-flex flex-column">
+					<h4 class="mb-4 text-white">Get In Touch</h4>
+					<a href=""><i class="fas fa-home me-2"></i> 123 Street, New York, USA</a>
+					<a href=""><i class="fas fa-envelope me-2"></i> info@example.com</a>
+					<a href=""><i class="fas fa-phone me-2"></i> +012 345 67890</a>
+					<a href="" class="mb-3"><i class="fas fa-print me-2"></i> +012 345 67890</a>
+					<div class="d-flex align-items-center">
+						<i class="fas fa-share fa-2x text-white me-2"></i>
+						<a class="btn-square btn btn-primary rounded-circle mx-1" href=""><i class="fab fa-facebook-f"></i></a>
+						<a class="btn-square btn btn-primary rounded-circle mx-1" href=""><i class="fab fa-twitter"></i></a>
+						<a class="btn-square btn btn-primary rounded-circle mx-1" href=""><i class="fab fa-instagram"></i></a>
+						<a class="btn-square btn btn-primary rounded-circle mx-1" href=""><i class="fab fa-linkedin-in"></i></a>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 col-lg-6 col-xl-3">
+				<div class="footer-item d-flex flex-column">
+					<h4 class="mb-4 text-white">Company</h4>
+					<a href=""><i class="fas fa-angle-right me-2"></i> About</a>
+					<a href=""><i class="fas fa-angle-right me-2"></i> Careers</a>
+					<a href=""><i class="fas fa-angle-right me-2"></i> Blog</a>
+					<a href=""><i class="fas fa-angle-right me-2"></i> Press</a>
+					<a href=""><i class="fas fa-angle-right me-2"></i> Gift Cards</a>
+					<a href=""><i class="fas fa-angle-right me-2"></i> Magazine</a>
+				</div>
+			</div>
+			<div class="col-md-6 col-lg-6 col-xl-3">
+				<div class="footer-item d-flex flex-column">
+					<h4 class="mb-4 text-white">Support</h4>
+					<a href=""><i class="fas fa-angle-right me-2"></i> Contact</a>
+					<a href=""><i class="fas fa-angle-right me-2"></i> Legal Notice</a>
+					<a href=""><i class="fas fa-angle-right me-2"></i> Privacy Policy</a>
+					<a href=""><i class="fas fa-angle-right me-2"></i> Terms and Conditions</a>
+					<a href=""><i class="fas fa-angle-right me-2"></i> Sitemap</a>
+					<a href=""><i class="fas fa-angle-right me-2"></i> Cookie policy</a>
+				</div>
+			</div>
+			<div class="col-md-6 col-lg-6 col-xl-3">
+				<div class="footer-item">
+					<div class="row gy-3 gx-2 mb-4">
+						<div class="col-xl-6">
+							<form>
+								<div class="form-floating">
+									<select class="form-select bg-dark border" id="select1">
+										<option value="1">Arabic</option>
+										<option value="2">German</option>
+										<option value="3">Greek</option>
+										<option value="3">New York</option>
+									</select>
+									<label for="select1">English</label>
+								</div>
+							</form>
+						</div>
+						<div class="col-xl-6">
+							<form>
+								<div class="form-floating">
+									<select class="form-select bg-dark border" id="select1">
+										<option value="1">USD</option>
+										<option value="2">EUR</option>
+										<option value="3">INR</option>
+										<option value="3">GBP</option>
+									</select>
+									<label for="select1">$</label>
+								</div>
+							</form>
+						</div>
+					</div>
+					<h4 class="text-white mb-3">Payments</h4>
+					<div class="footer-bank-card">
+						<a href="#" class="text-white me-2"><i class="fab fa-cc-amex fa-2x"></i></a>
+						<a href="#" class="text-white me-2"><i class="fab fa-cc-visa fa-2x"></i></a>
+						<a href="#" class="text-white me-2"><i class="fas fa-credit-card fa-2x"></i></a>
+						<a href="#" class="text-white me-2"><i class="fab fa-cc-mastercard fa-2x"></i></a>
+						<a href="#" class="text-white me-2"><i class="fab fa-cc-paypal fa-2x"></i></a>
+						<a href="#" class="text-white"><i class="fab fa-cc-discover fa-2x"></i></a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 <!-- Footer End -->
 
 <!-- Copyright Start -->
 <div class="container-fluid copyright text-body py-4">
-    <div class="container">
-        <div class="row g-4 align-items-center">
-            <div class="col-md-6 text-center text-md-end mb-md-0">
-                <i class="fas fa-copyright me-2"></i><a class="text-white" href="#">Your Site Name</a>, All right reserved.
-            </div>
-            <div class="col-md-6 text-center text-md-start">
-                Designed By <a class="text-white" href="https://htmlcodex.com">HTML Codex</a> Distributed By <a href="https://themewagon.com">ThemeWagon</a>
-            </div>
-        </div>
-    </div>
+	<div class="container">
+		<div class="row g-4 align-items-center">
+			<div class="col-md-6 text-center text-md-end mb-md-0">
+				<i class="fas fa-copyright me-2"></i><a class="text-white" href="#">Your Site Name</a>, All right reserved.
+			</div>
+			<div class="col-md-6 text-center text-md-start">
+				Designed By <a class="text-white" href="https://htmlcodex.com">HTML Codex</a> Distributed By
+				<a href="https://themewagon.com">ThemeWagon</a>
+			</div>
+		</div>
+	</div>
 </div>
 <!-- Copyright End -->
 
 <!-- Back to Top -->
 <a href="#" class="btn btn-primary btn-primary-outline-0 btn-md-square back-to-top"><i class="fa fa-arrow-up"></i></a>
-{% endblock %}
-
-{% block js %}
-{{ parent() }}
+{% endblock %} {% block js %} {{ parent() }}
 <script>
-$(document).ready(function() {
-    // Gestion du clic sur le bouton favori dans la page des favoris
-    $('.excursion-favorite-btn').click(function(e) {
-        e.preventDefault();
-        const button = $(this);
-        const excursionId = button.data('excursion-id');
-        const card = button.closest('.col-lg-4.col-md-6');
-        
-        $.ajax({
-            url: '/favoris/toggle/' + excursionId,
-            method: 'POST',
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-                    if (!response.isFavorite) {
-                        // Supprime la carte de la vue si l'utilisateur retire des favoris
-                        card.fadeOut(300, function() {
-                            $(this).remove();
-                            // Si plus d'excursions, affiche le message vide
-                            if ($('.package-item').length === 0) {
-                                const emptyHtml = `
+	$(document).ready(function () {
+		// Gestion du clic sur le bouton favori dans la page des favoris
+		$(".excursion-favorite-btn").click(function (e) {
+			e.preventDefault();
+			const button = $(this);
+			const excursionId = button.data("excursion-id");
+			const card = button.closest(".col-lg-4.col-md-6");
+
+			$.ajax({
+				url: "/favoris/toggle/" + excursionId,
+				method: "POST",
+				dataType: "json",
+				success: function (response) {
+					if (response.success) {
+						if (!response.isFavorite) {
+							// Supprime la carte de la vue si l'utilisateur retire des favoris
+							card.fadeOut(300, function () {
+								$(this).remove();
+								// Si plus d'excursions, affiche le message vide
+								if ($(".package-item").length === 0) {
+									const emptyHtml = `
                                     <div class="col-12">
                                         <div class="text-center py-5">
                                             <i class="fas fa-heart-broken fa-4x text-primary mb-4"></i>
@@ -314,21 +333,21 @@ $(document).ready(function() {
                                             </a>
                                         </div>
                                     </div>`;
-                                $('.row.g-5').append(emptyHtml);
-                            }
-                        });
-                    }
-                }
-            },
-            error: function(xhr) {
-                if (xhr.status === 401) {
-                    window.location.href = '/login';
-                } else {
-                    alert('Une erreur est survenue');
-                }
-            }
-        });
-    });
-});
+									$(".row.g-5").append(emptyHtml);
+								}
+							});
+						}
+					}
+				},
+				error: function (xhr) {
+					if (xhr.status === 401) {
+						window.location.href = "/login";
+					} else {
+						alert("Une erreur est survenue");
+					}
+				},
+			});
+		});
+	});
 </script>
 {% endblock %}

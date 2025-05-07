@@ -2,12 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\GuidesRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
+use App\Repository\GuidesRepository;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Excursions;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -16,7 +14,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[UniqueEntity(fields: ['email'], message: 'Un guide avec cette adresse email existe déjà.')]
 class Guides
 {
-    #[ORM\OneToMany(mappedBy: "guide", targetEntity: Excursions::class, cascade: ["persist", "remove"], orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'guide', targetEntity: Excursions::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $excursions;
 
     public function __construct()
@@ -24,38 +22,38 @@ class Guides
         $this->excursions = new ArrayCollection();
     }
 
-    #[ORM\Column(name: "guide_id")]
+    #[ORM\Column(name: 'guide_id')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "IDENTITY")]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private ?int $guideId = null;
 
-    #[ORM\Column(name: "name", length: 50)]
-    #[Assert\NotBlank(message: "Le prénom ne peut pas être vide.")]
-    #[Assert\Length(max: 50, maxMessage: "Le prénom ne peut pas dépasser 50 caractères.")]
+    #[ORM\Column(name: 'name', length: 50)]
+    #[Assert\NotBlank(message: 'Le prénom ne peut pas être vide.')]
+    #[Assert\Length(max: 50, maxMessage: 'Le prénom ne peut pas dépasser 50 caractères.')]
     private ?string $name = null;
 
-    #[ORM\Column(name: "last_name", length: 50)]
-    #[Assert\NotBlank(message: "Le nom de famille ne peut pas être vide.")]
-    #[Assert\Length(max: 50, maxMessage: "Le nom de famille ne peut pas dépasser 50 caractères.")]
+    #[ORM\Column(name: 'last_name', length: 50)]
+    #[Assert\NotBlank(message: 'Le nom de famille ne peut pas être vide.')]
+    #[Assert\Length(max: 50, maxMessage: 'Le nom de famille ne peut pas dépasser 50 caractères.')]
     private ?string $lastName = null;
 
-    #[ORM\Column(name: "email", length: 50, unique: true)]
+    #[ORM\Column(name: 'email', length: 50, unique: true)]
     #[Assert\NotBlank(message: "L'email ne peut pas être vide.")]
     #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide.")]
     #[Assert\Length(max: 50, maxMessage: "L'email ne peut pas dépasser 50 caractères.")]
     private ?string $email = null;
 
-    #[ORM\Column(name: "phone_num", length: 50)]
-    #[Assert\NotBlank(message: "Le numéro de téléphone ne peut pas être vide.")]
-    #[Assert\Length(max: 50, maxMessage: "Le numéro de téléphone ne peut pas dépasser 50 caractères.")]
+    #[ORM\Column(name: 'phone_num', length: 50)]
+    #[Assert\NotBlank(message: 'Le numéro de téléphone ne peut pas être vide.')]
+    #[Assert\Length(max: 50, maxMessage: 'Le numéro de téléphone ne peut pas dépasser 50 caractères.')]
     private ?string $phoneNum = null;
 
-    #[ORM\Column(name: "language", length: 50)]
-    #[Assert\NotBlank(message: "La langue ne peut pas être vide.")]
-    #[Assert\Length(max: 50, maxMessage: "La langue ne peut pas dépasser 50 caractères.")]
+    #[ORM\Column(name: 'language', length: 50)]
+    #[Assert\NotBlank(message: 'La langue ne peut pas être vide.')]
+    #[Assert\Length(max: 50, maxMessage: 'La langue ne peut pas dépasser 50 caractères.')]
     private ?string $language = null;
 
-    #[ORM\Column(name: "experience")]
+    #[ORM\Column(name: 'experience')]
     #[Assert\NotBlank(message: "L'expérience ne peut pas être vide.")]
     #[Assert\GreaterThanOrEqual(0, message: "L'expérience doit être un nombre positif.")]
     private ?int $experience = null;
@@ -148,6 +146,7 @@ class Guides
             $this->excursions->add($excursion);
             $excursion->setGuide($this);
         }
+
         return $this;
     }
 
@@ -159,6 +158,7 @@ class Guides
                 $excursion->setGuide(null);
             }
         }
+
         return $this;
     }
 }

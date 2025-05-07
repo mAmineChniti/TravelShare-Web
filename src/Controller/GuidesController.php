@@ -5,13 +5,12 @@ namespace App\Controller;
 use App\Entity\Guides;
 use App\Form\GuidesType;
 use App\Repository\GuidesRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class GuidesController extends AbstractController
 {
@@ -25,6 +24,7 @@ class GuidesController extends AbstractController
     public function read(GuidesRepository $guidesRepository): Response
     {
         $guides = $guidesRepository->findAll();
+
         return $this->render('guides/read.html.twig', [
             'guides' => $guides,
         ]);
@@ -43,6 +43,7 @@ class GuidesController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Guide added successfully!');
+
             return $this->redirectToRoute('app_guides_read');
         }
 
@@ -66,21 +67,21 @@ class GuidesController extends AbstractController
         if (!$guide) {
             throw $this->createNotFoundException('Guide not found');
         }
-    
+
         $form = $this->createForm(GuidesType::class, $guide);
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
+
             return $this->redirectToRoute('app_guides_read');
         }
-    
+
         return $this->render('guides/edit.html.twig', [
             'form' => $form,
             'guide' => $guide,
         ]);
     }
-    
 
     #[Route('/guides/delete/{id}', name: 'app_guides_delete', methods: ['POST'])]
     public function delete(Request $request, Guides $guide, EntityManagerInterface $entityManager): Response
@@ -89,12 +90,12 @@ class GuidesController extends AbstractController
             // La suppression en cascade est gérée automatiquement par Doctrine
             $entityManager->remove($guide);
             $entityManager->flush();
-            
+
             $this->addFlash('success', 'Le guide et ses excursions associées ont été supprimés avec succès.');
         } else {
             $this->addFlash('error', 'Token CSRF invalide, suppression annulée.');
         }
-    
+
         return $this->redirectToRoute('app_guides_read');
     }
 

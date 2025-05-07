@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
-use App\Repository\ListeFavorisRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ListeFavorisRepository;
 
 #[ORM\Entity(repositoryClass: ListeFavorisRepository::class)]
 class ListeFavoris
@@ -34,6 +34,7 @@ class ListeFavoris
     public function setUser(?Users $user): self
     {
         $this->user = $user;
+
         return $this;
     }
 
@@ -45,6 +46,7 @@ class ListeFavoris
     public function setExcursion(?Excursions $excursion): self
     {
         $this->excursion = $excursion;
+
         return $this;
     }
 }

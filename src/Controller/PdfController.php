@@ -2,19 +2,18 @@
 
 namespace App\Controller;
 
-use App\Entity\Excursions;
-use App\Repository\ExcursionsRepository;
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\ExcursionsRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class PdfController extends AbstractController
 {
     #[Route('/download-receipt/{excursionId}', name: 'app_download_receipt')]
     public function downloadReceipt(int $excursionId, ExcursionsRepository $excursionsRepository): Response
-        {
+    {
         // 1. Récupérer l'excursion
         $excursion = $excursionsRepository->find($excursionId);
 
@@ -32,7 +31,7 @@ class PdfController extends AbstractController
         $options->set([
             'isRemoteEnabled' => true,
             'defaultFont' => 'Arial',
-            'tempDir' => $this->getParameter('kernel.project_dir').'/var/tmp'
+            'tempDir' => $this->getParameter('kernel.project_dir').'/var/tmp',
         ]);
 
         $dompdf = new Dompdf($options);
@@ -50,7 +49,7 @@ class PdfController extends AbstractController
                     'attachment; filename="receipt-%d-%s.pdf"',
                     $excursion->getExcursionId(),
                     date('Ymd-His')
-                )
+                ),
             ]
         );
     }

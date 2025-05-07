@@ -3,8 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Excursions;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 class ExcursionsRepository extends ServiceEntityRepository
 {
@@ -23,22 +23,21 @@ class ExcursionsRepository extends ServiceEntityRepository
     }
 
     public function findByCriteria(array $criteria): array
-{
-    $qb = $this->createQueryBuilder('e')
-               ->leftJoin('e.guide', 'g')
-               ->addSelect('g');
+    {
+        $qb = $this->createQueryBuilder('e')
+                   ->leftJoin('e.guide', 'g')
+                   ->addSelect('g');
 
-    if (!empty($criteria['title'])) {
-        $qb->andWhere('e.title LIKE :title')
-           ->setParameter('title', '%'.$criteria['title'].'%');
+        if (!empty($criteria['title'])) {
+            $qb->andWhere('e.title LIKE :title')
+               ->setParameter('title', '%'.$criteria['title'].'%');
+        }
+
+        if (!empty($criteria['max_price'])) {
+            $qb->andWhere('e.prix <= :maxPrice')
+               ->setParameter('maxPrice', $criteria['max_price']);
+        }
+
+        return $qb->getQuery()->getResult();
     }
-
-    if (!empty($criteria['max_price'])) {
-        $qb->andWhere('e.prix <= :maxPrice')
-           ->setParameter('maxPrice', $criteria['max_price']);
-    }
-
-    return $qb->getQuery()->getResult();
-}
-
 }
