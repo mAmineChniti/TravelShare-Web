@@ -17,7 +17,7 @@ class LanguageApiService
     {
         $response = $this->client->request('GET', 'https://restcountries.com/v3.1/all');
 
-        if (200 !== $response->getStatusCode()) {
+        if ($response->getStatusCode() !== 200) {
             return [];
         }
 

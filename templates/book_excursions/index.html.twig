@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>TravelaShare - Secure Payment</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ asset('images2/favicon.svg') }}" type="image/x-icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600&family=Roboto&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{{ asset('lib/owlcarousel/assets/owl.carousel.css') }}" rel="stylesheet">
+    <link href="{{ asset('lib/lightbox/css/lightbox.min.css') }}" rel="stylesheet">
+
+    <!-- CSS -->
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+
+    <style>
+        .payment-card {
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+            border: none;
+            overflow: hidden;
+        }
+        .payment-header {
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        #card-element {
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background: #f9f9f9;
+        }
+        #card-errors {
+            color: #dc3545;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .payment-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+        }
+        .secure-badge {
+            background: #f8f9fa;
+            border-left: 4px solid #4e54c8;
+            padding: 0.8rem;
+            font-size: 0.9rem;
+        }
+        .form-control:focus {
+            border-color: #8f94fb;
+            box-shadow: 0 0 0 0.25rem rgba(78, 84, 200, 0.25);
+        }
+        .btn-pay {
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .btn-pay:hover {
+            background: linear-gradient(135deg, #4348a8, #7a7fd8);
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Spinner Start -->
+<div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+<!-- Spinner End -->
+
+<!-- Topbar Start -->
+<div class="container-fluid bg-primary px-5 d-none d-lg-block">
+    <div class="row gx-0">
+        <div class="col-lg-8 text-center text-lg-start mb-2 mb-lg-0">
+            <div class="d-inline-flex align-items-center" style="height: 45px;">
+                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-twitter fw-normal"></i></a>
+                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-facebook-f fw-normal"></i></a>
+                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-linkedin-in fw-normal"></i></a>
+                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle me-2" href=""><i class="fab fa-instagram fw-normal"></i></a>
+                <a class="btn btn-sm btn-outline-light btn-sm-square rounded-circle" href=""><i class="fab fa-youtube fw-normal"></i></a>
+            </div>
+        </div>
+        <div class="col-lg-4 text-center text-lg-end">
+            <div class="d-inline-flex align-items-center" style="height: 45px;">
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle text-light" data-bs-toggle="dropdown"><small><i class="fa fa-home me-2"></i> My Account</small></a>
+                    <div class="dropdown-menu rounded">
+                        <a href="" class="dropdown-item">
+                            <i class="fas fa-user-alt me-2"></i> My Profile
+                        </a>
+                        <a href="" class="dropdown-item">
+                            <i class="fas fa-comment-alt me-2"></i> Support
+                        </a>
+                        <a href="" class="dropdown-item">
+                            <i class="fas fa-history"></i> History
+                        </a>
+                        <a href="" class="dropdown-item">
+                            <i class="fas fa-power-off me-2"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Topbar End -->
+
+<!-- Navbar Start -->
+<div class="container-fluid position-relative p-0">
+    <nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
+        <a href="" class="navbar-brand p-0">
+            <h1 class="m-0"><i class="fa fa-map-marker-alt me-3"></i>TravelaShare</h1>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="fa fa-bars"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-nav ms-auto py-0">
+                <a href="{{ path('app_home') }}" class="nav-item nav-link">Home</a>
+                <a href="" class="nav-item nav-link">About</a>
+                <a href="" class="nav-item nav-link">Services</a>
+                <a href="" class="nav-item nav-link">Packages</a>
+                <a href="" class="nav-item nav-link">Blog</a>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">Pages</a>
+                    <div class="dropdown-menu m-0">
+                        <a href="{{ path('app_excursions_client') }}" class="dropdown-item">Excursions</a>
+                        <a href="" class="dropdown-item">Explore</a>
+                        <a href="" class="dropdown-item">Bookings</a>
+                        <a href="" class="dropdown-item">Gallery</a>
+                        <a href="" class="dropdown-item">Travel Guides</a>
+                        <a href="" class="dropdown-item">Testimonial</a>
+                        <a href="{{ path('app_error') }}" class="dropdown-item">Favoris List</a>
+                    </div>
+                </div>
+                <a href="" class="nav-item nav-link">Contact</a>
+            </div>
+            <a href="" class="btn btn-primary rounded-pill py-2 px-4 ms-lg-4">Book Now</a>
+        </div>
+    </nav>
+</div>
+<!-- Navbar End -->
+
+<!-- Header Start -->
+<div class="container-fluid bg-breadcrumb">
+    <div class="container text-center py-5" style="max-width: 900px;">
+        <h1 class="text-white display-3 mb-4">Secure Payment</h1>
+        <ol class="breadcrumb justify-content-center mb-0">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item"><a href="#">Excursions</a></li>
+            <li class="breadcrumb-item active text-white">Payment</li>
+        </ol>
+    </div>
+</div>
+<!-- Header End -->
+
+<!-- Payment Form Start -->
+<div class="container-fluid py-5">
+    <div class="container payment-container">
+        <div class="row g-5">
+            <div class="col-lg-7">
+                <div class="payment-card">
+                    <div class="payment-header">
+                        <h3><i class="fas fa-lock me-2"></i> Secure Payment</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="payment-form">
+                            <input type="hidden" id="excursion-id" value="{{ excursion.excursionId }}">
+                            
+                            <div class="mb-4">
+                                <label for="customer-name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="customer-name" placeholder="John Doe" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="customer-email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="customer-email" placeholder="your@email.com" required>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label">Credit Card Details</label>
+                                <div id="card-element"></div>
+                                <div id="card-errors" role="alert"></div>
+                            </div>
+                            
+                            <button id="submit-button" class="btn btn-pay w-100">
+                                <span id="button-text">Pay {{ excursion.prix }} TND</span>
+                                <span id="spinner" class="loading" style="display: none;"></span>
+                            </button>
+                            
+                            <div class="secure-badge mt-4">
+                                <i class="fas fa-shield-alt me-2"></i> Your payment information is processed securely. We do not store your credit card details.
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-5">
+                <div class="payment-card h-100">
+                    <div class="payment-header">
+                        <h3><i class="fas fa-receipt me-2"></i> Order Summary</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="summary-item">
+                            <span>Excursion:</span>
+                            <strong>{{ excursion.title }}</strong>
+                        </div>
+                        <div class="summary-item">
+                            <span>Date:</span>
+                            <span>{{ excursion.dateExcursion|date('M d, Y') }}</span>
+                        </div>
+                        <hr>
+                        <div class="summary-item">
+                            <span>Subtotal:</span>
+                            <span>{{ excursion.prix }} TND</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Taxes:</span>
+                            <span>0.00 TND</span>
+                        </div>
+                        <hr>
+                        <div class="summary-item h5">
+                            <span>Total:</span>
+                            <strong>{{ excursion.prix }} TND</strong>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mt-4">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <small>Free cancellation up to 24 hours before</small>
+                        </div>
+                        
+                        <div class="d-flex align-items-center mt-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <small>Instant confirmation</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Payment Form End -->
+
+<!-- Subscribe Start -->
+<div class="container-fluid subscribe py-5">
+    <div class="container text-center py-5">
+        <div class="mx-auto text-center" style="max-width: 900px;">
+            <h5 class="subscribe-title px-3">Subscribe</h5>
+            <h1 class="text-white mb-4">Our Newsletter</h1>
+            <p class="text-white mb-5">Stay updated with our latest travel offers and destination guides. Join our community of travel enthusiasts today!</p>
+            <div class="position-relative mx-auto">
+                <input class="form-control border-primary rounded-pill w-100 py-3 ps-4 pe-5" type="text" placeholder="Your email">
+                <button type="button" class="btn btn-primary rounded-pill position-absolute top-0 end-0 py-2 px-4 mt-2 me-2">Subscribe</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Subscribe End -->
+
+<!-- Footer Start -->
+<div class="container-fluid footer py-5">
+    <div class="container py-5">
+        <div class="row g-5">
+            <div class="col-md-6 col-lg-6 col-xl-3">
+                <div class="footer-item d-flex flex-column">
+                    <h4 class="mb-4 text-white">Get In Touch</h4>
+                    <a href=""><i class="fas fa-home me-2"></i> 123 Street, Tunis, Tunisia</a>
+                    <a href=""><i class="fas fa-envelope me-2"></i> info@travelashare.com</a>
+                    <a href=""><i class="fas fa-phone me-2"></i> +216 12 345 678</a>
+                    <div class="d-flex align-items-center mt-3">
+                        <a class="btn-square btn btn-primary rounded-circle mx-1" href=""><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn-square btn btn-primary rounded-circle mx-1" href=""><i class="fab fa-twitter"></i></a>
+                        <a class="btn-square btn btn-primary rounded-circle mx-1" href=""><i class="fab fa-instagram"></i></a>
+                        <a class="btn-square btn btn-primary rounded-circle mx-1" href=""><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-6 col-xl-3">
+                <div class="footer-item d-flex flex-column">
+                    <h4 class="mb-4 text-white">Company</h4>
+                    <a href=""><i class="fas fa-angle-right me-2"></i> About Us</a>
+                    <a href=""><i class="fas fa-angle-right me-2"></i> Careers</a>
+                    <a href=""><i class="fas fa-angle-right me-2"></i> Blog</a>
+                    <a href=""><i class="fas fa-angle-right me-2"></i> Press</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-6 col-xl-3">
+                <div class="footer-item d-flex flex-column">
+                    <h4 class="mb-4 text-white">Support</h4>
+                    <a href=""><i class="fas fa-angle-right me-2"></i> Contact Us</a>
+                    <a href=""><i class="fas fa-angle-right me-2"></i> Legal Notice</a>
+                    <a href=""><i class="fas fa-angle-right me-2"></i> Privacy Policy</a>
+                    <a href=""><i class="fas fa-angle-right me-2"></i> Terms & Conditions</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-6 col-xl-3">
+                <div class="footer-item">
+                    <h4 class="text-white mb-3">Payment Methods</h4>
+                    <div class="footer-bank-card">
+                        <a href="#" class="text-white me-2"><i class="fab fa-cc-visa fa-2x"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-cc-mastercard fa-2x"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-cc-paypal fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Footer End -->
+
+<!-- Copyright Start -->
+<div class="container-fluid copyright text-body py-4">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-md-6 text-center text-md-end mb-md-0">
+                <i class="fas fa-copyright me-2"></i><a class="text-white" href="#">TravelaShare</a>, All Rights Reserved.
+            </div>
+            <div class="col-md-6 text-center text-md-start">
+                Designed By <a class="text-white" href="#">Your Team</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Copyright End -->
+
+<!-- Back to Top -->
+<a href="#" class="btn btn-primary btn-primary-outline-0 btn-md-square back-to-top"><i class="fa fa-arrow-up"></i></a>
+
+<!-- JavaScript Libraries -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ asset('lib/easing/easing.min.js') }}"></script>
+<script src="{{ asset('lib/waypoints/waypoints.min.js') }}"></script>
+<script src="{{ asset('lib/owlcarousel/owl.carousel.min.js') }}"></script>
+<script src="{{ asset('lib/lightbox/js/lightbox.min.js') }}"></script>
+
+<!-- Stripe JS -->
+<script src="https://js.stripe.com/v3/"></script>
+
+<!-- Template Javascript -->
+<script src="{{ asset('js/main.js') }}"></script>
+
+<script>
+    const stripe = Stripe('{{ stripe_public_key }}');
+    const elements = stripe.elements();
+    const cardElement = elements.create('card', {
+        style: {
+            base: {
+                fontSize: '16px',
+                color: '#32325d',
+                '::placeholder': {
+                    color: '#aab7c4'
+                }
+            },
+            invalid: {
+                color: '#fa755a',
+                iconColor: '#fa755a'
+            }
+        }
+    });
+    cardElement.mount('#card-element');
+
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-button');
+    const buttonText = document.getElementById('button-text');
+    const spinner = document.getElementById('spinner');
+    const cardErrors = document.getElementById('card-errors');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Reset errors
+        cardErrors.style.display = 'none';
+        cardErrors.textContent = '';
+        
+        // Show loading state
+        submitButton.disabled = true;
+        buttonText.textContent = 'Processing...';
+        spinner.style.display = 'inline-block';
+
+        // Get form values
+        const customerName = document.getElementById('customer-name').value.trim();
+        const customerEmail = document.getElementById('customer-email').value.trim();
+        
+        // Basic validation
+        if (!customerName || !customerEmail) {
+            showError('Please fill in all required fields');
+            resetButton();
+            return;
+        }
+
+        try {
+            // Create payment method
+            const { paymentMethod, error } = await stripe.createPaymentMethod({
+                type: 'card',
+                card: cardElement,
+                billing_details: {
+                    name: customerName,
+                    email: customerEmail
+                }
+            });
+
+            if (error) {
+                throw error;
+            }
+
+            // Send to backend
+            const response = await fetch('{{ path('app_process_payment', {id: excursion.excursionId}) }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    paymentMethodId: paymentMethod.id,
+                    customerName: customerName,
+                    customerEmail: customerEmail
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Server error');
+            }
+
+            // Handle payment confirmation
+            if (data.requiresAction) {
+                const { error: confirmError } = await stripe.confirmPayment({
+                    clientSecret: data.clientSecret,
+                    paymentMethod: paymentMethod.id,
+                    return_url: '{{ path('app_payment_success', {id: excursion.excursionId}) }}'
+                });
+
+                if (confirmError) {
+                    throw confirmError;
+                }
+            } else {
+                // Payment succeeded without additional action
+                window.location.href = '{{ path('app_payment_success', {id: excursion.excursionId}) }}';
+            }
+
+        } catch (error) {
+            console.error('Payment error:', error);
+            showError(error.message || 'An error occurred while processing your payment');
+            resetButton();
+        }
+    });
+
+    function showError(message) {
+        cardErrors.textContent = message;
+        cardErrors.style.display = 'block';
+    }
+
+    function resetButton() {
+        submitButton.disabled = false;
+        buttonText.textContent = 'Pay {{ excursion.prix }} TND';
+        spinner.style.display = 'none';
+    }
+</script>
+</body>
+</html>

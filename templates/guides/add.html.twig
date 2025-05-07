@@ -1,302 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<title>{% block title %}Add Guide | Admin Dashboard{% endblock %}</title>
-		<meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>{% block title %}Add Guide | Admin Dashboard{% endblock %}</title>
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport"/>
 
-		<!-- Favicon -->
-		<link rel="icon" href="{{ asset('images2/favicon.svg') }}" type="image/x-icon" />
-		<link rel="icon" href="{{ asset('images2/favicon.ico') }}" />
+    <!-- Favicon -->
+    <link rel="icon" href="{{ asset('images2/favicon.svg') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('images2/favicon.ico') }}" />
 
-		{% block js %}
-		<!-- Fonts and icons -->
-		<script src="{{ asset('js2/plugin/webfont/webfont.min.js') }}"></script>
-		<script>
-			WebFont.load({
-				google: { families: ["Public Sans:300,400,500,600,700"] },
-				custom: {
-					families: ["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"],
-					urls: ["css3/fonts.min.css"],
-				},
-				active: function () {
-					sessionStorage.fonts = true;
-				},
-			});
-		</script>
-		{% endblock %} {% block css %}
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-		<!-- CSS Files -->
-		<link rel="stylesheet" href="{{ asset('css3/bootstrap.min.css') }}" />
-		<link rel="stylesheet" href="{{ asset('css3/plugins.min.css') }}" />
-		<link rel="stylesheet" href="{{ asset('css3/kaiadmin.min.css') }}" />
-		<link rel="stylesheet" href="{{ asset('css3/demo.css') }}" />
+    {% block js %}
+        <!-- Fonts and icons -->
+        <script src="{{ asset('js2/plugin/webfont/webfont.min.js') }}"></script>
+        <script>
+            WebFont.load({
+                google: { families: ["Public Sans:300,400,500,600,700"] },
+                custom: {
+                    families: [
+                        "Font Awesome 5 Solid",
+                        "Font Awesome 5 Regular",
+                        "Font Awesome 5 Brands",
+                        "simple-line-icons",
+                    ],
+                    urls: ["css3/fonts.min.css"],
+                },
+                active: function () {
+                    sessionStorage.fonts = true;
+                },
+            });
+        </script>
+    {% endblock %}
 
-		<style>
-			.form-guide-card {
-				max-width: 800px;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
-				border: none;
-			}
+    {% block css %}
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <!-- CSS Files -->
+        <link rel="stylesheet" href="{{ asset('css3/bootstrap.min.css') }}" />
+        <link rel="stylesheet" href="{{ asset('css3/plugins.min.css') }}" />
+        <link rel="stylesheet" href="{{ asset('css3/kaiadmin.min.css') }}" />
+        <link rel="stylesheet" href="{{ asset('css3/demo.css') }}" />
+        
+        <style>
+            .form-guide-card {
+                max-width: 800px;
+                margin: 0 auto;
+                border-radius: 12px;
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+                border: none;
+            }
+            
+            .form-guide-card .card-header {
+                background: linear-gradient(135deg, #6777ef 0%, #6777ef 100%);
+                color: white;
+                border-bottom: none;
+                padding: 1.5rem 2rem;
+                border-radius: 12px 12px 0 0 !important;
+            }
+            
+            .form-guide-card .card-header h4 {
+                font-weight: 600;
+                margin-bottom: 0;
+            }
+            
+            .form-guide-card .card-body {
+                padding: 2.5rem;
+                background-color: #f8f9fa;
+            }
+            
+            .form-control {
+                border-radius: 6px;
+                border: 1px solid #e0e0e0;
+                height: calc(1.5em + 1.1rem + 2px);
+                padding: 0.6rem 1.2rem;
+                transition: all 0.3s;
+                background-color: #fff;
+                margin-bottom: 0.5rem;
+            }
+            
+            .form-control:focus {
+                border-color: #6777ef;
+                box-shadow: 0 0 0 0.2rem rgba(103, 119, 239, 0.25);
+            }
+            
+            .form-group label {
+                font-weight: 500;
+                margin-bottom: 0.5rem;
+                color: #495057;
+                font-size: 0.9rem;
+            }
+            
+            .btn-primary {
+                background-color: #6777ef;
+                border-color: #6777ef;
+                padding: 0.6rem 1.5rem;
+                border-radius: 6px;
+                font-weight: 500;
+                transition: all 0.3s;
+            }
+            
+            .btn-primary:hover {
+                background-color: #5166ea;
+                border-color: #5166ea;
+                transform: translateY(-2px);
+            }
+            
+            .btn-secondary {
+                padding: 0.6rem 1.5rem;
+                border-radius: 6px;
+                font-weight: 500;
+                transition: all 0.3s;
+            }
+            
+            .btn-secondary:hover {
+                transform: translateY(-2px);
+            }
+            
+            .form-section {
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .form-section h5 {
+                color: #6777ef;
+                font-weight: 600;
+                margin-bottom: 1rem;
+            }
+            
+            .form-actions {
+                background-color: #f8f9fa;
+                padding: 1.5rem;
+                border-top: 1px solid #eee;
+                border-radius: 0 0 12px 12px;
+                display: flex;
+                justify-content: space-between;
+            }
+            
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+            
+            .card {
+                overflow: hidden;
+            }
+            
+            .error-message {
+                color: #dc3545;
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+            }
+            
+            .is-invalid {
+                border-color: #dc3545 !important;
+            }
+            
+            .is-invalid:focus {
+                box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+            }
+        </style>
+    {% endblock %}
+</head>
 
-			.form-guide-card .card-header {
-				background: linear-gradient(135deg, #6777ef 0%, #6777ef 100%);
-				color: white;
-				border-bottom: none;
-				padding: 1.5rem 2rem;
-				border-radius: 12px 12px 0 0 !important;
-			}
+<body>
+<div class="wrapper">
+    <!-- Sidebar -->
+    <!-- ... -->
 
-			.form-guide-card .card-header h4 {
-				font-weight: 600;
-				margin-bottom: 0;
-			}
+    <div class="main-panel">
+        <!-- Header -->
+        <!-- ... -->
 
-			.form-guide-card .card-body {
-				padding: 2.5rem;
-				background-color: #f8f9fa;
-			}
+        <div class="content">
+            <div class="page-inner">
+                <div class="page-header">
+                    <h4 class="page-title">Add a Guide</h4>
+                    <ul class="breadcrumbs">
+                        <li class="nav-home">
+                            <a href="{{ path('app_accueil_admin') }}">
+                                <i class="flaticon-home"></i>
+                            </a>
+                        </li>
+                        <li class="separator">
+                            <i class="flaticon-right-arrow"></i>
+                        </li>
+                    </ul>
+                </div>
 
-			.form-control {
-				border-radius: 6px;
-				border: 1px solid #e0e0e0;
-				height: calc(1.5em + 1.1rem + 2px);
-				padding: 0.6rem 1.2rem;
-				transition: all 0.3s;
-				background-color: #fff;
-				margin-bottom: 0.5rem;
-			}
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="card form-guide-card">
+                            <div class="card-header">
+                                <h4 class="card-title"><i class="fas fa-user-plus mr-2"></i>Add a new guide</h4>
+                            </div>
+                            <div class="card-body">
+                                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-user-circle mr-2"></i> Personal informations</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.name, "First Name", {'label_attr': {'class': 'form-label'}}) }}
+                                                    {{ form_widget(form.name, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Guide\'s first name'
+                                                        }
+                                                    }) }}
+                                                    <div class="error-message">{{ form_errors(form.name) }}</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.lastName, "Last Name", {'label_attr': {'class': 'form-label'}}) }}
+                                                    {{ form_widget(form.lastName, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Guide\'s last name'
+                                                        }
+                                                    }) }}
+                                                    <div class="error-message">{{ form_errors(form.lastName) }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-address-card mr-2"></i> Contact details</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.email, "Email", {'label_attr': {'class': 'form-label'}}) }}
+                                                    {{ form_widget(form.email, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Email of the guide'
+                                                        }
+                                                    }) }}
+                                                    <div class="error-message">{{ form_errors(form.email) }}</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.phoneNum, "Phone Number", {'label_attr': {'class': 'form-label'}}) }}
+                                                    {{ form_widget(form.phoneNum, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Phone number'
+                                                        }
+                                                    }) }}
+                                                    <div class="error-message">{{ form_errors(form.phoneNum) }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-section">
+                                        <h5><i class="fas fa-globe mr-2"></i> Professional information</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.language, "Language", {'label_attr': {'class': 'form-label'}}) }}
+                                                    {{ form_widget(form.language, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Languages spoken'
+                                                        }
+                                                    }) }}
+                                                    <div class="error-message">{{ form_errors(form.language) }}</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.experience, "Experience", {'label_attr': {'class': 'form-label'}}) }}
+                                                    {{ form_widget(form.experience, {
+                                                        'attr': {
+                                                            'class': 'form-control',
+                                                            'placeholder': 'Years of experience'
+                                                        }
+                                                    }) }}
+                                                    <div class="error-message">{{ form_errors(form.experience) }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-			.form-control:focus {
-				border-color: #6777ef;
-				box-shadow: 0 0 0 0.2rem rgba(103, 119, 239, 0.25);
-			}
+                                    <div class="form-actions">
+                                        <a href="{{ path('app_guides_read') }}" class="btn btn-secondary">
+                                            <i class="fas fa-arrow-left mr-2"></i> Back to list
+                                        </a>
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fas fa-save mr-2"></i> Save guide
+                                        </button>
+                                    </div>
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-			.form-group label {
-				font-weight: 500;
-				margin-bottom: 0.5rem;
-				color: #495057;
-				font-size: 0.9rem;
-			}
+{% block js2 %}
+    <!-- Core JS Files -->
+    <script src="{{ asset('js2/core/jquery-3.7.1.min.js') }}"></script>
+    <script src="{{ asset('js2/core/popper.min.js') }}"></script>
+    <script src="{{ asset('js2/core/bootstrap.min.js') }}"></script>
 
-			.btn-primary {
-				background-color: #6777ef;
-				border-color: #6777ef;
-				padding: 0.6rem 1.5rem;
-				border-radius: 6px;
-				font-weight: 500;
-				transition: all 0.3s;
-			}
+    <!-- Script pour la gestion des erreurs -->
+    <script>
+        $(document).ready(function() {
+            // Ajoute la classe is-invalid aux champs qui ont des erreurs
+            $('.form-control').each(function() {
+                if ($(this).next('.error-message').text().trim() !== '') {
+                    $(this).addClass('is-invalid');
+                }
+            });
 
-			.btn-primary:hover {
-				background-color: #5166ea;
-				border-color: #5166ea;
-				transform: translateY(-2px);
-			}
-
-			.btn-secondary {
-				padding: 0.6rem 1.5rem;
-				border-radius: 6px;
-				font-weight: 500;
-				transition: all 0.3s;
-			}
-
-			.btn-secondary:hover {
-				transform: translateY(-2px);
-			}
-
-			.form-section {
-				margin-bottom: 1.5rem;
-				padding-bottom: 1rem;
-				border-bottom: 1px solid #eee;
-			}
-
-			.form-section h5 {
-				color: #6777ef;
-				font-weight: 600;
-				margin-bottom: 1rem;
-			}
-
-			.form-actions {
-				background-color: #f8f9fa;
-				padding: 1.5rem;
-				border-top: 1px solid #eee;
-				border-radius: 0 0 12px 12px;
-				display: flex;
-				justify-content: space-between;
-			}
-
-			.form-group {
-				margin-bottom: 1.5rem;
-			}
-
-			.card {
-				overflow: hidden;
-			}
-
-			.error-message {
-				color: #dc3545;
-				font-size: 0.875rem;
-				margin-top: 0.25rem;
-			}
-
-			.is-invalid {
-				border-color: #dc3545 !important;
-			}
-
-			.is-invalid:focus {
-				box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-			}
-		</style>
-		{% endblock %}
-	</head>
-
-	<body>
-		<div class="wrapper">
-			<!-- Sidebar -->
-			<!-- ... -->
-
-			<div class="main-panel">
-				<!-- Header -->
-				<!-- ... -->
-
-				<div class="content">
-					<div class="page-inner">
-						<div class="page-header">
-							<h4 class="page-title">Add a Guide</h4>
-							<ul class="breadcrumbs">
-								<li class="nav-home">
-									<a href="{{ path('app_accueil_admin') }}">
-										<i class="flaticon-home"></i>
-									</a>
-								</li>
-								<li class="separator">
-									<i class="flaticon-right-arrow"></i>
-								</li>
-							</ul>
-						</div>
-
-						<div class="row">
-							<div class="col-md-10">
-								<div class="card form-guide-card">
-									<div class="card-header">
-										<h4 class="card-title"><i class="fas fa-user-plus mr-2"></i>Add a new guide</h4>
-									</div>
-									<div class="card-body">
-										{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-										<div class="form-section">
-											<h5><i class="fas fa-user-circle mr-2"></i> Personal informations</h5>
-											<div class="row">
-												<div class="col-md-6">
-													<div class="form-group">
-														{{ form_label(form.name, "First Name", {'label_attr': {'class': 'form-label'}}) }} {{
-														form_widget(form.name, { 'attr': { 'class': 'form-control', 'placeholder': 'Guide\'s first
-														name' } }) }}
-														<div class="error-message">{{ form_errors(form.name) }}</div>
-													</div>
-												</div>
-
-												<div class="col-md-6">
-													<div class="form-group">
-														{{ form_label(form.lastName, "Last Name", {'label_attr': {'class': 'form-label'}}) }} {{
-														form_widget(form.lastName, { 'attr': { 'class': 'form-control', 'placeholder': 'Guide\'s
-														last name' } }) }}
-														<div class="error-message">{{ form_errors(form.lastName) }}</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="form-section">
-											<h5><i class="fas fa-address-card mr-2"></i> Contact details</h5>
-											<div class="row">
-												<div class="col-md-6">
-													<div class="form-group">
-														{{ form_label(form.email, "Email", {'label_attr': {'class': 'form-label'}}) }} {{
-														form_widget(form.email, { 'attr': { 'class': 'form-control', 'placeholder': 'Email of the
-														guide' } }) }}
-														<div class="error-message">{{ form_errors(form.email) }}</div>
-													</div>
-												</div>
-
-												<div class="col-md-6">
-													<div class="form-group">
-														{{ form_label(form.phoneNum, "Phone Number", {'label_attr': {'class': 'form-label'}}) }} {{
-														form_widget(form.phoneNum, { 'attr': { 'class': 'form-control', 'placeholder': 'Phone
-														number' } }) }}
-														<div class="error-message">{{ form_errors(form.phoneNum) }}</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="form-section">
-											<h5><i class="fas fa-globe mr-2"></i> Professional information</h5>
-											<div class="row">
-												<div class="col-md-6">
-													<div class="form-group">
-														{{ form_label(form.language, "Language", {'label_attr': {'class': 'form-label'}}) }} {{
-														form_widget(form.language, { 'attr': { 'class': 'form-control', 'placeholder': 'Languages
-														spoken' } }) }}
-														<div class="error-message">{{ form_errors(form.language) }}</div>
-													</div>
-												</div>
-
-												<div class="col-md-6">
-													<div class="form-group">
-														{{ form_label(form.experience, "Experience", {'label_attr': {'class': 'form-label'}}) }} {{
-														form_widget(form.experience, { 'attr': { 'class': 'form-control', 'placeholder': 'Years of
-														experience' } }) }}
-														<div class="error-message">{{ form_errors(form.experience) }}</div>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="form-actions">
-											<a href="{{ path('app_guides_read') }}" class="btn btn-secondary">
-												<i class="fas fa-arrow-left mr-2"></i> Back to list
-											</a>
-											<button class="btn btn-primary" type="submit"><i class="fas fa-save mr-2"></i> Save guide</button>
-										</div>
-										{{ form_end(form) }}
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		{% block js2 %}
-		<!-- Core JS Files -->
-		<script src="{{ asset('js2/core/jquery-3.7.1.min.js') }}"></script>
-		<script src="{{ asset('js2/core/popper.min.js') }}"></script>
-		<script src="{{ asset('js2/core/bootstrap.min.js') }}"></script>
-
-		<!-- Script pour la gestion des erreurs -->
-		<script>
-			$(document).ready(function () {
-				// Ajoute la classe is-invalid aux champs qui ont des erreurs
-				$(".form-control").each(function () {
-					if ($(this).next(".error-message").text().trim() !== "") {
-						$(this).addClass("is-invalid");
-					}
-				});
-
-				// Gestion dynamique des erreurs lors de la saisie
-				$(".form-control").on("input", function () {
-					if ($(this).val().trim() !== "") {
-						$(this).removeClass("is-invalid");
-						$(this).next(".error-message").text("");
-					}
-				});
-			});
-		</script>
-		{% endblock %}
-	</body>
+            // Gestion dynamique des erreurs lors de la saisie
+            $('.form-control').on('input', function() {
+                if ($(this).val().trim() !== '') {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.error-message').text('');
+                }
+            });
+        });
+    </script>
+{% endblock %}
+</body>
 </html>

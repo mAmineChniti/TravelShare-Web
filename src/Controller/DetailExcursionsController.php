@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Excursions;
 use App\Repository\ExcursionsRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class DetailExcursionsController extends AbstractController
 {
@@ -13,7 +14,7 @@ class DetailExcursionsController extends AbstractController
     public function show(int $id, ExcursionsRepository $excursionsRepository): Response
     {
         $excursion = $excursionsRepository->find($id);
-
+        
         if (!$excursion) {
             throw $this->createNotFoundException('Excursion not found');
         }
