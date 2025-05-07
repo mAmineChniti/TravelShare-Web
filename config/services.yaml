@@ -42,3 +42,14 @@ services:
     App\EventSubscriber\CalendarSubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
+
+
+    # Remplacez la configuration de SessionInterface par :
+    Symfony\Component\HttpFoundation\Session\SessionInterface:
+        factory: [ '@request_stack', 'getSession' ]
+        public: true
+
+    App\Service\OpenAIProfanityFilter:
+        arguments:
+            $apiKey: '%env(OPENAI_API_KEY)%'
+            $model: 'text-moderation-latest'  # Modèle spécialisé pour la modération

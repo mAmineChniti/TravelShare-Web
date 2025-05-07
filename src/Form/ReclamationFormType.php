@@ -4,13 +4,13 @@ namespace App\Form;
 
 use App\Entity\Reclamations;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Length;
 
 class ReclamationFormType extends AbstractType
 {
@@ -21,7 +21,7 @@ class ReclamationFormType extends AbstractType
                 'label' => 'Complaint subject',
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Enter your complaint subject',
+                    'placeholder' => 'Enter your complaint subject'
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -31,7 +31,7 @@ class ReclamationFormType extends AbstractType
                         'min' => 5,
                         'minMessage' => 'Subject must be at least {{ limit }} characters',
                         'max' => 100,
-                        'maxMessage' => 'Subject cannot be longer than {{ limit }} characters',
+                        'maxMessage' => 'Subject cannot be longer than {{ limit }} characters'
                     ]),
                 ],
             ])
@@ -40,7 +40,7 @@ class ReclamationFormType extends AbstractType
                 'attr' => [
                     'class' => 'form-control',
                     'rows' => 8,
-                    'placeholder' => 'Describe your complaint in detail...',
+                    'placeholder' => 'Describe your complaint in detail...'
                 ],
                 'constraints' => [
                     new NotBlank([

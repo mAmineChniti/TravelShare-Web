@@ -2,11 +2,9 @@
 
 namespace App\Entity;
 
+use App\Repository\ReclamationsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\ReclamationsRepository;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'reclamations')]
@@ -14,19 +12,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: ReclamationsRepository::class)]
 class Reclamations
 {
-    #[ORM\Column(name: 'reclamation_id')]
+    #[ORM\Column(name: "reclamation_id")]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\GeneratedValue(strategy: "IDENTITY")]
     private ?int $reclamationId = null;
 
-    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'reclamations')]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: "reclamations")]
+    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "user_id", nullable: false, onDelete: "CASCADE")]
     private ?Users $user = null;
 
-    #[ORM\Column(name: 'user_id')]
+    #[ORM\Column(name: "user_id")]
     private ?int $userId = null;
 
-    #[ORM\Column(name: 'title', length: 50)]
+    #[ORM\Column(name: "title", length: 50)]
     #[Assert\NotBlank(message: 'Please enter a subject for your complaint')]
     #[Assert\Length(
         min: 5,
@@ -36,7 +34,7 @@ class Reclamations
     )]
     private ?string $title = null;
 
-    #[ORM\Column(name: 'description', length: 255)]
+    #[ORM\Column(name: "description", length: 255)]
     #[Assert\NotBlank(message: 'Please enter a description')]
     #[Assert\Length(
         min: 10,
@@ -46,21 +44,12 @@ class Reclamations
     )]
     private ?string $description = null;
 
-    #[ORM\Column(name: 'date_reclamation', type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: "date_reclamation", type: Types::DATE_MUTABLE)]
     #[Assert\NotBlank(message: 'Please select a date')]
     private ?\DateTimeInterface $dateReclamation = null;
 
-    #[ORM\Column(name: 'etat', length: 20, nullable: true, options: ['default' => 'en cours'])]
+    #[ORM\Column(name: "etat", length: 20, nullable: true, options: ["default" => 'en cours'])]
     private ?string $etat = 'en cours';
-
-    #[ORM\OneToMany(mappedBy: 'reclamation', targetEntity: Reponses::class, orphanRemoval: true)]
-    private Collection $reponses;
-
-    public function __construct()
-    {
-        $this->reponses = new ArrayCollection();
-        $this->dateReclamation = new \DateTime();
-    }
 
     public function getReclamationId(): ?int
     {
@@ -149,18 +138,6 @@ class Reclamations
         if (!$this->reponses->contains($reponse)) {
             $this->reponses->add($reponse);
             $reponse->setReclamation($this);
-        }
-
-        return $this;
-    }
-
-    public function removeReponse(Reponses $reponse): static
-    {
-        if ($this->reponses->removeElement($reponse)) {
-            // set the owning side to null (unless already changed)
-            if ($reponse->getReclamation() === $this) {
-                $reponse->setReclamation(null);
-            }
         }
 
         return $this;

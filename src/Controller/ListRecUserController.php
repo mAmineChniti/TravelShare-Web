@@ -2,14 +2,15 @@
 
 namespace App\Controller;
 
-use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Reclamations;
 use App\Repository\ReclamationsRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 final class ListRecUserController extends AbstractController
 {
@@ -30,14 +31,13 @@ final class ListRecUserController extends AbstractController
         int $id,
         Request $request,
         ReclamationsRepository $reclamationsRepository,
-        EntityManagerInterface $entityManager,
+        EntityManagerInterface $entityManager
     ): Response {
         $reclamation = $reclamationsRepository->find($id);
         $user = $this->getUser();
 
         if (!$reclamation || $reclamation->getUser() !== $user) {
             $this->addFlash('error', 'Réclamation introuvable ou accès refusé.');
-
             return $this->redirectToRoute('app_list_rec_user');
         }
 
@@ -45,7 +45,6 @@ final class ListRecUserController extends AbstractController
         $token = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('edit_reclamation', $token)) {
             $this->addFlash('error', 'Token CSRF invalide.');
-
             return $this->redirectToRoute('app_list_rec_user');
         }
 
@@ -54,9 +53,10 @@ final class ListRecUserController extends AbstractController
         $entityManager->flush();
 
         $this->addFlash('success', 'Réclamation mise à jour avec succès.');
-
         return $this->redirectToRoute('app_list_rec_user');
     }
+
+
 
     #[Route('/reclamation/delete/{id}', name: 'app_delete_rec', methods: ['POST'])]
     public function deleteReclamation(
@@ -64,21 +64,19 @@ final class ListRecUserController extends AbstractController
         int $id,
         ReclamationsRepository $reclamationsRepository,
         EntityManagerInterface $entityManager,
-        CsrfTokenManagerInterface $csrfTokenManager,
+        CsrfTokenManagerInterface $csrfTokenManager
     ): Response {
         $user = $this->getUser();
         $reclamation = $reclamationsRepository->find($id);
 
         if (!$reclamation || $reclamation->getUser() !== $user) {
             $this->addFlash('error', 'Réclamation introuvable ou accès refusé.');
-
             return $this->redirectToRoute('app_list_rec_user');
         }
 
         $submittedToken = $request->request->get('_token');
-        if (!$csrfTokenManager->isTokenValid(new CsrfToken('delete'.$reclamation->getReclamationId(), $submittedToken))) {
+        if (!$csrfTokenManager->isTokenValid(new CsrfToken('delete' . $reclamation->getReclamationId(), $submittedToken))) {
             $this->addFlash('error', 'Jeton CSRF invalide.');
-
             return $this->redirectToRoute('app_list_rec_user');
         }
 
@@ -86,7 +84,7 @@ final class ListRecUserController extends AbstractController
         $entityManager->flush();
 
         $this->addFlash('success', 'Réclamation supprimée avec succès.');
-
         return $this->redirectToRoute('app_list_rec_user');
     }
+
 }

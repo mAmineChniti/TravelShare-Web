@@ -2,13 +2,13 @@
 
 namespace App\Security;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Security;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Security;
 
 class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
@@ -25,7 +25,7 @@ class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler
     {
         $user = $token->getUser();
 
-        if (1 == $user->getRole()) {
+        if ($user->getRole() == 1) {
             return new RedirectResponse($this->router->generate('app_accueil_admin'));
         }
 

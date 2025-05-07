@@ -48,6 +48,7 @@ security:
         # - { path: ^/login, roles: PUBLIC_ACCESS }
         # - { path: ^/register, roles: PUBLIC_ACCESS }
         # - { path: ^/$, roles: PUBLIC_ACCESS }
+        - { path: ^/home, roles: ROLE_USER }
         
         # User routes - requires authenticated user
         # - { path: ^/home, roles: ROLE_USER }
