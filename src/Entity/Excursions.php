@@ -5,16 +5,17 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ExcursionsRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'excursions')]
-#[ORM\Index(name: 'fk_id_guide', columns: ['guide_id'])]
 #[ORM\Entity(repositoryClass: ExcursionsRepository::class)]
 class Excursions
 {
-    #[ORM\Column(name: 'excursion_id')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'excursion_id')]
     private ?int $excursionId = null;
 
     #[ORM\ManyToOne(targetEntity: Guides::class, inversedBy: 'excursions')]
@@ -25,30 +26,38 @@ class Excursions
     private ?int $guideId = null;
 
     #[ORM\Column(name: 'title', length: 50)]
-    #[Assert\NotBlank(message: "Le titre de l'excursion est requis.")]
-    #[Assert\Length(max: 50, maxMessage: 'Le titre ne peut pas dépasser 50 caractères.')]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 50)]
     private ?string $title = null;
 
     #[ORM\Column(name: 'description', length: 255)]
-    #[Assert\NotBlank(message: "La description de l'excursion est requise.")]
-    #[Assert\Length(max: 255, maxMessage: 'La description ne peut pas dépasser 255 caractères.')]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 255)]
     private ?string $description = null;
 
     #[ORM\Column(name: 'date_excursion', type: Types::DATE_MUTABLE)]
-    #[Assert\NotBlank(message: "La date de l'excursion est requise.")]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $dateExcursion = null;
 
     #[ORM\Column(name: 'date_fin', type: Types::DATE_MUTABLE)]
-    #[Assert\NotBlank(message: 'La date de fin est requise.')]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $dateFin = null;
 
     #[ORM\Column(name: 'image', type: 'string', length: 255, nullable: true)]
     private ?string $image = null;
 
     #[ORM\Column(name: 'prix')]
-    #[Assert\NotBlank(message: 'Le prix est requis.')]
-    #[Assert\Positive(message: 'Le prix doit être un nombre positif.')]
+    #[Assert\NotBlank]
+    #[Assert\Positive]
     private ?float $prix = null;
+
+    #[ORM\OneToMany(targetEntity: ListeFavoris::class, mappedBy: 'excursion')]
+    private Collection $favoris;
+
+    public function __construct()
+    {
+        $this->favoris = new ArrayCollection();
+    }
 
     public function getExcursionId(): ?int
     {
@@ -137,5 +146,22 @@ class Excursions
         $this->prix = $prix;
 
         return $this;
+    }
+
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function isPast(): bool
+    {
+        $now = new \DateTime('today');
+
+        return $this->dateExcursion < $now;
+    }
+
+    public function getFavoris(): Collection
+    {
+        return $this->favoris;
     }
 }
