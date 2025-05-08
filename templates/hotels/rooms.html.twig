@@ -1,57 +1,49 @@
 {% extends 'base.html.twig' %} {% block title %}Available Rooms{% endblock %} {% block body %}
-<div class="container mx-auto px-4 mt-8 space-y-6">
-	{% if unsplashImages is defined and unsplashImages|length > 0 %}
-	<h2 class="text-3xl font-semibold mb-4 text-gray-900 dark:text-white">Photos of {{ hotel.nom }}</h2>
-	<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-		{% for url in unsplashImages %}
-		<div class="overflow-hidden rounded-lg shadow dark:shadow-gray-700">
-			<img src="{{ url }}" alt="Photo of {{ hotel.nom }}" class="object-cover w-full h-48" />
-		</div>
-		{% endfor %}
-	</div>
-	{% else %}
-	<p class="text-gray-600 dark:text-gray-400 mb-8">No photos found for this hotel.</p>
-	{% endif %} {% set availableRooms = rooms|filter(r => r.disponible != 0) %} {% if availableRooms is empty %}
-	<div class="text-center text-gray-700 dark:text-gray-300">No rooms available at the moment.</div>
-	{% else %}
-	<h1 class="text-5xl font-bold mb-6 text-gray-900 dark:text-white">Available Rooms at {{ hotel.nom }}</h1>
-	<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-		{% for room in availableRooms %}
-		<div
-			class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700 hover:scale-105 hover:shadow-xl hover:border-blue-500 hover:-translate-y-1 hover:bg-blue-50 dark:hover:bg-gray-700 group transition-transform duration-300"
-		>
-			<div class="p-5">
-				<h5
-					class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-transform duration-300"
-				>
-					<i class="fas fa-door-open mr-2 text-blue-600 dark:text-blue-500 group-hover:animate-pulse"></i>Room {{
-					room.numeroChambre }}
-				</h5>
-				<div class="mb-3 space-y-2">
-					<p class="font-normal text-gray-700 dark:text-gray-400">
-						<i
-							class="fas fa-bed mr-2 text-purple-600 dark:text-purple-500 transition-transform duration-300 group-hover:scale-110"
-						></i
-						><span class="font-medium">Type:</span> {{ room.typeEnu|capitalize }}
-					</p>
-					<p class="font-normal text-gray-700 dark:text-gray-400">
-						<i
-							class="fas fa-money-bill-wave mr-2 text-green-600 dark:text-green-500 transition-transform duration-300 group-hover:scale-110"
-						></i
-						><span class="font-medium">Price:</span> {{ room.prixParNuit }} TND / night
-					</p>
-				</div>
-				<a
-					href="{{ path('room_details', { roomId: room.chambreId }) }}"
-					class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 group-hover:shadow-md group-hover:translate-x-1 transition-transform duration-300"
-				>
-					View details
-					<i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform duration-300"></i>
-				</a>
-			</div>
-		</div>
-		{% endfor %}
-	</div>
-	{% endif %}
+<div class="container my-5">
+    {% if unsplashImages is defined and unsplashImages|length > 0 %}
+    <h2 class="fs-3 fw-semibold mb-4 text-dark">Photos of {{ hotel.nom }}</h2>
+    <div class="row row-cols-2 row-cols-md-4 g-4 mb-4">
+        {% for url in unsplashImages %}
+        <div class="col">
+            <div class="card shadow-sm">
+                <img src="{{ url }}" alt="Photo of {{ hotel.nom }}" class="card-img-top" />
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-secondary mb-4">No photos found for this hotel.</p>
+    {% endif %}
+
+    {% set availableRooms = rooms|filter(r => r.disponible != 0) %}
+    {% if availableRooms is empty %}
+    <div class="text-center text-secondary">No rooms available at the moment.</div>
+    {% else %}
+    <h1 class="display-5 fw-bold mb-4 text-dark">Available Rooms at {{ hotel.nom }}</h1>
+    <div class="row g-4">
+        {% for room in availableRooms %}
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm transition-transform hover-scale">
+                <div class="card-body">
+                    <h5 class="card-title fs-4 fw-bold text-dark text-primary">
+                        <i class="fas fa-door-open text-primary me-2"></i>Room {{ room.numeroChambre }}
+                    </h5>
+                    <ul class="list-unstyled mb-3">
+                        <li class="mb-2">
+                            <i class="fas fa-bed text-success me-2"></i><strong>Type:</strong> {{ room.typeEnu|capitalize }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-money-bill-wave text-info me-2"></i><strong>Price:</strong> {{ room.prixParNuit }} TND / night
+                        </li>
+                    </ul>
+                    <a href="{{ path('room_details', { roomId: room.chambreId }) }}" class="btn btn-primary">
+                        View details <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Users;
 
 class ReservationHotelController extends AbstractController
 {
@@ -32,6 +33,11 @@ class ReservationHotelController extends AbstractController
         ChambresRepository $chambresRepository,
         ReservationHotelRepository $reservationHotelRepository,
     ): Response {
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            return $this->redirectToRoute('app_login');
+        }
+        $userId = $user->getUserId();
         $room = $chambresRepository->find($roomId);
         if (!$room) {
             return new JsonResponse(['error' => 'Room not found'], Response::HTTP_NOT_FOUND);
@@ -64,11 +70,11 @@ class ReservationHotelController extends AbstractController
         try {
             $duration = $end->diff($start)->days;
             $reservation = new ReservationHotel();
-            $reservation->setClientId(1);
+            $reservation->setClientId($userId);
             $reservation->setChambreId($roomId);
             $reservation->setDateDebut($start);
             $reservation->setDateFin($end);
-            $reservation->setStatusEnu('');
+            $reservation->setStatusEnu(''); // here
             $reservation->setPrixTotale($room->getPrixParNuit() * $duration);
 
             $reservationHotelRepository->add($reservation);
@@ -116,7 +122,7 @@ class ReservationHotelController extends AbstractController
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port = 587;
                 $mail->setFrom('voyagepidev@gmail.com', 'TRAVELSHARE');
-                $mail->addAddress('bouhrem4@gmail.com');
+                $mail->addAddress($user->getEmail());
                 $mail->isHTML(true);
                 $mail->Subject = 'Room Reservation Confirmation';
                 $mail->Body = '

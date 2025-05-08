@@ -50,15 +50,11 @@
 							<i class="fas fa-calendar-alt text-primary"></i>
 						</span>
 						<input
-							type="text"
+							type="date"
 							id="startReservation"
 							name="startReservation"
 							class="form-control"
-							placeholder="Start date"
-							data-date-format="mm/dd/yyyy"
-							data-date-container="#date-range-picker"
-							data-provide="datepicker"
-							readonly
+							min="{{ "now"|date("Y-m-d") }}"
 						/>
 					</div>
 				</div>
@@ -71,15 +67,11 @@
 							<i class="fas fa-calendar-alt text-primary"></i>
 						</span>
 						<input
-							type="text"
+							type="date"
 							id="endReservation"
 							name="endReservation"
 							class="form-control"
-							placeholder="End date"
-							data-date-format="mm/dd/yyyy"
-							data-date-container="#date-range-picker"
-							data-provide="datepicker"
-							readonly
+							min="{{ "now"|date("Y-m-d") }}"
 						/>
 					</div>
 				</div>
@@ -245,27 +237,9 @@
 	};
 
 	document.addEventListener("DOMContentLoaded", function () {
-		// Initialize datepickers with Bootstrap
-		$("#startReservation").datepicker({
-			autoclose: true,
-			todayHighlight: true,
-			startDate: new Date(),
-		});
-
-		$("#endReservation").datepicker({
-			autoclose: true,
-			todayHighlight: true,
-			startDate: new Date(),
-		});
-
-		// When start date changes, update end date minimum
-		$("#startReservation").on("changeDate", function (e) {
-			$("#endReservation").datepicker("setStartDate", e.date);
-		});
-
-		// Clear initial values
-		document.getElementById("startReservation").value = "";
-		document.getElementById("endReservation").value = "";
+			// Clear initial values
+			document.getElementById("startReservation").value = "";
+			document.getElementById("endReservation").value = "";
 	});
 </script>
 

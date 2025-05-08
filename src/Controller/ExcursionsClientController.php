@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\ExcursionsRepository;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -10,12 +11,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ExcursionsClientController extends AbstractController
 {
     #[Route('/excursions/client', name: 'app_excursions_client')]
-    public function index(ExcursionsRepository $excursionsRepository): Response
+    public function index(Request $request, ExcursionsRepository $excursionsRepository): Response
     {
-        $excursions = $excursionsRepository->findAllWithGuides();
+        $searchTitle = $request->query->get('title');
+        $maxPrice = $request->query->get('max_price');
+
+        $excursions = $excursionsRepository->findByCriteria([
+            'title' => $searchTitle,
+            'max_price' => $maxPrice,
+        ]);
 
         return $this->render('excursions_client/index.html.twig', [
             'excursions' => $excursions,
+            'searchTitle' => $searchTitle,
+            'maxPrice' => $maxPrice,
         ]);
     }
 

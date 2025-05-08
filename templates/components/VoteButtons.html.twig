@@ -1,5 +1,6 @@
 <div id="voteButtonsContainer-{{ postId }}" class="d-flex gap-2">
 	<form hx-post="{{ path('app_forum_upvote') }}" hx-target="#voteButtonsContainer-{{ postId }}" hx-swap="outerHTML">
+		<input type="hidden" name="userId" value="{{ app.user.userId }}" />
 		<input type="hidden" name="postId" value="{{ postId }}" />
 		<button
 			type="submit"
@@ -10,6 +11,7 @@
 		</button>
 	</form>
 	<form hx-post="{{ path('app_forum_downvote') }}" hx-target="#voteButtonsContainer-{{ postId }}" hx-swap="outerHTML">
+		<input type="hidden" name="userId" value="{{ app.user.userId }}" />
 		<input type="hidden" name="postId" value="{{ postId }}" />
 		<button
 			type="submit"

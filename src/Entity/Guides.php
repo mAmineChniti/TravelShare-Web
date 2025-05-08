@@ -7,9 +7,11 @@ use App\Repository\GuidesRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Table(name: 'guides')]
 #[ORM\Entity(repositoryClass: GuidesRepository::class)]
+#[UniqueEntity(fields: ['email'], message: 'Un guide avec cette adresse email existe déjà.')]
 class Guides
 {
     #[ORM\OneToMany(mappedBy: 'guide', targetEntity: Excursions::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -35,7 +37,7 @@ class Guides
     #[Assert\Length(max: 50, maxMessage: 'Le nom de famille ne peut pas dépasser 50 caractères.')]
     private ?string $lastName = null;
 
-    #[ORM\Column(name: 'email', length: 50)]
+    #[ORM\Column(name: 'email', length: 50, unique: true)]
     #[Assert\NotBlank(message: "L'email ne peut pas être vide.")]
     #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide.")]
     #[Assert\Length(max: 50, maxMessage: "L'email ne peut pas dépasser 50 caractères.")]

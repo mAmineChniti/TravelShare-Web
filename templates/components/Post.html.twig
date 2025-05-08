@@ -3,6 +3,7 @@
 		<div class="d-flex justify-content-between align-items-center mb-3">
 			<span class="text-primary fw-medium text-truncate">{{ post.name ~ ' ' ~ post.lastName }}</span>
 			<div class="d-flex gap-2">
+				{% if app.user and (app.user.userId == post.ownerId or is_granted('ROLE_ADMIN')) %}
 				<button
 					id="editButton-{{ post.postId }}"
 					class="btn btn-outline-secondary btn-sm p-1"
@@ -17,13 +18,14 @@
 					hx-post="{{ path('app_forum_delete', {'id': post.postId}) }}"
 					hx-target="#post-{{ post.postId }}"
 					hx-swap="outerHTML"
-					onsubmit="return confirm('Are you sure you want to delete this post?');"
 					class="d-inline"
+					onsubmit="return confirm('Are you sure you want to delete this post?');"
 				>
 					<button type="submit" class="btn btn-danger btn-sm" title="Delete post">
 						<i class="fas fa-trash"></i>
 					</button>
 				</form>
+				{% endif %}
 				<twig:VoteButtons
 					postId="{{ post.postId }}"
 					isLiked="{{ post.isLiked }}"
@@ -45,7 +47,7 @@
 			style="display: none"
 			class="mb-3"
 			action="{{ path('app_forum_edit', {'id': post.postId}) }}"
-			onsubmit="return false;"
+			method="POST"
 		>
 			<div class="mb-3">
 				<input
@@ -72,9 +74,9 @@
 			<div class="d-flex justify-content-end">
 				<button
 					type="button"
-					onclick="ForumApp.submitEditPostIfValid(this.form, {{ post.postId }})"
 					class="btn btn-primary"
 					title="Save changes"
+					onclick="ForumApp.submitEditPostIfValid(this.form, {{ post.postId }})"
 				>
 					<i class="fas fa-save"></i>
 				</button>

@@ -1,5 +1,7 @@
 <?php
+
 // src/Service/NotificationService.php
+
 namespace App\Service;
 
 use App\Repository\ExcursionsRepository;
@@ -9,8 +11,9 @@ class NotificationService
 {
     public function __construct(
         private ExcursionsRepository $excursionsRepository,
-        private RequestStack $requestStack
-    ) {}
+        private RequestStack $requestStack,
+    ) {
+    }
 
     public function checkPastExcursions(): array
     {
@@ -38,7 +41,7 @@ class NotificationService
     {
         $pastExcursions = $this->checkPastExcursions();
 
-        return array_map(function($excursion) {
+        return array_map(function ($excursion) {
             return [
                 'type' => 'warning',
                 'icon' => 'exclamation-triangle',
@@ -46,7 +49,7 @@ class NotificationService
                     $excursion->getTitle(),
                     $excursion->getDateExcursion()->format('d/m/Y')
                 ),
-                'createdAt' => $excursion->getDateExcursion()
+                'createdAt' => $excursion->getDateExcursion(),
             ];
         }, $pastExcursions);
     }

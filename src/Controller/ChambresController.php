@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Users;
 
 class ChambresController extends AbstractController
 {
@@ -21,6 +22,13 @@ class ChambresController extends AbstractController
         HttpClientInterface $httpClient,
         int $id,
     ): Response {
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            return $this->redirectToRoute('app_login');
+        }
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_hotels');
+        }
         $hotel = $hotelsRepository->findOneBy(['hotelId' => $id]);
         if (!$hotel) {
             throw $this->createNotFoundException('Hotel not found');
@@ -53,6 +61,14 @@ class ChambresController extends AbstractController
     #[Route('/dashboard/rooms/add/{hotelId}', name: 'dashboard_rooms_add', methods: ['GET', 'POST'])]
     public function addRoom(Request $request, ChambresRepository $chambresRepository, HotelsRepository $hotelsRepository, ValidatorInterface $validator, int $hotelId): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            return $this->redirectToRoute('app_login');
+        }
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app');
+        }
+        
         $hotel = $hotelsRepository->find($hotelId);
         if (!$hotel) {
             $this->addFlash('error', 'Hotel not found.');
@@ -97,6 +113,13 @@ class ChambresController extends AbstractController
     #[Route('/dashboard/rooms/edit/{id}', name: 'dashboard_rooms_edit', methods: ['GET', 'POST'])]
     public function editRoom(int $id, Request $request, ChambresRepository $chambresRepository, ValidatorInterface $validator): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            return $this->redirectToRoute('app_login');
+        }
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_hotels');
+        }
         $room = $chambresRepository->find($id);
         if (!$room) {
             $this->addFlash('error', 'Room not found.');
@@ -137,6 +160,13 @@ class ChambresController extends AbstractController
     #[Route('/dashboard/rooms/delete/{id}', name: 'dashboard_rooms_delete', methods: ['POST'])]
     public function deleteRoom(int $id, ChambresRepository $chambresRepository): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            return $this->redirectToRoute('app_login');
+        }
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_hotels');
+        }
         $room = $chambresRepository->find($id);
         if (!$room) {
             $this->addFlash('error', 'Room not found.');

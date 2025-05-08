@@ -27,10 +27,18 @@ button:not(:disabled),
   background-color: #2b3035;
 }
 
-/* Fix for hover effects in dark mode */
 [data-bs-theme="dark"] .hover-scale:hover {
   transform: scale(1.05);
   box-shadow: 0 0.5rem 1rem rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Ensure text adapts to dark and light modes */
+[data-bs-theme="dark"] h2, [data-bs-theme="dark"] h1, [data-bs-theme="dark"] h5 {
+  color: #ffffff !important;
+}
+
+[data-bs-theme="light"] h2, [data-bs-theme="light"] h1, [data-bs-theme="light"] h5 {
+  color: #000000 !important;
 }
 
 /* Transition for theme switching */
