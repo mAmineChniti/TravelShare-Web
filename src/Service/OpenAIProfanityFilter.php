@@ -11,8 +11,9 @@ class OpenAIProfanityFilter
     public function __construct(
         private HttpClientInterface $client,
         private string $apiKey,
-        private string $model
-    ) {}
+        private string $model,
+    ) {
+    }
 
     public function containsProfanity(string $text): bool
     {
@@ -26,12 +27,13 @@ class OpenAIProfanityFilter
                 ],
                 'json' => [
                     'input' => $text,
-                    'model' => $this->model
-                ]
+                    'model' => $this->model,
+                ],
             ]
         );
 
         $data = $response->toArray();
+
         return $data['results'][0]['flagged'] ?? false;
     }
 }

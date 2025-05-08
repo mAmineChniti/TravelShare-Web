@@ -5,13 +5,11 @@ namespace App\Controller;
 use App\Entity\Users;
 use App\Form\UserProfileType;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 
 class ProfileAdminController extends AbstractController
 {
@@ -31,7 +29,7 @@ class ProfileAdminController extends AbstractController
 
         return $this->render('profile_admin/index.html.twig', [
             'user' => $user,
-            'imageData' => $imageData
+            'imageData' => $imageData,
         ]);
     }
 
@@ -39,7 +37,7 @@ class ProfileAdminController extends AbstractController
     public function updateAccount(
         Request $request,
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHasher,
     ): Response {
         $user = $this->getUser();
         if (!$user instanceof Users) {
@@ -64,6 +62,7 @@ class ProfileAdminController extends AbstractController
 
             if ($plainPassword && $plainPassword !== $confirmPassword) {
                 $this->addFlash('error', 'Passwords do not match.');
+
                 return $this->redirectToRoute('app_update_account');
             }
 
@@ -85,7 +84,7 @@ class ProfileAdminController extends AbstractController
 
             $entityManager->flush();
 
-            //$this->addFlash('success', 'Profile updated successfully.');
+            // $this->addFlash('success', 'Profile updated successfully.');
             return $this->redirectToRoute('app_profile');
         }
 
@@ -95,5 +94,4 @@ class ProfileAdminController extends AbstractController
             'imageData' => $imageData,
         ]);
     }
-
 }

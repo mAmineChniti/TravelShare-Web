@@ -3,16 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Reponses;
-use App\Entity\Users;
 use App\Entity\Notification;
 use App\Repository\ReponsesRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class ListRepAdminController extends AbstractController
 {
@@ -21,7 +19,7 @@ final class ListRepAdminController extends AbstractController
     {
         // Vérification que l'utilisateur est un admin
         $user = $this->getUser();
-        if ($user->getRole() !== 1) {
+        if (1 !== $user->getRole()) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à accéder à cette page.');
         }
 
@@ -46,7 +44,6 @@ final class ListRepAdminController extends AbstractController
         ]);
     }
 
-
     #[Route('/reponse/delete/{id}', name: 'reponse_delete', methods: ['GET'])]
     public function delete(Reponses $reponse, EntityManagerInterface $em): RedirectResponse
     {
@@ -54,16 +51,16 @@ final class ListRepAdminController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'Réponse supprimée avec succès.');
+
         return $this->redirectToRoute('app_list_rep_admin');
     }
-
 
     #[Route('/reponse/edit/{id}', name: 'reponse_edit', methods: ['POST'])]
     public function edit(Reponses $reponse, Request $request, EntityManagerInterface $em): Response
     {
         $contenu = $request->request->get('contenu');
 
-        if ($contenu !== null) {
+        if (null !== $contenu) {
             $reponse->setContenu($contenu);
             $em->flush();
 
@@ -74,6 +71,4 @@ final class ListRepAdminController extends AbstractController
 
         return $this->redirectToRoute('app_list_rep_admin');
     }
-
-
 }

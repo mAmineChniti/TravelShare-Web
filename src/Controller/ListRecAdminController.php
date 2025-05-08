@@ -2,16 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Reponses;
 use App\Entity\Notification;
-use App\Entity\Users;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ReclamationsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\ReclamationsRepository;
-use App\Entity\Reponses;
-
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class ListRecAdminController extends AbstractController
 {
@@ -20,7 +18,7 @@ final class ListRecAdminController extends AbstractController
     {
         // Vérification que l'utilisateur est un admin
         $user = $this->getUser();
-        if ($user->getRole() !== 1) {
+        if (1 !== $user->getRole()) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à accéder à cette page.');
         }
 
@@ -40,7 +38,6 @@ final class ListRecAdminController extends AbstractController
         ]);
     }
 
-
     #[Route('/reclamation/{id}/reponse', name: 'app_add_response', methods: ['POST'])]
     public function addResponse(int $id, Request $request, ReclamationsRepository $reclamationsRepository, EntityManagerInterface $em): Response
     {
@@ -53,6 +50,7 @@ final class ListRecAdminController extends AbstractController
 
         if (empty($message)) {
             $this->addFlash('error', 'Le message de réponse ne peut pas être vide.');
+
             return $this->redirectToRoute('app_list_rec_admin');
         }
 
@@ -72,9 +70,7 @@ final class ListRecAdminController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'Réponse envoyée avec succès !');
+
         return $this->redirectToRoute('app_list_rec_admin');
     }
-
 }
-
-

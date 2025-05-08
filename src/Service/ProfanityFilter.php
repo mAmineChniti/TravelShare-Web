@@ -12,7 +12,7 @@ class ProfanityFilter
         $this->profanityWords = $profanityWords ?: [
             'badword', 'insult', 'offensive',
             'fuck', 'shit', 'asshole',
-            'connard', 'salope', 'pute'
+            'connard', 'salope', 'pute',
         ];
     }
 
@@ -21,7 +21,7 @@ class ProfanityFilter
         $text = mb_strtolower($text);
 
         foreach ($this->profanityWords as $word) {
-            if (mb_strpos($text, mb_strtolower($word)) !== false) {
+            if (false !== mb_strpos($text, mb_strtolower($word))) {
                 return true;
             }
         }
@@ -42,6 +42,7 @@ class ProfanityFilter
                 $found[] = $word;
             }
         }
+
         return $found;
     }
 }

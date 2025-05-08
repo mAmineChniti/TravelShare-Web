@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
 use App\Entity\Hotels;
 use App\Repository\HotelsRepository;
 use App\Repository\ChambresRepository;
@@ -11,7 +12,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Entity\Users;
 
 class HotelsController extends AbstractController
 {
@@ -117,7 +117,7 @@ Hotel List:\n".implode("\n", $hotelSummaries);
         if (!$user instanceof Users) {
             return $this->redirectToRoute('app_login');
         }
-        if(!$this->isGranted('ROLE_ADMIN')) {
+        if (!$this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('app_hotels');
         }
         $hotels = $hotelsRepository->findAll();
@@ -141,7 +141,7 @@ Hotel List:\n".implode("\n", $hotelSummaries);
         if (!$user instanceof Users) {
             return $this->redirectToRoute('app_login');
         }
-        if(!$this->isGranted('ROLE_ADMIN')) {
+        if (!$this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('app_hotels');
         }
         $hotel = new Hotels();
@@ -196,7 +196,7 @@ Hotel List:\n".implode("\n", $hotelSummaries);
         if (!$user instanceof Users) {
             return $this->redirectToRoute('app_login');
         }
-        if(!$this->isGranted('ROLE_ADMIN')) {
+        if (!$this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('app_hotels');
         }
 

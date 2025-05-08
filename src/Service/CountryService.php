@@ -26,6 +26,7 @@ class CountryService
         }
 
         ksort($countries); // trie alphabétique
+
         return $countries;
     }
 }

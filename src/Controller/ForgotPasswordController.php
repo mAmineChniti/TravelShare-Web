@@ -3,15 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Users;
+use Psr\Log\LoggerInterface;
 use App\Service\MailerService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class ForgotPasswordController extends AbstractController
 {
@@ -26,7 +26,7 @@ class ForgotPasswordController extends AbstractController
         LoggerInterface $logger,
         SessionInterface $session,
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHasher,
     ) {
         $this->mailerService = $mailerService;
         $this->logger = $logger;
@@ -48,14 +48,14 @@ class ForgotPasswordController extends AbstractController
         if ($request->isMethod('POST')) {
             if ($request->request->has('send_code')) {
                 if (empty($email)) {
-                    $error = "Email address is required.";
+                    $error = 'Email address is required.';
                 } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    $error = "Please enter a valid email address.";
+                    $error = 'Please enter a valid email address.';
                 } else {
                     $user = $this->entityManager->getRepository(Users::class)->findOneBy(['email' => $email]);
 
                     if (!$user) {
-                        $error = "No account found with this email address.";
+                        $error = 'No account found with this email address.';
                     } else {
                         $resetCode = (string) random_int(100000, 999999);
                         $this->session->set('reset_code', $resetCode);
@@ -63,29 +63,29 @@ class ForgotPasswordController extends AbstractController
                         $this->session->set('reset_code_expires_at', time() + 300);
 
                         if ($this->mailerService->sendResetPasswordEmail($email, $resetCode)) {
-                            $success = "A verification code has been sent to your email address.";
+                            $success = 'A verification code has been sent to your email address.';
                             $showCodeFields = true;
                         } else {
-                            $error = "Failed to send verification email. Please try again later.";
+                            $error = 'Failed to send verification email. Please try again later.';
                         }
                     }
                 }
             }
             // Handle Verify Code request
             elseif ($request->request->has('verify_code')) {
-                $submittedCode = implode('', (array)$request->request->all('code'));
+                $submittedCode = implode('', (array) $request->request->all('code'));
                 $storedCode = $this->session->get('reset_code');
                 $expiresAt = $this->session->get('reset_code_expires_at');
 
                 if (time() > $expiresAt) {
-                    $error = "The code has expired. Please request a new one.";
+                    $error = 'The code has expired. Please request a new one.';
                     $this->session->remove('reset_code');
                     $this->session->remove('reset_code_expires_at');
-                } elseif (empty($submittedCode) || strlen($submittedCode) !== 6) {
-                    $error = "Please enter the complete 6-digit code.";
+                } elseif (empty($submittedCode) || 6 !== strlen($submittedCode)) {
+                    $error = 'Please enter the complete 6-digit code.';
                     $showCodeFields = true;
                 } elseif ($submittedCode !== $storedCode) {
-                    $error = "Invalid verification code. Please try again.";
+                    $error = 'Invalid verification code. Please try again.';
                     $showCodeFields = true;
                 } else {
                     $showPasswordField = true;
@@ -99,7 +99,7 @@ class ForgotPasswordController extends AbstractController
                 $email = $this->session->get('reset_email');
 
                 if (empty($newPassword)) {
-                    $error = "New password is required.";
+                    $error = 'New password is required.';
                     $showPasswordField = true;
                 } else {
                     $user = $this->entityManager->getRepository(Users::class)->findOneBy(['email' => $email]);
@@ -111,6 +111,7 @@ class ForgotPasswordController extends AbstractController
 
                         $this->session->clear();
                         $this->addFlash('success', 'Your password has been reset successfully.');
+
                         return $this->redirectToRoute('app_login');
                     }
                 }

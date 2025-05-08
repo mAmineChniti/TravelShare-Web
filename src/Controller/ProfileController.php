@@ -5,13 +5,12 @@ namespace App\Controller;
 use App\Entity\Users;
 use App\Form\UserProfileType;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-
 
 class ProfileController extends AbstractController
 {
@@ -31,7 +30,7 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/index.html.twig', [
             'user' => $user,
-            'imageData' => $imageData
+            'imageData' => $imageData,
         ]);
     }
 
@@ -39,7 +38,7 @@ class ProfileController extends AbstractController
     public function updateAccount(
         Request $request,
         EntityManagerInterface $entityManager,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHasher,
     ): Response {
         $user = $this->getUser();
         if (!$user instanceof Users) {
@@ -64,6 +63,7 @@ class ProfileController extends AbstractController
 
             if ($plainPassword && $plainPassword !== $confirmPassword) {
                 $this->addFlash('error', 'Passwords do not match.');
+
                 return $this->redirectToRoute('app_update_account');
             }
 
@@ -85,7 +85,7 @@ class ProfileController extends AbstractController
 
             $entityManager->flush();
 
-            //$this->addFlash('success', 'Profile updated successfully.');
+            // $this->addFlash('success', 'Profile updated successfully.');
             return $this->redirectToRoute('app_profile');
         }
 
@@ -96,12 +96,11 @@ class ProfileController extends AbstractController
         ]);
     }
 
-
     #[Route('/profile/delete', name: 'app_delete_account', methods: ['POST'])]
     public function deleteAccount(
         Request $request,
         EntityManagerInterface $entityManager,
-        TokenStorageInterface $tokenStorage
+        TokenStorageInterface $tokenStorage,
     ): Response {
         $user = $this->getUser();
         if (!$user instanceof Users) {
@@ -112,6 +111,7 @@ class ProfileController extends AbstractController
         $submittedToken = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('delete-account', $submittedToken)) {
             $this->addFlash('error', 'Invalid CSRF token');
+
             return $this->redirectToRoute('app_profile');
         }
 
@@ -124,10 +124,10 @@ class ProfileController extends AbstractController
             $entityManager->remove($user);
             $entityManager->flush();
 
-            //$this->addFlash('success', 'Your account has been deleted successfully');
+            // $this->addFlash('success', 'Your account has been deleted successfully');
             return $this->redirectToRoute('app_home');
         } catch (\Exception $e) {
-            //$this->addFlash('error', 'An error occurred while deleting your account');
+            // $this->addFlash('error', 'An error occurred while deleting your account');
             return $this->redirectToRoute('app_profile');
         }
     }

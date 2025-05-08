@@ -37,6 +37,7 @@ class NotificationService
 
         return $pastExcursions;
     }
+
     public function getFormattedNotifications(): array
     {
         $pastExcursions = $this->checkPastExcursions();

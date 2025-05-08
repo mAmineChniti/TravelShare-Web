@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
 use App\Entity\Chambres;
 use App\Repository\HotelsRepository;
 use App\Repository\ChambresRepository;
@@ -11,7 +12,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Entity\Users;
 
 class ChambresController extends AbstractController
 {
@@ -68,7 +68,7 @@ class ChambresController extends AbstractController
         if (!$this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('app');
         }
-        
+
         $hotel = $hotelsRepository->find($hotelId);
         if (!$hotel) {
             $this->addFlash('error', 'Hotel not found.');

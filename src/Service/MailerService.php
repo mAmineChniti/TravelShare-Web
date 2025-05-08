@@ -2,16 +2,16 @@
 
 namespace App\Service;
 
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class MailerService
 {
     public function __construct(
         private MailerInterface $mailer,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -26,9 +26,11 @@ class MailerService
         try {
             $this->mailer->send($email);
             $this->logger->info("Password reset email sent to {$to}");
+
             return true;
         } catch (TransportExceptionInterface $e) {
             $this->logger->error("Failed to send reset email: {$e->getMessage()}");
+
             return false;
         }
     }
