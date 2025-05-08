@@ -49,12 +49,12 @@ security:
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/$, roles: PUBLIC_ACCESS }
         # User routes - requires authenticated user
-        - { path: ^/home, roles: ROLE_USER }
-        - { path: ^/flights, roles: ROLE_USER }
-        - { path: ^/hotels, roles: ROLE_USER }
-        - { path: ^/forum, roles: ROLE_USER }
-        - { path: ^/excursions, roles: ROLE_USER }
-        - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/, roles: [ROLE_USER, ROLE_ADMIN] }
+        - { path: ^/flights, roles: [ROLE_USER, ROLE_ADMIN] }
+        - { path: ^/hotels, roles: [ROLE_USER, ROLE_ADMIN] }
+        - { path: ^/forum, roles: [ROLE_USER, ROLE_ADMIN] }
+        - { path: ^/excursions, roles: [ROLE_USER, ROLE_ADMIN] }
+        - { path: ^/profile, roles: [ROLE_USER, ROLE_ADMIN] }
         # Admin routes - requires admin role
         - { path: ^/dashboard, roles: ROLE_ADMIN }
         - { path: ^/admin, roles: ROLE_ADMIN }

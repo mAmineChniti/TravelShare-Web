@@ -226,58 +226,62 @@
 </div>
 
 <script>
-	document.addEventListener("DOMContentLoaded", () => {
-		// Initialize Bootstrap tooltips
-		const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-		const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
+    document.addEventListener("DOMContentLoaded", () => {
 
-		// Share functionality
-		const shareModal = new bootstrap.Modal(document.getElementById("share-modal"));
-		const shareButtons = document.querySelectorAll(".share-btn");
-		const copyBtn = document.getElementById("copy-link");
-		const emailEl = document.getElementById("share-email");
-		const waEl = document.getElementById("share-whatsapp");
-		const fbEl = document.getElementById("share-facebook");
+        // Initialize Bootstrap tooltips
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
 
-		shareButtons.forEach((btn) => {
-			btn.addEventListener("click", (e) => {
-				e.preventDefault();
-				const url = btn.getAttribute("data-url");
-				const title = btn.getAttribute("data-title");
+        // Share functionality
+        const shareModalElement = document.getElementById("share-modal");
+        const shareModal = new bootstrap.Modal(shareModalElement);
+        const shareButtons = document.querySelectorAll(".share-btn");
+        const copyBtn = document.getElementById("copy-link");
+        const emailEl = document.getElementById("share-email");
+        const waEl = document.getElementById("share-whatsapp");
+        const fbEl = document.getElementById("share-facebook");
 
-				if (navigator.share) {
-					try {
-						navigator.share({ title, url });
-						return;
-					} catch (err) {
-						console.error("Sharing failed:", err);
-					}
-				}
+        shareButtons.forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault();
 
-				copyBtn.onclick = () => {
-					navigator.clipboard
-						.writeText(url)
-						.then(() => {
-							const originalText = copyBtn.innerHTML;
-							copyBtn.innerHTML = '<i class="fas fa-check me-2"></i> Copied!';
-							copyBtn.classList.remove("btn-primary");
-							copyBtn.classList.add("btn-success");
-							setTimeout(() => {
-								copyBtn.innerHTML = originalText;
-								copyBtn.classList.remove("btn-success");
-								copyBtn.classList.add("btn-primary");
-							}, 2000);
-						})
-						.catch(() => prompt("Copy this link:", url));
-				};
+                const url = btn.getAttribute("data-url");
+                const title = btn.getAttribute("data-title");
 
-				emailEl.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`;
-				waEl.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(title + " " + url)}`;
-				fbEl.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+                if (navigator.share) {
+                    navigator.share({ title, url })
+                        .then(() => console.log("Shared successfully"))
+                        .catch((err) => console.error("Sharing failed:", err));
+                    return;
+                }
 
-				shareModal.show();
-			});
-		});
-	});
+                copyBtn.onclick = () => {
+                    navigator.clipboard
+                        .writeText(url)
+                        .then(() => {
+                            const originalText = copyBtn.innerHTML;
+                            copyBtn.innerHTML = '<i class="fas fa-check me-2"></i> Copied!';
+                            copyBtn.classList.remove("btn-primary");
+                            copyBtn.classList.add("btn-success");
+                            setTimeout(() => {
+                                copyBtn.innerHTML = originalText;
+                                copyBtn.classList.remove("btn-success");
+                                copyBtn.classList.add("btn-primary");
+                            }, 2000);
+                        })
+                        .catch(() => {
+                            alert("Failed to copy. Please copy manually:");
+                            prompt("Copy this link:", url);
+                        });
+                };
+
+                emailEl.href = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(url)}`;
+                waEl.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(title + " " + url)}`;
+                fbEl.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+
+                shareModal.show();
+            });
+        });
+    });
 </script>
 {% endblock %}
