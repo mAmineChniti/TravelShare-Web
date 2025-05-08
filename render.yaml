@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: symfony-app
+    env: docker
+    plan: starter
+    buildCommand: "composer install --no-dev --optimize-autoloader"
+    startCommand: "php-fpm"
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: APP_ENV
+        value: prod
+      - key: APP_SECRET
+        fromDashboard: true
+      - key: DATABASE_URL
+        fromDashboard: true
+    predeploy:
+      - "php bin/console doctrine:migrations:migrate --no-interaction"
+      - "php bin/console cache:clear --env=prod"
+
+databases:
+  - name: symfony-db
+    databaseName: symfony
+    user: symfony
+    plan: starter
+    envVars:
+      - key: MYSQL_ROOT_PASSWORD
+        fromDashboard: true
+      - key: MYSQL_DATABASE
+        value: symfony
+      - key: MYSQL_USER
+        value: symfony
+      - key: MYSQL_PASSWORD
+        fromDashboard: true

@@ -1,0 +1,12 @@
+# Exclude unnecessary files and directories
+node_modules
+vendor
+var/cache
+var/log
+.env
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+render.yaml
+.dockerignore
