@@ -1,313 +1,232 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Forgot Password{% endblock %}
+{% block title %}Reclamation{% endblock %}
 
-{% block css %}
-	<link rel="stylesheet" href="{{ asset('fonts2/material-design-iconic-font/css/material-design-iconic-font.min.css') }}">
-	<link href="{{ asset('css2/style.css') }}" rel="stylesheet">
-	<style>
-		.form-group-inline {
-			display: flex;
-			gap: 10px;
-			justify-content: center;
-			margin-bottom: 25px;
-		}
-		.form-group-inline input {
-			width: 40px;
-			text-align: center;
-			font-size: 20px;
-			border: none;
-			border-bottom: 1px solid #ccc;
-			outline: none;
-			padding-bottom: 5px;
-		}
-		.form-group-inline input:focus {
-			border-bottom: 2px solid #4e73df;
-		}
-		.form-group-inline input.invalid {
-			border-bottom: 2px solid #ff3860;
-		}
-		.countdown {
-			text-align: center;
-			font-size: 14px;
-			margin: 10px 0 25px;
-			color: #333;
-		}
-		.btn-send, .btn-verify, .btn-reset {
-			width: 100%;
-			margin-top: 25px;
-			padding: 12px;
-			border: none;
-			border-radius: 4px; /* Bordure moins arrondie pour un look rectangle */
-			cursor: pointer;
-			font-size: 16px;
-			transition: all 0.3s;
-			background-color: #4e73df; /* Bleu comme dans votre design */
-			color: white;
-			font-weight: 600;
-			text-transform: uppercase;
-			letter-spacing: 1px;
-		}
-		.btn-send:hover, .btn-verify:hover, .btn-reset:hover {
-			background-color: #3a5bbf; /* Bleu légèrement plus foncé au survol */
-			transform: translateY(-2px);
-			box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-		}
-		.password-field {
-			margin: 25px 0;
-		}
-		.alert {
-			padding: 10px;
-			margin-bottom: 25px;
-			border-radius: 4px;
-			text-align: center;
-		}
-		.alert-danger {
-			color: #721c24;
-			background-color: #f8d7da;
-			border: 1px solid #f5c6cb;
-		}
-		.alert-success {
-			color: #155724;
-			background-color: #d4edda;
-			border: 1px solid #c3e6cb;
-		}
-		.form-wrapper {
-			position: relative;
-			margin-bottom: 25px;
-		}
-		.form-control {
-			width: 100%;
-			padding: 10px 0;
-			border: none;
-			border-bottom: 1px solid #ccc;
-			outline: none;
-			background: transparent;
-		}
-		.form-control:focus {
-			border-bottom: 2px solid #4e73df;
-		}
-		.form-control.invalid {
-			border-bottom: 2px solid #ff3860;
-		}
-		.zmdi {
-			position: absolute;
-			right: 0;
-			bottom: 10px;
-			color: #666;
-		}
-		.error-message {
-			color: #ff3860;
-			font-size: 12px;
-			margin-top: 5px;
-			display: none;
-		}
-		.forgot-password {
-			text-align: center;
-			margin-top: 20px;
-		}
-		.forgot-password a {
-			color: #666;
-			text-decoration: none;
-			transition: color 0.3s;
-		}
-		.forgot-password a:hover {
-			color: #4e73df;
-		}
-	</style>
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
+        .profanity-feedback {
+            color: #dc3545;
+            font-size: 0.875em;
+            display: none;
+            margin-top: 0.25rem;
+        }
+        .profanity-warning {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
+            display: none;
+        }
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
-	<div class="wrapper" style="background-image: url('{{ asset('images2/imagett.jpg') }}');">
-		<div class="inner">
-			<div class="image-holder">
-				<img src="{{ asset('images2/agence.png') }}" alt="Logo">
-				<div class="already-have-account">
-					<a href="{{ path('app_logup') }}">You don't have an account?</a>
-				</div>
-			</div>
+    <div class="container-fluid contact bg-light py-5">
+        <div class="container py-5">
+            <div class="container mb-5 position-relative">
+                <div class="d-flex align-items-center">
+                    <a href="{{ path('app_home') }}" class="text-dark me-3">
+                        <i class="fas fa-arrow-left fa-lg"></i>
+                    </a>
+                    <div class="text-center flex-grow-1">
+                        <h5 class="section-title">Reclamation</h5>
+                        <h1 class="mb-0">Need help? Write to us!</h1>
+                    </div>
+                </div>
+            </div>
 
-			<form method="post" id="forgotPasswordForm" novalidate>
-				<h3>Forgot Password</h3>
+            {% for message in app.flashes('warning') %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
 
-				{% if error %}
-					<div class="alert alert-danger">{{ error }}</div>
-				{% endif %}
-				{% if success %}
-					<div class="alert alert-success">{{ success }}</div>
-				{% endif %}
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-4">
+                    <div class="bg-white rounded p-4">
+                        <div class="text-center mb-4">
+                            <i class="fa fa-map-marker-alt fa-3x text-primary"></i>
+                            <h4 class="text-primary">Adresse</h4>
+                            <p class="mb-0">123 Tunis, <br> Tunis</p>
+                        </div>
+                        <div class="text-center mb-4">
+                            <i class="fa fa-phone-alt fa-3x text-primary mb-3"></i>
+                            <h4 class="text-primary">Mobile</h4>
+                            <p class="mb-0">+216 00 000 000</p>
+                        </div>
+                        <div class="text-center">
+                            <i class="fa fa-envelope-open fa-3x text-primary mb-3"></i>
+                            <h4 class="text-primary">Email</h4>
+                            <p class="mb-0">benmwiem@gmail.com</p>
+                        </div>
+                    </div>
+                </div>
 
-				<div class="form-wrapper">
-					<input type="email"
-						   name="email"
-						   id="email"
-						   class="form-control"
-						   placeholder="Enter your email"
-						   required
-						   value="{{ email ?? '' }}">
-					<i class="zmdi zmdi-email"></i>
-					<div class="error-message" id="emailError">Please enter a valid email address</div>
-				</div>
+                <div class="col-lg-8">
+                    <h3 class="mb-2">Send us a message</h3>
+                    <p class="mb-4">Write your complaint, we will respond to you as soon as possible.</p>
+                    <div class="profanity-warning" id="profanityWarning">
+                        <strong><i class="fas fa-exclamation-triangle me-2"></i>Warning!</strong>
+                        <span id="profanityMessage">If your complaint contains inappropriate words, it will be deleted or not submitted.</span>
+                    </div>
 
-				<button type="submit" name="send_code" class="btn-send">Send Code</button>
 
-				{% if show_code_fields %}
-					<div class="countdown">
-						Code expires in <span id="timer">05:00</span>
-					</div>
+                    {{ form_start(form, {'attr': {'class': 'row g-3 needs-validation', 'novalidate': 'novalidate', 'id': 'reclamationForm'}}) }}
 
-					<div class="form-group-inline" id="code-fields">
-						{% for i in 1..6 %}
-							<input type="text"
-								   name="code[]"
-								   maxlength="1"
-								   required
-								   pattern="\d"
-								   class="code-input"
-								   oninput="validateCodeInput(this)"/>
-						{% endfor %}
-					</div>
-					<div class="error-message" id="codeError">Please enter the complete 6-digit code</div>
+                    <div class="col-md-12">
+                        <div class="form-floating">
+                            {{ form_widget(form.title, {
+                                'attr': {
+                                    'class': 'form-control ' ~ (form.title.vars.valid ? '' : 'is-invalid'),
+                                    'placeholder': 'Subject of the complaint',
+                                    'id': 'reclamation_title'
+                                }
+                            }) }}
+                            {{ form_label(form.title, null, {'label_attr': {'class': 'form-label'}}) }}
+                        </div>
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.title) }}
+                        </div>
+                    </div>
 
-					<button type="submit" name="verify_code" class="btn-verify">Verify Code</button>
-				{% endif %}
+                    <div class="col-12">
+                        <div class="form-floating">
+                            {{ form_widget(form.description, {
+                                'attr': {
+                                    'class': 'form-control ' ~ (form.description.vars.valid ? '' : 'is-invalid'),
+                                    'style': 'height: 160px',
+                                    'placeholder': 'Describe your problem...',
+                                    'id': 'reclamation_description'
+                                }
+                            }) }}
+                            {{ form_label(form.description, null, {'label_attr': {'class': 'form-label'}}) }}
+                        </div>
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.description) }}
+                        </div>
+                        <div class="invalid-feedback profanity-feedback" id="profanityFeedback">
+                            <i class="fas fa-exclamation-circle me-1"></i> Contenu inapproprié détecté
+                        </div>
+                    </div>
 
-				{% if show_password_field %}
-					<div class="form-wrapper password-field">
-						<input type="password"
-							   name="new_password"
-							   id="new_password"
-							   class="form-control"
-							   placeholder="Enter new password"
-							   required
-							   minlength="6">
-						<i class="zmdi zmdi-lock"></i>
-						<div class="error-message" id="passwordError">Password must be at least 6 characters</div>
-					</div>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form_widget(form.dateReclamation, {
+                                'attr': {
+                                    'class': 'form-control ' ~ (form.dateReclamation.vars.valid ? '' : 'is-invalid')
+                                }
+                            }) }}
+                            {{ form_label(form.dateReclamation, null, {'label_attr': {'class': 'form-label'}}) }}
+                        </div>
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.dateReclamation) }}
+                        </div>
+                    </div>
 
-					<button type="submit" name="reset_password" class="btn-reset">Reset Password</button>
-				{% endif %}
+                    <div class="col-12">
+                        <button class="btn btn-primary w-100 py-3" type="submit">
+                            <i class="fas fa-paper-plane me-2"></i> Submit Reclamation
+                        </button>
+                    </div>
 
-				<div class="forgot-password">
-					<a href="{{ path('app_login') }}">Back to Login</a>
-				</div>
-			</form>
-		</div>
-	</div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
 
-	<script>
-		// Validation côté client
-		document.addEventListener('DOMContentLoaded', function() {
-			const form = document.getElementById('forgotPasswordForm');
-			const email = document.getElementById('email');
-			const emailError = document.getElementById('emailError');
-			let formSubmitted = false;
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+			document.addEventListener('DOMContentLoaded', function() {
+				const profanityWords = {{ profanity_words|json_encode|raw }};
+				const form = document.getElementById('reclamationForm');
+				const titleInput = document.getElementById('reclamation_title');
+				const descInput = document.getElementById('reclamation_description');
+				const warningElement = document.getElementById('profanityWarning');
+				const feedbackElement = document.getElementById('profanityFeedback');
 
-			function validateEmail() {
-				if (!email.value) {
-					email.classList.add('invalid');
-					emailError.style.display = 'block';
-					return false;
+				function checkProfanity(text) {
+					const foundWords = [];
+					const lowerText = text.toLowerCase();
+
+					profanityWords.forEach(word => {
+						const regex = new RegExp('\\b' + word.toLowerCase() + '\\b');
+						if (regex.test(lowerText)) {
+							foundWords.push(word);
+						}
+					});
+
+					return foundWords;
 				}
-				if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-					email.classList.add('invalid');
-					emailError.style.display = 'block';
-					return false;
-				}
-				email.classList.remove('invalid');
-				emailError.style.display = 'none';
-				return true;
-			}
 
-			function validateCode() {
-				const codeInputs = document.querySelectorAll('.code-input');
-				if (!codeInputs.length) return true;
+				function updateValidation() {
+					const titleWords = checkProfanity(titleInput.value);
+					const descWords = checkProfanity(descInput.value);
+					const hasProfanity = titleWords.length > 0 || descWords.length > 0;
 
-				let fullCode = '';
-				codeInputs.forEach(input => {
-					fullCode += input.value;
-					if (!input.value) {
-						input.classList.add('invalid');
+					// Mise à jour visuelle
+					if (descWords.length > 0) {
+						descInput.classList.add('is-invalid');
+						feedbackElement.style.display = 'block';
+						feedbackElement.textContent = 'Termes inappropriés détectés: ' + descWords.join(', ');
 					} else {
-						input.classList.remove('invalid');
+						descInput.classList.remove('is-invalid');
+						feedbackElement.style.display = 'none';
+					}
+
+					if (hasProfanity) {
+						warningElement.style.display = 'block';
+						document.getElementById('profanityMessage').textContent =
+							'Termes inappropriés détectés: ' + [...titleWords, ...descWords].join(', ');
+					} else {
+						warningElement.style.display = 'none';
+					}
+
+					return !hasProfanity;
+				}
+
+				// Validation en temps réel
+				[titleInput, descInput].forEach(input => {
+					input.addEventListener('input', function() {
+						updateValidation();
+					});
+				});
+
+				// Validation à la soumission
+				form.addEventListener('submit', function(e) {
+					if (!updateValidation()) {
+						e.preventDefault();
+						window.scrollTo({
+							top: descInput.offsetTop - 100,
+							behavior: 'smooth'
+						});
 					}
 				});
 
-				if (fullCode.length !== 6) {
-					document.getElementById('codeError').style.display = 'block';
-					return false;
-				}
-				document.getElementById('codeError').style.display = 'none';
-				return true;
-			}
-
-			function validatePassword() {
-				const password = document.getElementById('new_password');
-				if (!password) return true;
-
-				if (!password.value || password.value.length < 6) {
-					password.classList.add('invalid');
-					document.getElementById('passwordError').style.display = 'block';
-					return false;
-				}
-				password.classList.remove('invalid');
-				document.getElementById('passwordError').style.display = 'none';
-				return true;
-			}
-
-			form.addEventListener('submit', function(event) {
-				formSubmitted = true;
-				const isEmailValid = validateEmail();
-				const isCodeValid = validateCode();
-				const isPasswordValid = validatePassword();
-
-				if (!isEmailValid || !isCodeValid || !isPasswordValid) {
-					event.preventDefault();
-				}
+				// Validation initiale
+				updateValidation();
 			});
-
-			email.addEventListener('input', validateEmail);
-
-			// Auto-tab between code fields
-			const codeInputs = document.querySelectorAll('.code-input');
-			codeInputs.forEach((input, index) => {
-				input.addEventListener('input', function() {
-					// Ne permet que les chiffres
-					this.value = this.value.replace(/[^0-9]/g, '');
-
-					// Passe au champ suivant si un chiffre est saisi
-					if (this.value.length === 1 && index < codeInputs.length - 1) {
-						codeInputs[index + 1].focus();
-					}
-
-					// Validation en temps réel
-					if (formSubmitted) validateCode();
-				});
-			});
-
-			if (document.getElementById('new_password')) {
-				document.getElementById('new_password').addEventListener('input', validatePassword);
-			}
-		});
-
-		// Countdown Timer
-		{% if show_code_fields %}
-		let timerElement = document.getElementById('timer');
-		let time = 300; // 5 minutes en secondes
-
-		const interval = setInterval(() => {
-			const minutes = Math.floor(time / 60).toString().padStart(2, '0');
-			const seconds = (time % 60).toString().padStart(2, '0');
-			timerElement.textContent = `${minutes}:${seconds}`;
-
-			if (--time < 0) {
-				clearInterval(interval);
-				timerElement.textContent = "Expired";
-				timerElement.style.color = "#ff3860";
-			} else if (time < 60) {
-				timerElement.style.color = "#ff9800";
-			}
-		}, 1000);
-		{% endif %}
-	</script>
+    </script>
 {% endblock %}
