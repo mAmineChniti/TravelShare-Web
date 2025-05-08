@@ -512,7 +512,7 @@ final class ForumController extends AbstractController
         if (!$user instanceof Users) {
             return $this->redirectToRoute('app_login');
         }
-        if(!$this->isGranted('ROLE_ADMIN')) {
+        if (!$this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('app_forum');
         }
         $userId = $user->getUserId();

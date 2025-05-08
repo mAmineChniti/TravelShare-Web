@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Reponses;
+use App\Entity\Notification;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ReclamationsRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,12 +14,27 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class ListRecAdminController extends AbstractController
 {
     #[Route('/list/rec/admin', name: 'app_list_rec_admin')]
-    public function listAll(ReclamationsRepository $reclamationsRepository): Response
+    public function listAll(ReclamationsRepository $reclamationsRepository, EntityManagerInterface $em): Response
     {
+        // Vérification que l'utilisateur est un admin
+        $user = $this->getUser();
+        if (1 !== $user->getRole()) {
+            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à accéder à cette page.');
+        }
+
+        // Récupérer toutes les réclamations
         $reclamations = $reclamationsRepository->findAll();
+
+        // Récupérer les notifications de l'administrateur (utilisateur connecté)
+        $notifications = $em->getRepository(Notification::class)->findBy(
+            ['user' => $user], // Filtrage des notifications pour l'utilisateur admin
+            ['createdAt' => 'DESC'] // Tri par date (les plus récentes en premier)
+        );
 
         return $this->render('list_rec_admin/index.html.twig', [
             'reclamations' => $reclamations,
+            'notifications' => $notifications, // Passer les notifications à la vue
+            'current_menu' => 'admin_users',
         ]);
     }
 
@@ -38,12 +54,19 @@ final class ListRecAdminController extends AbstractController
             return $this->redirectToRoute('app_list_rec_admin');
         }
 
+        // Créer et persister la réponse
         $reponse = new Reponses();
         $reponse->setContenu($message);
-        $reponse->setReclamation($reclamation); // This will now work
+        $reponse->setReclamation($reclamation);
         $reponse->setDateReponse(new \DateTime());
 
         $em->persist($reponse);
+
+        // Mettre à jour l'état de la réclamation
+        $reclamation->setEtat('repondu'); // Changer l'état en "répondu"
+
+        // Persister la réclamation mise à jour
+        $em->persist($reclamation);
         $em->flush();
 
         $this->addFlash('success', 'Réponse envoyée avec succès !');

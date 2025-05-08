@@ -45,10 +45,12 @@ security:
     # Access control rules to specify which roles have access to which paths
     access_control:
         # Public routes accessible to everyone (visitors)
+        
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/$, roles: PUBLIC_ACCESS }
         # User routes - requires authenticated user
+        - { path: ^/favoris, roles: [ROLE_USER, ROLE_ADMIN] }
         - { path: ^/, roles: [ROLE_USER, ROLE_ADMIN] }
         - { path: ^/flights, roles: [ROLE_USER, ROLE_ADMIN] }
         - { path: ^/hotels, roles: [ROLE_USER, ROLE_ADMIN] }

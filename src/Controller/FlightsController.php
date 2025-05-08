@@ -5,6 +5,7 @@ namespace App\Controller;
 use Knp\Snappy\Pdf;
 use App\Entity\Users;
 use App\Entity\OffresVoyage;
+use App\Repository\UsersRepository;
 use App\Entity\ReservationOffresVoyage;
 use App\Repository\OffresVoyageRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,9 +17,7 @@ use App\Repository\ReservationOffresVoyageRepository;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Knp\Bundle\SnappyBundle\Snappy\Response\PdfResponse;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Repository\UsersRepository;
 
 final class FlightsController extends AbstractController
 {
@@ -70,20 +69,23 @@ final class FlightsController extends AbstractController
         $user = $this->getUser();
         if (!$user instanceof Users) {
             $this->addFlash('error', 'You must be logged in to reserve a flight.');
+
             return $this->redirectToRoute('app_login');
         }
-        
+
         // Check if user exists in database
         $dbUser = $usersRepository->find($user->getUserId());
         if (!$dbUser) {
             $this->addFlash('error', 'User account not found in the system.');
+
             return $this->redirectToRoute('app_login');
         }
-        
+
         $voyage = $VoyageOffre->find($id);
-        
+
         if (!$voyage) {
             $this->addFlash('error', 'Flight not found.');
+
             return $this->redirectToRoute('app_flights');
         }
 
@@ -91,6 +93,7 @@ final class FlightsController extends AbstractController
 
         if ($nbrPlace < 1 || $nbrPlace > $voyage->getPlacesDisponibles()) {
             $this->addFlash('error', 'Invalid number of seats selected.');
+
             return $this->redirectToRoute('app_flight_details', ['id' => $id]);
         }
 
@@ -132,9 +135,10 @@ final class FlightsController extends AbstractController
         // Check if user has admin role, redirect to homepage if not
         if (!$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('notice', 'You need administrator privileges to access this page.');
+
             return $this->redirectToRoute('app_home');
         }
-        
+
         $voyages = $voyageService->findAllOffres();
 
         return $this->render('dashboard/flights/index.html.twig', [
@@ -148,9 +152,10 @@ final class FlightsController extends AbstractController
         // Check if user has admin role, redirect to homepage if not
         if (!$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('notice', 'You need administrator privileges to access this page.');
+
             return $this->redirectToRoute('app_home');
         }
-        
+
         $errorMessages = [];
         if ($request->isMethod('POST')) {
             $voyage = new OffresVoyage();
@@ -167,11 +172,13 @@ final class FlightsController extends AbstractController
                 foreach ($errors as $error) {
                     $errorMessages[] = $error->getMessage();
                     $this->addFlash('error', $error->getMessage());
+
                     return $this->redirectToRoute('app_add_flight');
                 }
             } else {
                 $voyageService->add($voyage);
                 $this->addFlash('success', 'Flight added successfully!');
+
                 return $this->redirectToRoute('app_dashboard_flights');
             }
         }
@@ -187,9 +194,10 @@ final class FlightsController extends AbstractController
         // Check if user has admin role, redirect to homepage if not
         if (!$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('notice', 'You need administrator privileges to access this page.');
+
             return $this->redirectToRoute('app_home');
         }
-        
+
         $voyage = $voyageService->find($id);
 
         if (!$voyage) {
@@ -211,11 +219,13 @@ final class FlightsController extends AbstractController
                 foreach ($errors as $error) {
                     $errorMessages[] = $error->getMessage();
                     $this->addFlash('error', $error->getMessage());
+
                     return $this->redirectToRoute('app_edit_flight');
                 }
             } else {
                 $voyageService->update($voyage);
                 $this->addFlash('success', 'Flight updated successfully!');
+
                 return $this->redirectToRoute('app_dashboard_flights');
             }
         }
@@ -232,13 +242,15 @@ final class FlightsController extends AbstractController
         // Check if user has admin role, redirect to homepage if not
         if (!$this->isGranted('ROLE_ADMIN')) {
             $this->addFlash('notice', 'You need administrator privileges to access this page.');
+
             return $this->redirectToRoute('app_home');
         }
-        
+
         $voyage = $voyageService->find($id);
 
         if (!$voyage) {
             $this->addFlash('error', 'Flight not found.');
+
             return $this->redirectToRoute('app_dashboard_flights');
         }
 
@@ -313,15 +325,17 @@ final class FlightsController extends AbstractController
         $user = $this->getUser();
         if (!$user instanceof Users) {
             $this->addFlash('error', 'You must be logged in to generate a PDF.');
+
             return $this->redirectToRoute('app_login');
         }
-        
+
         $reservation = $reservationRepo->find($id);
         if (!$reservation) {
             $this->addFlash('error', 'Reservation not found.');
+
             return $this->redirectToRoute('app_flights');
         }
-        
+
         // Check if the user owns this reservation or is an admin
         if ($reservation->getClientId() !== $user->getUserId() && !$this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('app_home');
@@ -330,6 +344,7 @@ final class FlightsController extends AbstractController
         $voyage = $offreVoyageRepo->find($reservation->getOffreId());
         if (!$voyage) {
             $this->addFlash('error', 'Flight not found.');
+
             return $this->redirectToRoute('app_flights');
         }
 

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Reponses;
+use App\Entity\Notification;
 use App\Repository\ReponsesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,8 +15,15 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class ListRepAdminController extends AbstractController
 {
     #[Route('/list/rep/admin', name: 'app_list_rep_admin')]
-    public function listAll(ReponsesRepository $reponsesRepository): Response
+    public function listAll(ReponsesRepository $reponsesRepository, EntityManagerInterface $em): Response
     {
+        // Vérification que l'utilisateur est un admin
+        $user = $this->getUser();
+        if (1 !== $user->getRole()) {
+            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à accéder à cette page.');
+        }
+
+        // Récupérer les réponses des réclamations avec les informations liées
         $reponses = $reponsesRepository->createQueryBuilder('r')
             ->join('r.reclamation', 'rec')
             ->join('rec.user', 'u')
@@ -23,8 +31,16 @@ final class ListRepAdminController extends AbstractController
             ->getQuery()
             ->getResult();
 
+        // Récupérer les notifications de l'administrateur (utilisateur connecté)
+        $notifications = $em->getRepository(Notification::class)->findBy(
+            ['user' => $user], // Filtrage des notifications pour l'utilisateur admin
+            ['createdAt' => 'DESC'] // Tri par date (les plus récentes en premier)
+        );
+
+        // Passer les réponses et notifications à la vue
         return $this->render('list_rep_admin/index.html.twig', [
             'reponses' => $reponses,
+            'notifications' => $notifications, // Passer les notifications à la vue
         ]);
     }
 

@@ -23,11 +23,12 @@ services:
 
     # makes classes in src/ available to be used as services
     App\:
-        resource: "../src/"
+        resource: '../src/'
         exclude:
-            - "../src/DependencyInjection/"
-            - "../src/Entity/"
-            - "../src/Kernel.php"
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Tests/'
 
     App\Security\CustomAuthenticationSuccessHandler:
         arguments:
@@ -44,3 +45,20 @@ services:
     App\EventSubscriber\CalendarSubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
+
+    # Configuration spécifique pour les contrôleurs
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: [ 'controller.service_arguments' ]
+
+
+
+    # Remplacez la configuration de SessionInterface par :
+    Symfony\Component\HttpFoundation\Session\SessionInterface:
+        factory: [ '@request_stack', 'getSession' ]
+        public: true
+
+    App\Service\OpenAIProfanityFilter:
+        arguments:
+            $apiKey: '%env(OPENAI_API_KEY)%'
+            $model: 'text-moderation-latest'  # Modèle spécialisé pour la modération

@@ -76,6 +76,7 @@ class ReclamationFormType extends AbstractType
                 'novalidate' => 'novalidate',
                 'class' => 'needs-validation',
             ],
+            'allow_extra_fields' => true, // Allow extra fields like user to be set programmatically
         ]);
     }
 }

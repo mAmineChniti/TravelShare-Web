@@ -1,0 +1,4 @@
+framework:
+  serializer:
+    enabled: true
+    enable_annotations: false  # Désactive le support des annotations

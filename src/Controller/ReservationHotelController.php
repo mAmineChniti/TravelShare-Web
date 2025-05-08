@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Users;
 use Endroid\QrCode\QrCode;
 use App\Entity\ReservationHotel;
 use PHPMailer\PHPMailer\Exception;
@@ -17,7 +18,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Entity\Users;
 
 class ReservationHotelController extends AbstractController
 {
