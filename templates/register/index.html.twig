@@ -29,25 +29,6 @@
 		background-color: rgba(var(--bs-primary-rgb), 0.1);
 	}
 
-	.social-buttons {
-		display: flex;
-		justify-content: center;
-		gap: 1rem;
-		margin: 1.5rem 0;
-	}
-
-	.social-button {
-		width: 40px;
-		height: 40px;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: all 0.3s;
-		background-color: var(--bs-tertiary-bg);
-		border: 1px solid var(--bs-border-color);
-	}
-
 	.text-error {
 		color: var(--bs-danger);
 		font-size: 0.875rem;
@@ -173,18 +154,6 @@
 										</div>
 										<div class="text-error">{{ form_errors(form.address) }}</div>
 									</div>
-								</div>
-
-								<div class="social-buttons">
-									<button type="button" class="social-button" title="Sign up with Google">
-										<i class="fab fa-google"></i>
-									</button>
-									<button type="button" class="social-button" title="Sign up with Facebook">
-										<i class="fab fa-facebook-f"></i>
-									</button>
-									<button type="button" class="social-button" title="Sign up with Twitter">
-										<i class="fab fa-twitter"></i>
-									</button>
 								</div>
 
 								<div class="d-grid">

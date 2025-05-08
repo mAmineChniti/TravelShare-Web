@@ -29,34 +29,25 @@
 		background-color: rgba(var(--bs-primary-rgb), 0.1);
 	}
 
-	.social-buttons {
-		display: flex;
-		justify-content: center;
-		gap: 1rem;
-		margin: 1.5rem 0;
-	}
-
-	.social-button {
-		width: 40px;
-		height: 40px;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: all 0.3s;
-		background-color: var(--bs-tertiary-bg);
-		border: 1px solid var(--bs-border-color);
-	}
-
-	.social-button:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-	}
-
 	.text-error {
 		color: var(--bs-danger);
 		font-size: 0.875rem;
 		margin-top: 0.25rem;
+	}
+
+	.form-wrapper {
+		margin-bottom: 1.5rem;
+	}
+
+	#error-message {
+		display: none;
+		color: var(--bs-danger);
+		font-size: 0.875rem;
+		margin-top: 0.25rem;
+	}
+
+	.invalid-input {
+		border-color: var(--bs-danger) !important;
 	}
 
 	@media (max-width: 767.98px) {
@@ -130,18 +121,10 @@
 									</div>
 								</div>
 
-								<div class="mb-4">{{ form_row(loginForm.recaptcha) }}</div>
-
-								<div class="social-buttons">
-									<button type="button" class="social-button" title="Sign in with Google">
-										<i class="fab fa-google"></i>
-									</button>
-									<button type="button" class="social-button" title="Sign in with Facebook">
-										<i class="fab fa-facebook-f"></i>
-									</button>
-									<button type="button" class="social-button" title="Sign in with Twitter">
-										<i class="fab fa-twitter"></i>
-									</button>
+								<!-- reCAPTCHA -->
+								<div class="form-wrapper">
+									<div class="g-recaptcha" data-sitekey="6LduMSQrAAAAAMilOA0YocwwlbFgxMqgQ2RYoiWm"></div>
+									<div class="error-message" id="recaptchaError">Please verify that you are not a robot</div>
 								</div>
 
 								<div class="d-grid">
@@ -169,18 +152,80 @@
 	</div>
 </div>
 
+<!-- Script reCAPTCHA -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<!-- Validation JS -->
 <script>
 	document.addEventListener("DOMContentLoaded", function () {
 		const form = document.getElementById("loginForm");
-		if (!form) return;
+		const email = document.getElementById("inputEmail");
+		const password = document.getElementById("inputPassword");
+		const emailError = document.getElementById("emailError");
+		const passwordError = document.getElementById("passwordError");
+		const recaptchaError = document.getElementById("recaptchaError");
+		let formSubmitted = false;
 
-		// Bootstrap 5 validation styles
-		form.addEventListener("submit", function (event) {
-			if (!this.checkValidity()) {
-				event.preventDefault();
-				event.stopPropagation();
+		function validateEmail() {
+			if (formSubmitted && !email.value) {
+				email.classList.add("invalid-input");
+				emailError.style.display = "block";
+				return false;
 			}
-			form.classList.add("was-validated");
+			email.classList.remove("invalid-input");
+			emailError.style.display = "none";
+			return true;
+		}
+
+		function validatePassword() {
+			if (formSubmitted && !password.value) {
+				passwordError.textContent = "Password is required";
+				password.classList.add("invalid-input");
+				passwordError.style.display = "block";
+				return false;
+			} else if (formSubmitted && password.value.length < 8) {
+				passwordError.textContent = "Password must be at least 8 characters";
+				password.classList.add("invalid-input");
+				passwordError.style.display = "block";
+				return false;
+			}
+			password.classList.remove("invalid-input");
+			passwordError.style.display = "none";
+			return true;
+		}
+
+		function validateRecaptcha() {
+			const response = grecaptcha.getResponse();
+			if (formSubmitted && response.length === 0) {
+				recaptchaError.style.display = "block";
+				return false;
+			}
+			recaptchaError.style.display = "none";
+			return true;
+		}
+
+		form.addEventListener("submit", function (event) {
+			formSubmitted = true;
+			const isEmailValid = validateEmail();
+			const isPasswordValid = validatePassword();
+			const isRecaptchaValid = validateRecaptcha();
+
+			if (!isEmailValid || !isPasswordValid || !isRecaptchaValid) {
+				event.preventDefault();
+				if (!isEmailValid) {
+					email.focus();
+				} else if (!isPasswordValid) {
+					password.focus();
+				}
+			}
+		});
+
+		email.addEventListener("input", function () {
+			if (formSubmitted) validateEmail();
+		});
+
+		password.addEventListener("input", function () {
+			if (formSubmitted) validatePassword();
 		});
 	});
 </script>

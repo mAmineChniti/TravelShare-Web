@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
-class ExcursionsType extends AbstractType
+class ExcursionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

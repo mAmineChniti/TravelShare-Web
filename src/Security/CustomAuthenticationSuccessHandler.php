@@ -3,7 +3,7 @@
 namespace App\Security;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security; // Updated to use the non-deprecated Security class
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -23,12 +23,6 @@ class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response
     {
-        $user = $token->getUser();
-
-        if (1 == $user->getRole()) {
-            return new RedirectResponse($this->router->generate('app_accueil_admin'));
-        }
-
         return new RedirectResponse($this->router->generate('app_home'));
     }
 }

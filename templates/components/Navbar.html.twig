@@ -86,13 +86,6 @@
 						<li>
 							<a class="dropdown-item" href="{{ path('app_profile') }}"><i class="fas fa-user me-2"></i>Profile</a>
 						</li>
-						{% if is_granted('ROLE_ADMIN') %}
-						<li>
-							<a class="dropdown-item" href="{{ path('app_dashboard', {}) }}"
-								><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a
-							>
-						</li>
-						{% endif %}
 						<li><hr class="dropdown-divider" /></li>
 						<li>
 							<a class="dropdown-item" href="{{ path('app_logout') }}"
@@ -120,7 +113,6 @@
 		const themeIcon = document.getElementById("theme-icon");
 		const navbarLogo = document.getElementById("navbar-logo");
 
-		// Initialize the theme based on localStorage or system preference
 		const getStoredTheme = () => localStorage.getItem("theme");
 		const getPreferredTheme = () => {
 			const storedTheme = getStoredTheme();
@@ -131,34 +123,27 @@
 			return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 		};
 
-		// Set theme on HTML element
 		const setTheme = (theme) => {
 			htmlElement.setAttribute("data-bs-theme", theme);
 			localStorage.setItem("theme", theme);
 
-			// Update icon based on current theme
 			if (theme === "dark") {
 				themeIcon.className = "fas fa-moon";
-				// Invert logo in dark mode to make it visible (since it's a black logo)
 				navbarLogo.style.filter = "invert(100%)";
 			} else {
 				themeIcon.className = "fas fa-sun";
-				// Don't invert in light mode (show original black logo)
 				navbarLogo.style.filter = "none";
 			}
 		};
 
-		// Initialize theme on page load
 		setTheme(getPreferredTheme());
 
-		// Toggle theme when button is clicked
 		themeToggleBtn.addEventListener("click", () => {
 			const currentTheme = getStoredTheme() || "light";
 			const newTheme = currentTheme === "light" ? "dark" : "light";
 			setTheme(newTheme);
 		});
 
-		// Listen for system preference changes
 		window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
 			if (!getStoredTheme()) {
 				setTheme(matches ? "dark" : "light");

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Posts;
+use App\Entity\Users;
 use App\Entity\Comments;
 use App\Entity\PostImages;
 use App\Repository\LikesRepository;
@@ -38,7 +39,7 @@ final class ForumController extends AbstractController
         return $post;
     }
 
-    private function getRecommendedPosts(array $postsToBeAnalyzed, PostsRepository $postsRepository, CommentsRepository $commentsRepository, LikesRepository $likesRepository, PostImagesRepository $postImagesRepository, int $userId): array
+    private function getRecommendedPosts(array $postsToBeAnalyzed, int $userId, PostsRepository $postsRepository, CommentsRepository $commentsRepository, LikesRepository $likesRepository, PostImagesRepository $postImagesRepository): array
     {
         $postContents = array_map(function ($post) {
             return [
@@ -96,7 +97,7 @@ final class ForumController extends AbstractController
 
         $recommendedPosts = [];
         if (!empty($recommendedPostIds)) {
-            $recommendedPosts = $postsRepository->fetchPostsByIds($recommendedPostIds, $userId);
+            $recommendedPosts = $postsRepository->fetchPostsByIds($recommendedPostIds);
             if (!empty($recommendedPosts)) {
                 foreach ($recommendedPosts as &$post) {
                     $post = $this->enrichPost($post, $userId, $commentsRepository, $likesRepository, $postImagesRepository);
@@ -115,7 +116,11 @@ final class ForumController extends AbstractController
         LikesRepository $likesRepository,
         PostImagesRepository $postImagesRepository,
     ): Response {
-        $userId = 1;
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            return $this->redirectToRoute('app_login');
+        }
+        $userId = $user->getUserId();
         $offset = max(0, (int) $request->query->get('offset', 0));
         $limit = min(100, max(1, (int) $request->query->get('limit', 10)));
 
@@ -125,8 +130,7 @@ final class ForumController extends AbstractController
         }
 
         $postsToBeAnalyzed = $postsRepository->listAll();
-        $recommendedPosts = $this->getRecommendedPosts($postsToBeAnalyzed, $postsRepository, $commentsRepository, $likesRepository, $postImagesRepository, $userId);
-
+        $recommendedPosts = $this->getRecommendedPosts($postsToBeAnalyzed, $userId, $postsRepository, $commentsRepository, $likesRepository, $postImagesRepository);
         if (!empty($recommendedPosts)) {
             $recommendedPostIds = array_column($recommendedPosts, 'postId');
             $posts = array_filter($posts, function ($post) use ($recommendedPostIds) {
@@ -150,8 +154,11 @@ final class ForumController extends AbstractController
     ): Response {
         $postText = $request->request->get('postText');
         $postTitle = $request->request->get('postTitle');
-        $userId = 1;
-
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            throw new AccessDeniedException('You are not allowed to access this page.');
+        }
+        $userId = $user->getUserId();
         $post = new Posts();
         $post->setTextContent($postText);
         $post->setPostTitle($postTitle);
@@ -189,6 +196,7 @@ final class ForumController extends AbstractController
         $user = $userRepository->find($userId);
         $images = $postImagesRepository->findImagesByPostId($post->getPostId());
         $postData = [
+            'ownerId' => $post->getOwnerId(),
             'postId' => $post->getPostId(),
             'name' => $user->getName(),
             'lastName' => $user->getLastName(),
@@ -215,13 +223,30 @@ final class ForumController extends AbstractController
         int $id,
     ): Response {
         $post = $postsRepository->find($id);
-
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            throw new AccessDeniedException('You are not allowed to access this page.');
+        }
+        $userId = $user->getUserId();
+        if (!$userId) {
+            throw new AccessDeniedException('You are not allowed to access this page.');
+        }
+        if (!$userId) {
+            return new JsonResponse(['error' => 'User ID is missing or invalid'], 400);
+        }
         if (!$post) {
             return new JsonResponse(['error' => 'Post not found.'], 404);
         }
 
-        if (1 !== $post->getOwnerId()) {
-            return new JsonResponse(['error' => 'Unauthorized.'], 403);
+        if ((string) $userId !== (string) $post->getOwnerId() && !$this->isGranted('ROLE_ADMIN')) {
+            return new JsonResponse([
+                'error' => 'Unauthorized.',
+                'debug' => [
+                    'userId' => $userId,
+                    'ownerId' => $post->getOwnerId(),
+                    'comparison' => (string) $userId === (string) $post->getOwnerId(),
+                ],
+            ], 403);
         }
 
         $postText = $request->request->get('editTextarea-'.$id);
@@ -241,9 +266,18 @@ final class ForumController extends AbstractController
             return new JsonResponse(['error' => $errorMessages], 400);
         }
 
+        if (!$postText || !$postTitle) {
+            return new JsonResponse(['error' => 'Both title and content are required.'], 400);
+        }
+
+        if ($postTitle !== $post->getPostTitle()) {
+            $post->setSlug($postTitle.'-'.uniqid());
+        }
+
         $postsRepository->update($post);
 
         return $this->render('components/PostText.html.twig', [
+            'slug' => $post->getSlug(),
             'postId' => $post->getPostId(),
             'postTitle' => $post->getPostTitle(),
             'textContent' => $post->getTextContent(),
@@ -253,16 +287,21 @@ final class ForumController extends AbstractController
     #[Route('/forum/delete/{id}', name: 'app_forum_delete', methods: ['POST'])]
     public function delete(
         PostsRepository $postsRepository,
+        Request $request,
         int $id,
     ): Response {
         $post = $postsRepository->find($id);
-
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            throw new AccessDeniedException('You are not allowed to access this page.');
+        }
+        $userId = $user->getUserId();
         if (!$post) {
             throw $this->createNotFoundException('No post found for id '.$id);
         }
 
-        if (1 !== $post->getOwnerId()) {
-            throw new AccessDeniedException('You are not allowed to delete this post.');
+        if ((string) $userId !== (string) $post->getOwnerId() && !$this->isGranted('ROLE_ADMIN')) {
+            return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
         $postsRepository->delete($id);
@@ -284,8 +323,11 @@ final class ForumController extends AbstractController
         if (!$postsRepository->find($postId)) {
             return new JsonResponse(['success' => false, 'message' => 'Post not found'], 404);
         }
-
-        $userId = 1;
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            return new JsonResponse(['success' => false, 'message' => 'User not found'], 404);
+        }
+        $userId = $user->getUserId();
         $likesRepository->handleVote($userId, $postId, true);
         $isLiked = $likesRepository->isLikedByUser($userId, $postId);
 
@@ -308,7 +350,11 @@ final class ForumController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Post ID is missing or invalid'], 400);
         }
 
-        $userId = 1;
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            return new JsonResponse(['success' => false, 'message' => 'User not found'], 404);
+        }
+        $userId = $user->getUserId();
 
         $likesRepository->handleVote($userId, $postId, false);
 
@@ -338,8 +384,11 @@ final class ForumController extends AbstractController
     ): Response {
         $postId = $request->request->get('postId');
         $commentText = $request->request->get('commentText');
-        $userId = 1;
-
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            throw new AccessDeniedException('You are not allowed to access this page.');
+        }
+        $userId = $user->getUserId();
         $post = $postsRepository->findOneBy(['postId' => $postId]);
         if (!$post) {
             return new JsonResponse(['error' => 'Post not found.'], 404);
@@ -380,16 +429,22 @@ final class ForumController extends AbstractController
     #[Route('/forum/delete/comment/{id}', name: 'comment_delete', methods: ['POST'])]
     public function deleteComment(
         CommentsRepository $commentsRepository,
+        Request $request,
         int $id,
     ): Response {
         $comment = $commentsRepository->find($id);
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            throw new AccessDeniedException('You are not allowed to access this page.');
+        }
+        $userId = $user->getUserId();
 
         if (!$comment) {
             throw $this->createNotFoundException('No comment found for id '.$id);
         }
 
-        if (1 !== $comment->getCommenterId()) {
-            throw new AccessDeniedException('You are not allowed to delete this comment.');
+        if ((string) $userId !== (string) $comment->getCommenterId() && !$this->isGranted('ROLE_ADMIN')) {
+            return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
         $commentsRepository->delete($id);
@@ -406,12 +461,16 @@ final class ForumController extends AbstractController
         int $id,
     ): Response {
         $comment = $commentsRepository->find($id);
-
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            throw new AccessDeniedException('You are not allowed to access this page.');
+        }
+        $userId = $user->getUserId();
         if (!$comment) {
             return new JsonResponse(['error' => 'Comment not found.'], 404);
         }
 
-        if (1 !== $comment->getCommenterId()) {
+        if ((string) $userId !== (string) $comment->getCommenterId() && !$this->isGranted('ROLE_ADMIN')) {
             return new JsonResponse(['error' => 'Unauthorized.'], 403);
         }
 
@@ -449,7 +508,14 @@ final class ForumController extends AbstractController
         PostImagesRepository $postImagesRepository,
         Request $request,
     ): Response {
-        $userId = 1;
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            return $this->redirectToRoute('app_login');
+        }
+        if(!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_forum');
+        }
+        $userId = $user->getUserId();
         $offset = max(0, (int) $request->query->get('offset', 0));
         $limit = min(100, max(1, (int) $request->query->get('limit', 10)));
         $posts = $postsRepository->fetchPosts($offset, $limit, $userId);
@@ -466,7 +532,11 @@ final class ForumController extends AbstractController
     public function searchByTextContent(Request $request, PostsRepository $postsRepository, CommentsRepository $commentsRepository, LikesRepository $likesRepository, PostImagesRepository $postImagesRepository): Response
     {
         $searchTerm = $request->query->get('q', '');
-        $userId = 1;
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            return $this->redirectToRoute('app_login');
+        }
+        $userId = $user->getUserId();
         if (empty($searchTerm)) {
             return $this->redirectToRoute('app_forum');
         }
@@ -492,7 +562,11 @@ final class ForumController extends AbstractController
         }
         $offset = max(0, (int) $request->query->get('offset', 0));
         $limit = min(100, max(1, (int) $request->query->get('limit', 10)));
-        $userId = 1;
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            throw new AccessDeniedException('You are not allowed to access this page.');
+        }
+        $userId = $user->getUserId();
         switch ($sortBy) {
             case 'date_asc':
                 $posts = $postsRepository->fetchPostsSorted('date_asc', $offset, $limit, $userId);
@@ -511,7 +585,7 @@ final class ForumController extends AbstractController
         }
 
         $postsToBeAnalyzed = $postsRepository->listAll();
-        $recommendedPosts = $this->getRecommendedPosts($postsToBeAnalyzed, $postsRepository, $commentsRepository, $likesRepository, $postImagesRepository, $userId);
+        $recommendedPosts = $this->getRecommendedPosts($postsToBeAnalyzed, $userId, $postsRepository, $commentsRepository, $likesRepository, $postImagesRepository, $userId);
 
         if (!empty($recommendedPosts)) {
             $recommendedPostIds = array_column($recommendedPosts, 'postId');
@@ -542,7 +616,11 @@ final class ForumController extends AbstractController
             throw $this->createNotFoundException('Post not found.');
         }
 
-        $userId = 1;
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            throw new AccessDeniedException('You are not allowed to access this page.');
+        }
+        $userId = $user->getUserId();
         $user = $usersRepository->find($post->getOwnerId());
         if (!$user) {
             throw $this->createNotFoundException('User not found.');
@@ -553,6 +631,7 @@ final class ForumController extends AbstractController
             throw $this->createNotFoundException('User name or last name not found.');
         }
         $postData = [
+            'ownerId' => $post->getOwnerId(),
             'postId' => $post->getPostId(),
             'name' => $userName,
             'lastName' => $userLastName,
@@ -613,7 +692,7 @@ final class ForumController extends AbstractController
                     $isInappropriate = true;
                     break;
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 return new JsonResponse(['error' => 'An error occurred while validating the image.'], 500);
             }
         }
