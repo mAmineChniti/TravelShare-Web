@@ -12,7 +12,7 @@
 			<div id="postsContainer" class="d-flex flex-column gap-4">
 				{% for post in posts %}
 				<div id="post-{{ post.postId }}" class="card bg-light">
-					<div class="card-body">
+					<div class="card-body card">
 						<div class="d-flex justify-content-between align-items-center mb-2">
 							<span class="text-primary fw-medium">{{ post.name ~ ' ' ~ post.lastName }}</span>
 							<form

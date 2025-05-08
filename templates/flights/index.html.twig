@@ -43,45 +43,23 @@
 					<div class="col-md-5">
 						<div class="card h-100">
 							<div class="card-body">
-								<label class="form-label">
-									<i class="fas fa-calendar-alt me-2"></i>Travel Dates
-								</label>
-								<form method="get" action="{{ path('app_flights_filter') }}" id="date-filter-form">
-									<div id="date-range-picker" class="d-flex align-items-center">
-										<div class="input-group me-2">
-											<span class="input-group-text">
-												<i class="fas fa-calendar-alt"></i>
-											</span>
-											<input 
-												id="datepicker-range-start" 
-												name="departureDate" 
-												type="text" 
-												class="form-control" 
-												placeholder="Departure date"
-												value="{{ app.request.query.get('departureDate') ? app.request.query.get('departureDate')|date('m/d/Y') : '' }}"
-												readonly
-											>
+									<form method="get" action="{{ path('app_flights_filter') }}" id="date-filter-form">
+										<div class="row g-3">
+											<div class="col-md-5">
+												<label for="departure-date" class="form-label">Departure Date</label>
+												<input type="date" id="departure-date" name="departureDate" class="form-control" min="{{ "now"|date("Y-m-d") }}">
+											</div>
+											<div class="col-md-5">
+												<label for="return-date" class="form-label">Return Date</label>
+												<input type="date" id="return-date" name="returnDate" class="form-control" min="{{ "now"|date("Y-m-d") }}">
+											</div>
+											<div class="col-md-2 d-flex align-items-end">
+												<button type="submit" class="btn btn-primary">
+													<i class="fas fa-filter"></i>
+												</button>
+											</div>
 										</div>
-										<span class="mx-2">to</span>
-										<div class="input-group me-2">
-											<span class="input-group-text">
-												<i class="fas fa-calendar-alt"></i>
-											</span>
-											<input 
-												id="datepicker-range-end" 
-												name="returnDate" 
-												type="text" 
-												class="form-control" 
-												placeholder="Return date"
-												value="{{ app.request.query.get('returnDate') ? app.request.query.get('returnDate')|date('m/d/Y') : '' }}"
-												readonly
-											>
-										</div>
-										<button type="submit" class="btn btn-primary">
-											<i class="fas fa-filter"></i>
-										</button>
-									</div>
-								</form>
+									</form>
 							</div>
 						</div>
 					</div>
@@ -234,9 +212,21 @@
 			searchTimeout = setTimeout(() => {
 				searchForm.submit();
 			}, 500);
+		 });
+
+		// Remove auto-submit for departure and return date inputs
+		const departureDateInput = document.getElementById("departure-date");
+		const returnDateInput = document.getElementById("return-date");
+
+		departureDateInput?.addEventListener("change", () => {
+			console.log("Departure date selected: ", departureDateInput.value);
 		});
 
-		// Sort select auto-submission
+		returnDateInput?.addEventListener("change", () => {
+			console.log("Return date selected: ", returnDateInput.value);
+		});
+
+		// Sort select auto-submission remains
 		const sortSelect = document.getElementById("sort-select");
 		const sortForm = document.getElementById("sort-form");
 

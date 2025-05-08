@@ -11,10 +11,15 @@ import "./bootstrap.js";
 import "./styles/app.css";
 
 // Import Bootstrap JS
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;
 
 // Import Font Awesome
 import '@fortawesome/fontawesome-free/css/all.min.css';
+
+// Import Leaflet CSS and JS
+import 'leaflet/dist/leaflet.css';
+import 'leaflet';
 
 // Initialize Bootstrap color mode
 document.addEventListener('DOMContentLoaded', () => {

@@ -40,19 +40,19 @@
 						<li><a class="dropdown-item" href="{{ path('app_promo') }}">Promotions</a></li>
 						<li><a class="dropdown-item" href="{{ path('app_dashboard_flights') }}">Flights Dashboard</a></li>
 						<li><a class="dropdown-item" href="{{ path('dashboard_hotels') }}">Hotels Dashboard</a></li>
-					</ul>
+					</ul>																																																							
 				</li>
 				<li class="nav-item">
-					<a href="{{ path('app_flights') }}" class="nav-link px-3">Flights Admin</a>
+					<a href="{{ path('app_flights') }}" class="nav-link px-3">Flights</a>
 				</li>
 				<li class="nav-item">
-					<a href="{{ path('app_hotels') }}" class="nav-link px-3">Hotels Admin</a>
+					<a href="{{ path('app_hotels') }}" class="nav-link px-3">Hotels</a>
 				</li>
 				<li class="nav-item">
-					<a href="{{ path('app_forum') }}" class="nav-link px-3">Forum Admin</a>
+					<a href="{{ path('app_forum') }}" class="nav-link px-3">Forum</a>
 				</li>
 				<li class="nav-item">
-					<a href="{{ path('app_excursions') }}" class="nav-link px-3">Excursions Admin</a>
+					<a href="{{ path('app_excursions') }}" class="nav-link px-3">Excursions</a>
 				</li>
 				{% else %}
 				<li class="nav-item">
@@ -71,7 +71,6 @@
 			</ul>
 			<div class="d-flex align-items-center">
 				{% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-				<a href="{{ path('app_profile') }}" class="btn btn-outline-secondary me-2">Profile</a>
 				<div class="dropdown">
 					<button
 						class="btn btn-secondary dropdown-toggle"
@@ -105,7 +104,33 @@
 		</div>
 	</div>
 </nav>
+<style>
+[data-bs-theme="dark"] .dropdown-menu {
+  background-color: #FFF;
+  color: #2b3035;
+}
 
+[data-bs-theme="dark"] .dropdown-item {
+  color: #2b3035;
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover {
+  background-color: #2b3035;
+}
+
+[data-bs-theme="light"] .dropdown-menu {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+[data-bs-theme="light"] .dropdown-item {
+  color: #212529;
+}
+
+[data-bs-theme="light"] .dropdown-item:hover {
+  background-color: #e9ecef;
+}
+</style>
 <script>
 	document.addEventListener("DOMContentLoaded", () => {
 		const htmlElement = document.documentElement;
