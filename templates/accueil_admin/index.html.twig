@@ -1,189 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<title>{% block title %}Admin Dashboard{% endblock %}</title>
-	<meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport"/>
+{% extends 'base.html.twig' %}
 
-	<!-- Lien vers la favicon -->
-	<link rel="icon" href="{{ asset('images2/favicon.svg') }}" type="image/x-icon">
-	<link rel="icon" href="{{ asset('images2/favicon.ico') }}" />
+{% block title %}Admin Dashboard{% endblock %}
 
-	{% block js %}
-		<!-- Fonts and icons -->
-		<script src="{{ asset('js2/plugin/webfont/webfont.min.js') }}"></script>
-		<script>
-			WebFont.load({
-				google: { families: ["Public Sans:300,400,500,600,700"] },
-				custom: {
-					families: [
-						"Font Awesome 5 Solid",
-						"Font Awesome 5 Regular",
-						"Font Awesome 5 Brands",
-						"simple-line-icons",
-					],
-					urls: ["css3/fonts.min.css"],
-				},
-				active: function () {
-					sessionStorage.fonts = true;
-				},
-			});
-		</script>
-	{% endblock %}
+{% block stylesheets %}
+	{{ parent() }}
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+	<!-- CSS Files -->
+	<link rel="stylesheet" href="{{ asset('css3/bootstrap.min.css') }}" />
+	<link rel="stylesheet" href="{{ asset('css3/plugins.min.css') }}" />
+	<link rel="stylesheet" href="{{ asset('css3/kaiadmin.min.css') }}" />
 
-	{% block css %}
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-		<!-- CSS Files -->
-		<link rel="stylesheet" href="{{ asset('css3/bootstrap.min.css') }}" />
-		<link rel="stylesheet" href="{{ asset('css3/plugins.min.css') }}" />
-		<link rel="stylesheet" href="{{ asset('css3/kaiadmin.min.css') }}" />
+	<!-- CSS Just for demo purpose, don't include it in your project -->
+	<link rel="stylesheet" href="{{ asset('css3/demo.css') }}" />
 
-		<!-- CSS Just for demo purpose, don't include it in your project -->
-		<link rel="stylesheet" href="{{ asset('css3/demo.css') }}" />
+	<style>
+		/* assets/styles/admin.css */
+		.table-hover tbody tr:hover {
+			background-color: rgba(0, 0, 0, 0.02);
+		}
 
-		<style>
+		.avatar-initials {
+			width: 40px;
+			height: 40px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: bold;
+		}
 
-			/* assets/styles/admin.css */
-			.table-hover tbody tr:hover {
-				background-color: rgba(0, 0, 0, 0.02);
-			}
+		.btn-sm {
+			padding: 0.25rem 0.5rem;
+			font-size: 0.875rem;
+		}
 
-			.avatar-initials {
-				width: 40px;
-				height: 40px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				font-weight: bold;
-			}
+		.badge {
+			font-size: 0.75em;
+			font-weight: 500;
+			padding: 0.35em 0.65em;
+		}
 
-			.btn-sm {
-				padding: 0.25rem 0.5rem;
-				font-size: 0.875rem;
-			}
+		.bg-light-blue {
+			background-color: #f8fafc;
+		}
+		.avatar-placeholder {
+			font-weight: 600;
+			font-size: 0.9rem;
+		}
+		.table-hover tbody tr:hover {
+			background-color: rgba(0, 123, 255, 0.05) !important;
+		}
+		.badge {
+			font-weight: 500;
+			letter-spacing: 0.5px;
+		}
 
-			.badge {
-				font-size: 0.75em;
-				font-weight: 500;
-				padding: 0.35em 0.65em;
-			}
+		.notif-box {
+			max-height: 400px;
+			overflow-y: auto;
+			padding: 10px;
+			border-radius: 5px;
+			box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+		}
 
-			.bg-light-blue {
-				background-color: #f8fafc;
-			}
-			.avatar-placeholder {
-				font-weight: 600;
-				font-size: 0.9rem;
-			}
-			.table-hover tbody tr:hover {
-				background-color: rgba(0, 123, 255, 0.05) !important;
-			}
-			.badge {
-				font-weight: 500;
-				letter-spacing: 0.5px;
-			}
+		.notif-content {
+			padding-left: 10px;
+			padding-right: 10px;
+			padding-bottom: 10px;
+		}
+	</style>
+{% endblock %}
 
-			.notif-box {
-				max-height: 400px;
-				overflow-y: auto;
-				padding: 10px;
-				border-radius: 5px;
-				box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-			}
-
-			.notif-content {
-				padding-left: 10px;
-				padding-right: 10px;
-				padding-bottom: 10px;
-			}
-
-		</style>
-	{% endblock %}
-
-</head>
+{% block javascripts %}
+	{{ parent() }}
+	<script src="{{ asset('js2/plugin/webfont/webfont.min.js') }}"></script>
+	<script>
+		WebFont.load({
+			google: { families: ["Public Sans:300,400,500,600,700"] },
+			custom: {
+				families: [
+					"Font Awesome 5 Solid",
+					"Font Awesome 5 Regular",
+					"Font Awesome 5 Brands",
+					"simple-line-icons",
+				],
+				urls: ["css3/fonts.min.css"],
+			},
+			active: function () {
+				sessionStorage.fonts = true;
+			},
+		});
+	</script>
+{% endblock %}
 
 {% block body%}
 
-<body>
 <div class="wrapper">
-	<!-- Sidebar -->
-	<div class="sidebar" data-background-color="dark">
-		<div class="sidebar-logo">
-			<!-- Logo Header -->
-			<div class="logo-header" data-background-color="dark">
-				<img
-						src="{{ asset('images2/favicon.svg') }}"
-						alt="navbar brand"
-						class="navbar-brand"
-						height="20"
-				/>
-				<span class="ms-2 fs-5 text-primary">Admin Dashboard</span>
-			</div>
-			<!-- End Logo Header -->
-		</div>
-
-		<div class="sidebar-wrapper scrollbar scrollbar-inner">
-			<div class="sidebar-content">
-				<ul class="nav nav-secondary">
-					<!-- Lien vers Dashboard -->
-					<li class="nav-item active">
-						<a href="{{ path('app_accueil_admin') }}">
-							<i class="fas fa-home"></i>
-							<p>Dashboard</p>
-						</a>
-					</li>
-
-					<!-- Section séparée -->
-					<li class="nav-section">
-                    <span class="sidebar-mini-icon">
-                        <i class="fa fa-ellipsis-h"></i>
-                    </span>
-						<h4 class="text-section">Components</h4>
-					</li>
-
-					<!-- Lien vers Reclamation -->
-					<li class="nav-item">
-						<a href="{{ path('app_list_rec_admin') }}">
-							<i class="fas fa-pen-square"></i>
-							<p>Reclamation</p>
-						</a>
-					</li>
-
-					<!-- Lien vers Reponse -->
-					<li class="nav-item ">
-						<a href="{{ path('app_list_rep_admin') }}">
-							<i class="fas fa-pen-square"></i>
-							<p>Reponse</p>
-						</a>
-					</li>
-					<li class="nav-item ">
-						<a href="{{ path('app_guides_read') }}">
-							<i class="fas fa-pen-square"></i>
-							<p>Guides</p>
-						</a>
-					</li>
-					<li class="nav-item ">
-						<a href="{{ path('app_excursions_read') }}">
-							<i class="fas fa-pen-square"></i>
-							<p>Excursions</p>
-						</a>
-					</li>
-
-					<!-- Lien vers chart -->
-					<li class="nav-item ">
-						<a href="{{ path('app_chart_admin') }}">
-							<i class="fas fa-pen-square"></i>
-							<p>Charts</p>
-						</a>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</div>
-	<!-- End Sidebar -->
-
-
 	<div class="main-panel">
 		<div class="main-header">
 			<!-- Navbar Header -->
@@ -1081,9 +992,6 @@
 		});
 
 
-
-
 	</script>
 {% endblock %}
-</body>
-</html>
+

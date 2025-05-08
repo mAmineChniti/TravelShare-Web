@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
-use App\Entity\Users;
 use App\Entity\Notification;
 use App\Entity\Reclamations;
-use App\Service\ProfanityFilter;
+use App\Entity\Users;
 use App\Form\ReclamationFormType;
+use App\Service\ProfanityFilter;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ReclamationController extends AbstractController
 {
@@ -68,7 +68,7 @@ class ReclamationController extends AbstractController
 
             // Create notification for admin
             $notification = new Notification();
-            $notification->setMessage('New complaint submitted by '.$user->getName());
+            $notification->setMessage('New complaint submitted by ' . $user->getName());
             $notification->setIsRead(false);
             $notification->setCreatedAt(new \DateTime());
             $notification->setUpdatedAt(new \DateTime());
@@ -78,7 +78,6 @@ class ReclamationController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Your complaint has been successfully submitted!');
-
             return $this->redirectToRoute('app_list_rec_user');
         }
 

@@ -29,9 +29,6 @@
             margin-bottom: 1rem;
         }
 
-        .form-control.is-invalid {
-            border-color: #dc3545;
-        }
         .invalid-feedback {
             color: #dc3545;
             font-size: 0.875em;
@@ -90,14 +87,13 @@
                         <span id="profanityMessage">If your complaint contains inappropriate words, it will be deleted or not submitted.</span>
                     </div>
 
-
                     {{ form_start(form, {'attr': {'class': 'row g-3 needs-validation', 'novalidate': 'novalidate', 'id': 'reclamationForm'}}) }}
 
                     <div class="col-md-12">
                         <div class="form-floating">
                             {{ form_widget(form.title, {
                                 'attr': {
-                                    'class': 'form-control ' ~ (form.title.vars.valid ? '' : 'is-invalid'),
+                                    'class': 'form-control',
                                     'placeholder': 'Subject of the complaint',
                                     'id': 'reclamation_title'
                                 }
@@ -113,7 +109,7 @@
                         <div class="form-floating">
                             {{ form_widget(form.description, {
                                 'attr': {
-                                    'class': 'form-control ' ~ (form.description.vars.valid ? '' : 'is-invalid'),
+                                    'class': 'form-control',
                                     'style': 'height: 160px',
                                     'placeholder': 'Describe your problem...',
                                     'id': 'reclamation_description'
@@ -133,7 +129,7 @@
                         <div class="form-floating">
                             {{ form_widget(form.dateReclamation, {
                                 'attr': {
-                                    'class': 'form-control ' ~ (form.dateReclamation.vars.valid ? '' : 'is-invalid')
+                                    'class': 'form-control'
                                 }
                             }) }}
                             {{ form_label(form.dateReclamation, null, {'label_attr': {'class': 'form-label'}}) }}
@@ -159,74 +155,74 @@
 {% block javascripts %}
     {{ parent() }}
     <script>
-			document.addEventListener('DOMContentLoaded', function() {
-				const profanityWords = {{ profanity_words|json_encode|raw }};
-				const form = document.getElementById('reclamationForm');
-				const titleInput = document.getElementById('reclamation_title');
-				const descInput = document.getElementById('reclamation_description');
-				const warningElement = document.getElementById('profanityWarning');
-				const feedbackElement = document.getElementById('profanityFeedback');
+        document.addEventListener('DOMContentLoaded', function() {
+            const profanityWords = {{ profanity_words|json_encode|raw }};
+            const form = document.getElementById('reclamationForm');
+            const titleInput = document.getElementById('reclamation_title');
+            const descInput = document.getElementById('reclamation_description');
+            const warningElement = document.getElementById('profanityWarning');
+            const feedbackElement = document.getElementById('profanityFeedback');
 
-				function checkProfanity(text) {
-					const foundWords = [];
-					const lowerText = text.toLowerCase();
+            function checkProfanity(text) {
+                const foundWords = [];
+                const lowerText = text.toLowerCase();
 
-					profanityWords.forEach(word => {
-						const regex = new RegExp('\\b' + word.toLowerCase() + '\\b');
-						if (regex.test(lowerText)) {
-							foundWords.push(word);
-						}
-					});
+                profanityWords.forEach(word => {
+                    const regex = new RegExp('\\b' + word.toLowerCase() + '\\b');
+                    if (regex.test(lowerText)) {
+                        foundWords.push(word);
+                    }
+                });
 
-					return foundWords;
-				}
+                return foundWords;
+            }
 
-				function updateValidation() {
-					const titleWords = checkProfanity(titleInput.value);
-					const descWords = checkProfanity(descInput.value);
-					const hasProfanity = titleWords.length > 0 || descWords.length > 0;
+            function updateValidation() {
+                const titleWords = checkProfanity(titleInput.value);
+                const descWords = checkProfanity(descInput.value);
+                const hasProfanity = titleWords.length > 0 || descWords.length > 0;
 
-					// Mise à jour visuelle
-					if (descWords.length > 0) {
-						descInput.classList.add('is-invalid');
-						feedbackElement.style.display = 'block';
-						feedbackElement.textContent = 'Termes inappropriés détectés: ' + descWords.join(', ');
-					} else {
-						descInput.classList.remove('is-invalid');
-						feedbackElement.style.display = 'none';
-					}
+                // Mise à jour visuelle
+                if (descWords.length > 0) {
+                    descInput.classList.add('is-invalid');
+                    feedbackElement.style.display = 'block';
+                    feedbackElement.textContent = `Termes inappropriés détectés: ${descWords.join(', ')}`;
+                } else {
+                    descInput.classList.remove('is-invalid');
+                    feedbackElement.style.display = 'none';
+                }
 
-					if (hasProfanity) {
-						warningElement.style.display = 'block';
-						document.getElementById('profanityMessage').textContent =
-							'Termes inappropriés détectés: ' + [...titleWords, ...descWords].join(', ');
-					} else {
-						warningElement.style.display = 'none';
-					}
+                if (hasProfanity) {
+                    warningElement.style.display = 'block';
+                    document.getElementById('profanityMessage').textContent =
+                        `Termes inappropriés détectés: ${[...titleWords, ...descWords].join(', ')}`;
+                } else {
+                    warningElement.style.display = 'none';
+                }
 
-					return !hasProfanity;
-				}
+                return !hasProfanity;
+            }
 
-				// Validation en temps réel
-				[titleInput, descInput].forEach(input => {
-					input.addEventListener('input', function() {
-						updateValidation();
-					});
-				});
+            // Validation en temps réel
+            [titleInput, descInput].forEach(input => {
+                input.addEventListener('input', function() {
+                    updateValidation();
+                });
+            });
 
-				// Validation à la soumission
-				form.addEventListener('submit', function(e) {
-					if (!updateValidation()) {
-						e.preventDefault();
-						window.scrollTo({
-							top: descInput.offsetTop - 100,
-							behavior: 'smooth'
-						});
-					}
-				});
+            // Validation à la soumission
+            form.addEventListener('submit', function(e) {
+                if (!updateValidation()) {
+                    e.preventDefault();
+                    window.scrollTo({
+                        top: descInput.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
 
-				// Validation initiale
-				updateValidation();
-			});
+            // Validation initiale
+            updateValidation();
+        });
     </script>
 {% endblock %}

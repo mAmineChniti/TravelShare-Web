@@ -36,12 +36,18 @@
 						Dashboards
 					</a>
 					<ul class="dropdown-menu" aria-labelledby="dashboardDropdown">
+						<li><a class="dropdown-item" href="{{ path('app_accueil_admin') }}">Admin Dashboard</a></li>
+						<li><a class="dropdown-item" href="{{ path('app_list_rec_admin') }}">List of Reclamations</a></li>
+						<li><a class="dropdown-item" href="{{ path('app_list_rep_admin') }}">List of Responses</a></li>
 						<li><a class="dropdown-item" href="{{ path('app_dashboard_forum') }}">Forum Dashboard</a></li>
 						<li><a class="dropdown-item" href="{{ path('app_promo') }}">Promotions</a></li>
 						<li><a class="dropdown-item" href="{{ path('app_dashboard_flights') }}">Flights Dashboard</a></li>
 						<li><a class="dropdown-item" href="{{ path('dashboard_hotels') }}">Hotels Dashboard</a></li>
-					</ul>																																																							
+					</ul>
+
 				</li>
+
+
 				<li class="nav-item">
 					<a href="{{ path('app_flights') }}" class="nav-link px-3">Flights</a>
 				</li>
@@ -67,6 +73,19 @@
 				<li class="nav-item">
 					<a href="{{ path('app_excursions') }}" class="nav-link px-3">Excursions</a>
 				</li>
+
+				<li class="nav-item">
+					<a href="{{ path('app_profile') }}" class="nav-link px-3">My Profile</a>
+				</li>
+				<li class="nav-item">
+					<a href="{{ path('app_reclamation') }}" class="nav-link px-3">Reclamation</a>
+				</li>
+				<li class="nav-item">
+					<a href="{{ path('app_list_rec_user') }}" class="nav-link px-3">Historic</a>
+				</li>
+
+
+
 				{% endif %} {% endif %}
 			</ul>
 			<div class="d-flex align-items-center">
@@ -83,7 +102,10 @@
 					</button>
 					<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuDropdown">
 						<li>
-							<a class="dropdown-item" href="{{ path('app_profile') }}"><i class="fas fa-user me-2"></i>Profile</a>
+							<a class="dropdown-item" href="{{ path('app_profile') }}"><i class="fas fa-user me-2"></i>My Profile</a>
+						</li>
+						<li>
+							<a class="dropdown-item" href="{{ path('app_update_account') }}"><i class="fas fa-user me-2"></i>Account Settings</a>
 						</li>
 						<li><hr class="dropdown-divider" /></li>
 						<li>
