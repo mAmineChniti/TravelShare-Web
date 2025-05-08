@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\ReclamationsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'reclamations')]
@@ -21,10 +23,7 @@ class Reclamations
     #[ORM\JoinColumn(name: "user_id", referencedColumnName: "user_id", nullable: false, onDelete: "CASCADE")]
     private ?Users $user = null;
 
-    #[ORM\Column(name: "user_id")]
-    private ?int $userId = null;
-
-    #[ORM\Column(name: "title", length: 50)]
+    #[ORM\Column(name: "title", length: 100)]
     #[Assert\NotBlank(message: 'Please enter a subject for your complaint')]
     #[Assert\Length(
         min: 5,
@@ -51,21 +50,17 @@ class Reclamations
     #[ORM\Column(name: "etat", length: 20, nullable: true, options: ["default" => 'en cours'])]
     private ?string $etat = 'en cours';
 
+    #[ORM\OneToMany(mappedBy: 'reclamation', targetEntity: Reponses::class, cascade: ['persist', 'remove'])]
+    private Collection $reponses;
+
+    public function __construct()
+    {
+        $this->reponses = new ArrayCollection();
+    }
+
     public function getReclamationId(): ?int
     {
         return $this->reclamationId;
-    }
-
-    public function getUserId(): ?int
-    {
-        return $this->userId;
-    }
-
-    public function setUserId(int $userId): static
-    {
-        $this->userId = $userId;
-
-        return $this;
     }
 
     public function getTitle(): ?string
@@ -128,6 +123,9 @@ class Reclamations
         return $this;
     }
 
+    /**
+     * @return Collection<int, Reponses>
+     */
     public function getReponses(): Collection
     {
         return $this->reponses;
@@ -142,4 +140,17 @@ class Reclamations
 
         return $this;
     }
+
+    public function removeReponse(Reponses $reponse): static
+    {
+        if ($this->reponses->removeElement($reponse)) {
+            // set the owning side to null (unless already changed)
+            if ($reponse->getReclamation() === $this) {
+                $reponse->setReclamation(null);
+            }
+        }
+
+        return $this;
+    }
 }
+

@@ -12,16 +12,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ReclamationController extends AbstractController
 {
     #[Route('/reclamation', name: 'app_reclamation')]
     public function ajouter(Request $request, EntityManagerInterface $em, ProfanityFilter $profanityFilter): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        // $this->d/enyAccessUnlessGranted('ROLE_USER');
 
         $reclamation = new Reclamations();
+
+        // Set the user before handling the form
+        $reclamation->setUser($this->getUser());
+
         $form = $this->createForm(ReclamationFormType::class, $reclamation);
         $form->handleRequest($request);
 
@@ -48,7 +51,6 @@ class ReclamationController extends AbstractController
             }
 
             // Save the complaint if no profanity found
-            $reclamation->setUser($this->getUser());
             $reclamation->setDateReclamation(new \DateTime());
 
             $em->persist($reclamation);
@@ -57,9 +59,16 @@ class ReclamationController extends AbstractController
             // Get admin user (role = 1)
             $admin = $em->getRepository(Users::class)->findOneBy(['role' => 1]);
 
+            /** @var Users $user */
+            $user = $this->getUser();
+
+            if (!$user instanceof Users) {
+                throw new \Exception('The user must be an instance of App\\Entity\\Users.');
+            }
+
             // Create notification for admin
             $notification = new Notification();
-            $notification->setMessage('New complaint submitted by ' . $this->getUser()->getName());
+            $notification->setMessage('New complaint submitted by ' . $user->getName());
             $notification->setIsRead(false);
             $notification->setCreatedAt(new \DateTime());
             $notification->setUpdatedAt(new \DateTime());

@@ -20,7 +20,7 @@ class ReclamationsRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Reclamations::class);
     }
-
+    
 //    /**
 //     * @return Reclamations[] Returns an array of Reclamations objects
 //     */
