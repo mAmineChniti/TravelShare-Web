@@ -11,6 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Users;
 
 class HotelsController extends AbstractController
 {
@@ -112,6 +113,13 @@ Hotel List:\n".implode("\n", $hotelSummaries);
     #[Route('/dashboard/hotels', name: 'dashboard_hotels')]
     public function dashboardHotels(HotelsRepository $hotelsRepository): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            return $this->redirectToRoute('app_login');
+        }
+        if(!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_hotels');
+        }
         $hotels = $hotelsRepository->findAll();
         foreach ($hotels as $hotel) {
             if ($hotel->getImageH()) {
@@ -129,6 +137,13 @@ Hotel List:\n".implode("\n", $hotelSummaries);
     #[Route('/dashboard/hotels/add', name: 'dashboard_hotels_add', methods: ['GET', 'POST'])]
     public function addHotel(Request $request, HotelsRepository $hotelsRepository, ValidatorInterface $validator): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            return $this->redirectToRoute('app_login');
+        }
+        if(!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_hotels');
+        }
         $hotel = new Hotels();
         $errorMessages = [];
         if ($request->isMethod('POST')) {
@@ -177,6 +192,14 @@ Hotel List:\n".implode("\n", $hotelSummaries);
     #[Route('/dashboard/hotels/edit/{id}', name: 'dashboard_hotels_edit', methods: ['GET', 'POST'])]
     public function editHotel(int $id, Request $request, HotelsRepository $hotelsRepository, ValidatorInterface $validator): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof Users) {
+            return $this->redirectToRoute('app_login');
+        }
+        if(!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_hotels');
+        }
+
         $hotel = $hotelsRepository->find($id);
         if (!$hotel) {
             return $this->redirectToRoute('dashboard_hotels');

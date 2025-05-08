@@ -55,24 +55,19 @@ class PostsRepository extends ServiceEntityRepository
         return $this->findAll();
     }
 
-    public function fetchPosts(int $offset, int $limit, int $userId): array
+    public function fetchPosts(int $offset, int $limit): array
     {
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
             'SELECT p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId, p.postTitle, p.slug
-         FROM App\Entity\Posts p 
-         JOIN App\Entity\Users u WITH p.ownerId = u.userId 
-         LEFT JOIN App\Entity\FlaggedContent f WITH p.postId = f.postId AND f.flaggerId = :userId 
-         WHERE f.postId IS NULL 
-         ORDER BY p.createdAt DESC'
+             FROM App\Entity\Posts p 
+             JOIN App\Entity\Users u WITH p.ownerId = u.userId 
+             ORDER BY p.createdAt DESC'
         )
-            ->setParameter('userId', $userId)
             ->setFirstResult($offset)
             ->setMaxResults($limit);
 
-        $posts = $query->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
-
-        return $posts;
+        return $query->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
     public function searchByTextContent(string $searchTerm, int $offset, int $limit): array
@@ -80,12 +75,10 @@ class PostsRepository extends ServiceEntityRepository
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
             'SELECT p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId, p.postTitle, p.slug
-            FROM App\\Entity\\Posts p 
-            JOIN App\Entity\Users u WITH p.ownerId = u.userId 
-            LEFT JOIN App\Entity\FlaggedContent f WITH p.postId = f.postId AND f.flaggerId = :userId
-            WHERE f.postId IS NULL
-            AND p.textContent LIKE :searchTerm
-            ORDER BY p.createdAt DESC'
+             FROM App\Entity\Posts p 
+             JOIN App\Entity\Users u WITH p.ownerId = u.userId 
+             WHERE p.textContent LIKE :searchTerm
+             ORDER BY p.createdAt DESC'
         )
         ->setParameter('searchTerm', '%'.$searchTerm.'%')
         ->setFirstResult($offset)
@@ -94,7 +87,7 @@ class PostsRepository extends ServiceEntityRepository
         return $query->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
-    public function fetchPostsSorted(string $sortBy, int $offset, int $limit, int $userId): array
+    public function fetchPostsSorted(string $sortBy, int $offset, int $limit): array
     {
         $entityManager = $this->getEntityManager();
 
@@ -102,9 +95,6 @@ class PostsRepository extends ServiceEntityRepository
             ->select('p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId, p.postTitle, p.slug')
             ->from('App\\Entity\\Posts', 'p')
             ->join('App\\Entity\\Users', 'u', 'WITH', 'p.ownerId = u.userId')
-            ->leftJoin('App\\Entity\\FlaggedContent', 'f', 'WITH', 'p.postId = f.postId AND f.flaggerId = :userId')
-            ->where('f.postId IS NULL')
-            ->setParameter('userId', $userId)
             ->setFirstResult($offset)
             ->setMaxResults($limit);
 
@@ -122,17 +112,15 @@ class PostsRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
     }
 
-    public function fetchPostsByIds(array $postIds, int $userId): array
+    public function fetchPostsByIds(array $postIds): array
     {
         $entityManager = $this->getEntityManager();
         $query = $entityManager->createQuery(
             'SELECT p.postId, p.textContent, u.name, u.lastName, p.createdAt, p.ownerId, p.postTitle, p.slug
              FROM App\Entity\Posts p 
              JOIN App\Entity\Users u WITH p.ownerId = u.userId 
-             LEFT JOIN App\Entity\FlaggedContent f WITH p.postId = f.postId AND f.flaggerId = :userId 
-             WHERE f.postId IS NULL AND p.postId IN (:postIds)'
+             WHERE p.postId IN (:postIds)'
         )
-        ->setParameter('userId', $userId)
         ->setParameter('postIds', $postIds);
 
         return $query->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
