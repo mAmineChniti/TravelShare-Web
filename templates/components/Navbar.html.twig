@@ -43,7 +43,9 @@
 						<li><a class="dropdown-item" href="{{ path('app_promo') }}">Promotions</a></li>
 						<li><a class="dropdown-item" href="{{ path('app_dashboard_flights') }}">Flights Dashboard</a></li>
 						<li><a class="dropdown-item" href="{{ path('dashboard_hotels') }}">Hotels Dashboard</a></li>
-					</ul>
+						<li><a class="dropdown-item" href="{{ path('app_excursions_read') }}">Excursions Dashboard</a></li>
+						<li><a class="dropdown-item" href="{{ path('app_guides_read') }}">Guides Dashboard</a></li>
+					</ul>																																																							
 				</li>
 
 				<li class="nav-item">
@@ -54,9 +56,6 @@
 				</li>
 				<li class="nav-item">
 					<a href="{{ path('app_forum') }}" class="nav-link px-3">Forum</a>
-				</li>
-				<li class="nav-item">
-					<a href="{{ path('app_excursions') }}" class="nav-link px-3">Excursions</a>
 				</li>
 				{% else %}
 				<li class="nav-item">
@@ -69,7 +68,7 @@
 					<a href="{{ path('app_forum') }}" class="nav-link px-3">Forum</a>
 				</li>
 				<li class="nav-item">
-					<a href="{{ path('app_excursions') }}" class="nav-link px-3">Excursions</a>
+					<a href="{{ path('app_excursions_client') }}" class="nav-link px-3"> Excursions</a>
 				</li>
 
 				<li class="nav-item">
