@@ -1,232 +1,203 @@
-{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %} {% block title %}Reclamation{% endblock %} {% block stylesheets %} {{ parent() }}
+<style>
+	.form-control.is-invalid {
+		border-color: #dc3545;
+		box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+	}
+	.profanity-feedback {
+		color: #dc3545;
+		font-size: 0.875em;
+		display: none;
+		margin-top: 0.25rem;
+	}
+	.profanity-warning {
+		color: #dc3545;
+		background-color: #f8d7da;
+		border-color: #f5c6cb;
+		padding: 0.75rem 1.25rem;
+		margin-bottom: 1rem;
+		border: 1px solid transparent;
+		border-radius: 0.25rem;
+		display: none;
+	}
+	.form-floating {
+		margin-bottom: 1rem;
+	}
 
-{% block title %}Reclamation{% endblock %}
+	.invalid-feedback {
+		color: #dc3545;
+		font-size: 0.875em;
+	}
+</style>
+{% endblock %} {% block body %}
+<div class="container-fluid contact bg-light py-5">
+	<div class="container py-5">
+		<div class="container mb-5 position-relative">
+			<div class="d-flex align-items-center">
+				<a href="{{ path('app_home') }}" class="text-dark me-3">
+					<i class="fas fa-arrow-left fa-lg"></i>
+				</a>
+				<div class="text-center flex-grow-1">
+					<h5 class="section-title">Reclamation</h5>
+					<h1 class="mb-0">Need help? Write to us!</h1>
+				</div>
+			</div>
+		</div>
 
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .form-control.is-invalid {
-            border-color: #dc3545;
-            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
-        }
-        .profanity-feedback {
-            color: #dc3545;
-            font-size: 0.875em;
-            display: none;
-            margin-top: 0.25rem;
-        }
-        .profanity-warning {
-            color: #dc3545;
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-            padding: 0.75rem 1.25rem;
-            margin-bottom: 1rem;
-            border: 1px solid transparent;
-            border-radius: 0.25rem;
-            display: none;
-        }
-        .form-floating {
-            margin-bottom: 1rem;
-        }
+		{% for message in app.flashes('warning') %}
+		<div class="alert alert-warning alert-dismissible fade show" role="alert">
+			{{ message }}
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		{% endfor %}
 
-        .form-control.is-invalid {
-            border-color: #dc3545;
-        }
-        .invalid-feedback {
-            color: #dc3545;
-            font-size: 0.875em;
-        }
-    </style>
-{% endblock %}
+		<div class="row g-5 align-items-center">
+			<div class="col-lg-4">
+				<div class="bg-white rounded p-4">
+					<div class="text-center mb-4">
+						<i class="fa fa-map-marker-alt fa-3x text-primary"></i>
+						<h4 class="text-primary">Adresse</h4>
+						<p class="mb-0">
+							123 Tunis, <br />
+							Tunis
+						</p>
+					</div>
+					<div class="text-center mb-4">
+						<i class="fa fa-phone-alt fa-3x text-primary mb-3"></i>
+						<h4 class="text-primary">Mobile</h4>
+						<p class="mb-0">+216 00 000 000</p>
+					</div>
+					<div class="text-center">
+						<i class="fa fa-envelope-open fa-3x text-primary mb-3"></i>
+						<h4 class="text-primary">Email</h4>
+						<p class="mb-0">benmwiem@gmail.com</p>
+					</div>
+				</div>
+			</div>
 
-{% block body %}
-    <div class="container-fluid contact bg-light py-5">
-        <div class="container py-5">
-            <div class="container mb-5 position-relative">
-                <div class="d-flex align-items-center">
-                    <a href="{{ path('app_home') }}" class="text-dark me-3">
-                        <i class="fas fa-arrow-left fa-lg"></i>
-                    </a>
-                    <div class="text-center flex-grow-1">
-                        <h5 class="section-title">Reclamation</h5>
-                        <h1 class="mb-0">Need help? Write to us!</h1>
-                    </div>
-                </div>
-            </div>
+			<div class="col-lg-8">
+				<h3 class="mb-2">Send us a message</h3>
+				<p class="mb-4">Write your complaint, we will respond to you as soon as possible.</p>
+				<div class="profanity-warning" id="profanityWarning">
+					<strong><i class="fas fa-exclamation-triangle me-2"></i>Warning!</strong>
+					<span id="profanityMessage"
+						>If your complaint contains inappropriate words, it will be deleted or not submitted.</span
+					>
+				</div>
 
-            {% for message in app.flashes('warning') %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
+				{{ form_start(form, {'attr': {'class': 'row g-3 needs-validation', 'novalidate': 'novalidate', 'id':
+				'reclamationForm'}}) }}
 
-            <div class="row g-5 align-items-center">
-                <div class="col-lg-4">
-                    <div class="bg-white rounded p-4">
-                        <div class="text-center mb-4">
-                            <i class="fa fa-map-marker-alt fa-3x text-primary"></i>
-                            <h4 class="text-primary">Adresse</h4>
-                            <p class="mb-0">123 Tunis, <br> Tunis</p>
-                        </div>
-                        <div class="text-center mb-4">
-                            <i class="fa fa-phone-alt fa-3x text-primary mb-3"></i>
-                            <h4 class="text-primary">Mobile</h4>
-                            <p class="mb-0">+216 00 000 000</p>
-                        </div>
-                        <div class="text-center">
-                            <i class="fa fa-envelope-open fa-3x text-primary mb-3"></i>
-                            <h4 class="text-primary">Email</h4>
-                            <p class="mb-0">benmwiem@gmail.com</p>
-                        </div>
-                    </div>
-                </div>
+				<div class="col-md-12">
+					<div class="form-floating">
+						{{ form_widget(form.title, { 'attr': { 'class': 'form-control', 'placeholder': 'Subject of the complaint',
+						'id': 'reclamation_title' } }) }} {{ form_label(form.title, null, {'label_attr': {'class': 'form-label'}})
+						}}
+					</div>
+					<div class="invalid-feedback">{{ form_errors(form.title) }}</div>
+				</div>
 
-                <div class="col-lg-8">
-                    <h3 class="mb-2">Send us a message</h3>
-                    <p class="mb-4">Write your complaint, we will respond to you as soon as possible.</p>
-                    <div class="profanity-warning" id="profanityWarning">
-                        <strong><i class="fas fa-exclamation-triangle me-2"></i>Warning!</strong>
-                        <span id="profanityMessage">If your complaint contains inappropriate words, it will be deleted or not submitted.</span>
-                    </div>
+				<div class="col-12">
+					<div class="form-floating">
+						{{ form_widget(form.description, { 'attr': { 'class': 'form-control', 'style': 'height: 160px',
+						'placeholder': 'Describe your problem...', 'id': 'reclamation_description' } }) }} {{
+						form_label(form.description, null, {'label_attr': {'class': 'form-label'}}) }}
+					</div>
+					<div class="invalid-feedback">{{ form_errors(form.description) }}</div>
+					<div class="invalid-feedback profanity-feedback" id="profanityFeedback">
+						<i class="fas fa-exclamation-circle me-1"></i> Contenu inapproprié détecté
+					</div>
+				</div>
 
+				<div class="col-md-6">
+					<div class="form-floating">
+						{{ form_widget(form.dateReclamation, { 'attr': { 'class': 'form-control' } }) }} {{
+						form_label(form.dateReclamation, null, {'label_attr': {'class': 'form-label'}}) }}
+					</div>
+					<div class="invalid-feedback">{{ form_errors(form.dateReclamation) }}</div>
+				</div>
 
-                    {{ form_start(form, {'attr': {'class': 'row g-3 needs-validation', 'novalidate': 'novalidate', 'id': 'reclamationForm'}}) }}
+				<div class="col-12">
+					<button class="btn btn-primary w-100 py-3" type="submit">
+						<i class="fas fa-paper-plane me-2"></i> Submit Reclamation
+					</button>
+				</div>
 
-                    <div class="col-md-12">
-                        <div class="form-floating">
-                            {{ form_widget(form.title, {
-                                'attr': {
-                                    'class': 'form-control ' ~ (form.title.vars.valid ? '' : 'is-invalid'),
-                                    'placeholder': 'Subject of the complaint',
-                                    'id': 'reclamation_title'
-                                }
-                            }) }}
-                            {{ form_label(form.title, null, {'label_attr': {'class': 'form-label'}}) }}
-                        </div>
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.title) }}
-                        </div>
-                    </div>
+				{{ form_end(form) }}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %} {% block javascripts %} {{ parent() }}
+<script>
+	document.addEventListener('DOMContentLoaded', function() {
+	    const profanityWords = {{ profanity_words|json_encode|raw }};
+	    const form = document.getElementById('reclamationForm');
+	    const titleInput = document.getElementById('reclamation_title');
+	    const descInput = document.getElementById('reclamation_description');
+	    const warningElement = document.getElementById('profanityWarning');
+	    const feedbackElement = document.getElementById('profanityFeedback');
 
-                    <div class="col-12">
-                        <div class="form-floating">
-                            {{ form_widget(form.description, {
-                                'attr': {
-                                    'class': 'form-control ' ~ (form.description.vars.valid ? '' : 'is-invalid'),
-                                    'style': 'height: 160px',
-                                    'placeholder': 'Describe your problem...',
-                                    'id': 'reclamation_description'
-                                }
-                            }) }}
-                            {{ form_label(form.description, null, {'label_attr': {'class': 'form-label'}}) }}
-                        </div>
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.description) }}
-                        </div>
-                        <div class="invalid-feedback profanity-feedback" id="profanityFeedback">
-                            <i class="fas fa-exclamation-circle me-1"></i> Contenu inapproprié détecté
-                        </div>
-                    </div>
+	    function checkProfanity(text) {
+	        const foundWords = [];
+	        const lowerText = text.toLowerCase();
 
-                    <div class="col-md-6">
-                        <div class="form-floating">
-                            {{ form_widget(form.dateReclamation, {
-                                'attr': {
-                                    'class': 'form-control ' ~ (form.dateReclamation.vars.valid ? '' : 'is-invalid')
-                                }
-                            }) }}
-                            {{ form_label(form.dateReclamation, null, {'label_attr': {'class': 'form-label'}}) }}
-                        </div>
-                        <div class="invalid-feedback">
-                            {{ form_errors(form.dateReclamation) }}
-                        </div>
-                    </div>
+	        profanityWords.forEach(word => {
+	            const regex = new RegExp('\\b' + word.toLowerCase() + '\\b');
+	            if (regex.test(lowerText)) {
+	                foundWords.push(word);
+	            }
+	        });
 
-                    <div class="col-12">
-                        <button class="btn btn-primary w-100 py-3" type="submit">
-                            <i class="fas fa-paper-plane me-2"></i> Submit Reclamation
-                        </button>
-                    </div>
+	        return foundWords;
+	    }
 
-                    {{ form_end(form) }}
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock %}
+	    function updateValidation() {
+	        const titleWords = checkProfanity(titleInput.value);
+	        const descWords = checkProfanity(descInput.value);
+	        const hasProfanity = titleWords.length > 0 || descWords.length > 0;
 
-{% block javascripts %}
-    {{ parent() }}
-    <script>
-			document.addEventListener('DOMContentLoaded', function() {
-				const profanityWords = {{ profanity_words|json_encode|raw }};
-				const form = document.getElementById('reclamationForm');
-				const titleInput = document.getElementById('reclamation_title');
-				const descInput = document.getElementById('reclamation_description');
-				const warningElement = document.getElementById('profanityWarning');
-				const feedbackElement = document.getElementById('profanityFeedback');
+	        // Mise à jour visuelle
+	        if (descWords.length > 0) {
+	            descInput.classList.add('is-invalid');
+	            feedbackElement.style.display = 'block';
+	            feedbackElement.textContent = `Termes inappropriés détectés: ${descWords.join(', ')}`;
+	        } else {
+	            descInput.classList.remove('is-invalid');
+	            feedbackElement.style.display = 'none';
+	        }
 
-				function checkProfanity(text) {
-					const foundWords = [];
-					const lowerText = text.toLowerCase();
+	        if (hasProfanity) {
+	            warningElement.style.display = 'block';
+	            document.getElementById('profanityMessage').textContent =
+	                `Termes inappropriés détectés: ${[...titleWords, ...descWords].join(', ')}`;
+	        } else {
+	            warningElement.style.display = 'none';
+	        }
 
-					profanityWords.forEach(word => {
-						const regex = new RegExp('\\b' + word.toLowerCase() + '\\b');
-						if (regex.test(lowerText)) {
-							foundWords.push(word);
-						}
-					});
+	        return !hasProfanity;
+	    }
 
-					return foundWords;
-				}
+	    // Validation en temps réel
+	    [titleInput, descInput].forEach(input => {
+	        input.addEventListener('input', function() {
+	            updateValidation();
+	        });
+	    });
 
-				function updateValidation() {
-					const titleWords = checkProfanity(titleInput.value);
-					const descWords = checkProfanity(descInput.value);
-					const hasProfanity = titleWords.length > 0 || descWords.length > 0;
+	    // Validation à la soumission
+	    form.addEventListener('submit', function(e) {
+	        if (!updateValidation()) {
+	            e.preventDefault();
+	            window.scrollTo({
+	                top: descInput.offsetTop - 100,
+	                behavior: 'smooth'
+	            });
+	        }
+	    });
 
-					// Mise à jour visuelle
-					if (descWords.length > 0) {
-						descInput.classList.add('is-invalid');
-						feedbackElement.style.display = 'block';
-						feedbackElement.textContent = 'Termes inappropriés détectés: ' + descWords.join(', ');
-					} else {
-						descInput.classList.remove('is-invalid');
-						feedbackElement.style.display = 'none';
-					}
-
-					if (hasProfanity) {
-						warningElement.style.display = 'block';
-						document.getElementById('profanityMessage').textContent =
-							'Termes inappropriés détectés: ' + [...titleWords, ...descWords].join(', ');
-					} else {
-						warningElement.style.display = 'none';
-					}
-
-					return !hasProfanity;
-				}
-
-				// Validation en temps réel
-				[titleInput, descInput].forEach(input => {
-					input.addEventListener('input', function() {
-						updateValidation();
-					});
-				});
-
-				// Validation à la soumission
-				form.addEventListener('submit', function(e) {
-					if (!updateValidation()) {
-						e.preventDefault();
-						window.scrollTo({
-							top: descInput.offsetTop - 100,
-							behavior: 'smooth'
-						});
-					}
-				});
-
-				// Validation initiale
-				updateValidation();
-			});
-    </script>
+	    // Validation initiale
+	    updateValidation();
+	});
+</script>
 {% endblock %}

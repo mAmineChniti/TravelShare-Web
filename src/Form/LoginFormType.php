@@ -32,6 +32,7 @@ class LoginFormType extends AbstractType
                     'placeholder' => 'Email Address',
                     'class' => 'form-control',
                     'autocomplete' => 'email',
+                    'required' => true
                 ],
             ])
             ->add('_password', PasswordType::class, [
@@ -50,6 +51,7 @@ class LoginFormType extends AbstractType
                     'placeholder' => 'Password',
                     'class' => 'form-control',
                     'autocomplete' => 'current-password',
+                    'required' => true
                 ],
             ])
             ->add('recaptcha', EWZRecaptchaType::class, [

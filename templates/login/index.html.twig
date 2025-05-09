@@ -114,13 +114,6 @@
 									<div class="text-error">{{ form_errors(loginForm._password) }}</div>
 								</div>
 
-								<div class="mb-3">
-									<div class="form-check">
-										<input class="form-check-input" type="checkbox" name="_remember_me" id="remember_me" />
-										<label class="form-check-label" for="remember_me"> Remember me </label>
-									</div>
-								</div>
-
 								<!-- reCAPTCHA -->
 								<div class="form-wrapper">
 									<div class="g-recaptcha" data-sitekey="6LduMSQrAAAAAMilOA0YocwwlbFgxMqgQ2RYoiWm"></div>
@@ -135,7 +128,7 @@
 
 								<div class="text-center mt-3">
 									<div class="mb-2">
-										<a href="#" class="text-decoration-none">Forgot password?</a>
+										<a href="{{ path('app_forgot_password') }}" class="text-decoration-underline">Forgot password?</a>
 									</div>
 									<p class="mb-0">
 										Don't have an account?

@@ -1,249 +1,144 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<title>{% block title %}Admin Dashboard{% endblock %}</title>
-	<meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport"/>
+{% extends 'base.html.twig' %} {% block title %}Admin Dashboard{% endblock %} {% block stylesheets %} {{ parent() }}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+<!-- CSS Files -->
+<link rel="stylesheet" href="{{ asset('css3/bootstrap.min.css') }}" />
+<link rel="stylesheet" href="{{ asset('css3/plugins.min.css') }}" />
+<link rel="stylesheet" href="{{ asset('css3/kaiadmin.min.css') }}" />
 
-	<!-- Lien vers la favicon -->
-	<link rel="icon" href="{{ asset('images2/favicon.svg') }}" type="image/x-icon">
-	<link rel="icon" href="{{ asset('images2/favicon.ico') }}" />
+<!-- CSS Just for demo purpose, don't include it in your project -->
+<link rel="stylesheet" href="{{ asset('css3/demo.css') }}" />
 
-	{% block js %}
-		<!-- Fonts and icons -->
-		<script src="{{ asset('js2/plugin/webfont/webfont.min.js') }}"></script>
-		<script>
-			WebFont.load({
-				google: { families: ["Public Sans:300,400,500,600,700"] },
-				custom: {
-					families: [
-						"Font Awesome 5 Solid",
-						"Font Awesome 5 Regular",
-						"Font Awesome 5 Brands",
-						"simple-line-icons",
-					],
-					urls: ["css3/fonts.min.css"],
-				},
-				active: function () {
-					sessionStorage.fonts = true;
-				},
-			});
-		</script>
-	{% endblock %}
+<style>
+	/* assets/styles/admin.css */
+	.table-hover tbody tr:hover {
+		background-color: rgba(0, 0, 0, 0.02);
+	}
 
-	{% block css %}
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-		<!-- CSS Files -->
-		<link rel="stylesheet" href="{{ asset('css3/bootstrap.min.css') }}" />
-		<link rel="stylesheet" href="{{ asset('css3/plugins.min.css') }}" />
-		<link rel="stylesheet" href="{{ asset('css3/kaiadmin.min.css') }}" />
+	.avatar-initials {
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: bold;
+	}
 
-		<!-- CSS Just for demo purpose, don't include it in your project -->
-		<link rel="stylesheet" href="{{ asset('css3/demo.css') }}" />
+	.btn-sm {
+		padding: 0.25rem 0.5rem;
+		font-size: 0.875rem;
+	}
 
-		<style>
+	.badge {
+		font-size: 0.75em;
+		font-weight: 500;
+		padding: 0.35em 0.65em;
+	}
 
-			/* assets/styles/admin.css */
-			.table-hover tbody tr:hover {
-				background-color: rgba(0, 0, 0, 0.02);
-			}
+	.bg-light-blue {
+		background-color: #f8fafc;
+	}
+	.avatar-placeholder {
+		font-weight: 600;
+		font-size: 0.9rem;
+	}
+	.table-hover tbody tr:hover {
+		background-color: rgba(0, 123, 255, 0.05) !important;
+	}
+	.badge {
+		font-weight: 500;
+		letter-spacing: 0.5px;
+	}
 
-			.avatar-initials {
-				width: 40px;
-				height: 40px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				font-weight: bold;
-			}
+	.notif-box {
+		max-height: 400px;
+		overflow-y: auto;
+		padding: 10px;
+		border-radius: 5px;
+		box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+	}
 
-			.btn-sm {
-				padding: 0.25rem 0.5rem;
-				font-size: 0.875rem;
-			}
+	.notif-content {
+		padding-left: 10px;
+		padding-right: 10px;
+		padding-bottom: 10px;
+	}
+</style>
+{% endblock %} {% block javascripts %} {{ parent() }}
+<script src="{{ asset('js2/plugin/webfont/webfont.min.js') }}"></script>
+<script>
+	WebFont.load({
+		google: { families: ["Public Sans:300,400,500,600,700"] },
+		custom: {
+			families: ["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"],
+			urls: ["css3/fonts.min.css"],
+		},
+		active: function () {
+			sessionStorage.fonts = true;
+		},
+	});
+</script>
+{% endblock %} {% block body%}
 
-			.badge {
-				font-size: 0.75em;
-				font-weight: 500;
-				padding: 0.35em 0.65em;
-			}
-
-			.bg-light-blue {
-				background-color: #f8fafc;
-			}
-			.avatar-placeholder {
-				font-weight: 600;
-				font-size: 0.9rem;
-			}
-			.table-hover tbody tr:hover {
-				background-color: rgba(0, 123, 255, 0.05) !important;
-			}
-			.badge {
-				font-weight: 500;
-				letter-spacing: 0.5px;
-			}
-
-			.notif-box {
-				max-height: 400px;
-				overflow-y: auto;
-				padding: 10px;
-				border-radius: 5px;
-				box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-			}
-
-			.notif-content {
-				padding-left: 10px;
-				padding-right: 10px;
-				padding-bottom: 10px;
-			}
-
-		</style>
-	{% endblock %}
-
-</head>
-
-{% block body%}
-
-<body>
 <div class="wrapper">
-	<!-- Sidebar -->
-	<div class="sidebar" data-background-color="dark">
-		<div class="sidebar-logo">
-			<!-- Logo Header -->
-			<div class="logo-header" data-background-color="dark">
-				<img
-						src="{{ asset('images2/favicon.svg') }}"
-						alt="navbar brand"
-						class="navbar-brand"
-						height="20"
-				/>
-				<span class="ms-2 fs-5 text-primary">Admin Dashboard</span>
-			</div>
-			<!-- End Logo Header -->
-		</div>
-
-		<div class="sidebar-wrapper scrollbar scrollbar-inner">
-			<div class="sidebar-content">
-				<ul class="nav nav-secondary">
-					<!-- Lien vers Dashboard -->
-					<li class="nav-item active">
-						<a href="{{ path('app_accueil_admin') }}">
-							<i class="fas fa-home"></i>
-							<p>Dashboard</p>
-						</a>
-					</li>
-
-					<!-- Section séparée -->
-					<li class="nav-section">
-                    <span class="sidebar-mini-icon">
-                        <i class="fa fa-ellipsis-h"></i>
-                    </span>
-						<h4 class="text-section">Components</h4>
-					</li>
-
-					<!-- Lien vers Reclamation -->
-					<li class="nav-item">
-						<a href="{{ path('app_list_rec_admin') }}">
-							<i class="fas fa-pen-square"></i>
-							<p>Reclamation</p>
-						</a>
-					</li>
-
-					<!-- Lien vers Reponse -->
-					<li class="nav-item ">
-						<a href="{{ path('app_list_rep_admin') }}">
-							<i class="fas fa-pen-square"></i>
-							<p>Reponse</p>
-						</a>
-					</li>
-					<li class="nav-item ">
-						<a href="{{ path('app_guides_read') }}">
-							<i class="fas fa-pen-square"></i>
-							<p>Guides</p>
-						</a>
-					</li>
-					<li class="nav-item ">
-						<a href="{{ path('app_excursions_read') }}">
-							<i class="fas fa-pen-square"></i>
-							<p>Excursions</p>
-						</a>
-					</li>
-
-					<!-- Lien vers chart -->
-					<li class="nav-item ">
-						<a href="{{ path('app_chart_admin') }}">
-							<i class="fas fa-pen-square"></i>
-							<p>Charts</p>
-						</a>
-					</li>
-				</ul>
-			</div>
-		</div>
-	</div>
-	<!-- End Sidebar -->
-
-
 	<div class="main-panel">
 		<div class="main-header">
 			<!-- Navbar Header -->
-			<nav
-					class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom"
-			>
+			<nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
 				<div class="container-fluid">
-					<nav
-							class="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex"
-					>
+					<nav class="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex">
 						<div class="input-group">
 							<div class="input-group-prepend">
 								<button type="submit" class="btn btn-search pe-1">
 									<i class="fa fa-search search-icon"></i>
 								</button>
 							</div>
-							<input
-									type="text"
-									placeholder="Search ..."
-									class="form-control"
-							/>
+							<input type="text" placeholder="Search ..." class="form-control" />
 						</div>
 					</nav>
 
 					<ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
-						<li
-								class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none"
-						>
+						<li class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">
 							<a
-									class="nav-link dropdown-toggle"
-									data-bs-toggle="dropdown"
-									href="#"
-									role="button"
-									aria-expanded="false"
-									aria-haspopup="true"
+								class="nav-link dropdown-toggle"
+								data-bs-toggle="dropdown"
+								href="#"
+								role="button"
+								aria-expanded="false"
+								aria-haspopup="true"
 							>
 								<i class="fa fa-search"></i>
 							</a>
 							<ul class="dropdown-menu dropdown-search animated fadeIn">
 								<form class="navbar-left navbar-form nav-search">
 									<div class="input-group">
-										<input
-												type="text"
-												placeholder="Search ..."
-												class="form-control"
-										/>
+										<input type="text" placeholder="Search ..." class="form-control" />
 									</div>
 								</form>
 							</ul>
 						</li>
 
-						{# notification #}
-						{# accueil_admin/index.html.twig #}
+						{# notification #} {# accueil_admin/index.html.twig #}
 
 						<li class="nav-item topbar-icon dropdown hidden-caret">
-							<a class="nav-link dropdown-toggle" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<a
+								class="nav-link dropdown-toggle"
+								href="#"
+								id="notifDropdown"
+								role="button"
+								data-bs-toggle="dropdown"
+								aria-haspopup="true"
+								aria-expanded="false"
+							>
 								<i class="fa fa-bell"></i>
-								<span class="notification">{{ notifications|length }}</span> <!-- Affiche le nombre de notifications -->
+								<span class="notification">{{ notifications|length }}</span>
+								<!-- Affiche le nombre de notifications -->
 							</a>
-							<ul class="dropdown-menu notif-box animated fadeIn" aria-labelledby="notifDropdown" style="max-height: 400px; overflow-y: auto;"> <!-- Ajouter un max-height et un scroll vertical -->
+							<ul
+								class="dropdown-menu notif-box animated fadeIn"
+								aria-labelledby="notifDropdown"
+								style="max-height: 400px; overflow-y: auto"
+							>
+								<!-- Ajouter un max-height et un scroll vertical -->
 								<li>
 									<div class="dropdown-title">
 										Vous avez {{ notifications|length }} nouvelle notification{{ notifications|length > 1 ? 's' : '' }}
@@ -253,17 +148,21 @@
 									<div class="notif-scroll scrollbar-outer">
 										<div class="notif-center">
 											{% for notification in notifications %}
-												<a href="#">
-													<div class="notif-icon notif-primary">
-														<i class="fa fa-comment"></i> <!-- Utilisez l'icône appropriée pour la notification -->
-													</div>
-													<div class="notif-content">
-														<span class="block">{{ notification.message }}</span> <!-- Affichage du message -->
-														<span class="time">{{ notification.createdAt|date('d/m/Y H:i') }}</span> <!-- Date de création -->
-													</div>
-												</a>
+											<a href="#">
+												<div class="notif-icon notif-primary">
+													<i class="fa fa-comment"></i>
+													<!-- Utilisez l'icône appropriée pour la notification -->
+												</div>
+												<div class="notif-content">
+													<span class="block">{{ notification.message }}</span>
+													<!-- Affichage du message -->
+													<span class="time">{{ notification.createdAt|date('d/m/Y H:i') }}</span>
+													<!-- Date de création -->
+												</div>
+											</a>
 											{% else %}
-												<div>Aucune notification</div> <!-- Si aucune notification -->
+											<div>Aucune notification</div>
+											<!-- Si aucune notification -->
 											{% endfor %}
 										</div>
 									</div>
@@ -271,14 +170,8 @@
 							</ul>
 						</li>
 
-
 						<li class="nav-item topbar-icon dropdown hidden-caret">
-							<a
-									class="nav-link"
-									data-bs-toggle="dropdown"
-									href="#"
-									aria-expanded="false"
-							>
+							<a class="nav-link" data-bs-toggle="dropdown" href="#" aria-expanded="false">
 								<i class="fas fa-layer-group"></i>
 							</a>
 							<div class="dropdown-menu quick-actions animated fadeIn">
@@ -299,9 +192,7 @@
 											</a>
 											<a class="col-6 col-md-4 p-0" href="#">
 												<div class="quick-actions-item">
-													<div
-															class="avatar-item bg-warning rounded-circle"
-													>
+													<div class="avatar-item bg-warning rounded-circle">
 														<i class="fas fa-map"></i>
 													</div>
 													<span class="text">Maps</span>
@@ -317,9 +208,7 @@
 											</a>
 											<a class="col-6 col-md-4 p-0" href="#">
 												<div class="quick-actions-item">
-													<div
-															class="avatar-item bg-success rounded-circle"
-													>
+													<div class="avatar-item bg-success rounded-circle">
 														<i class="fas fa-envelope"></i>
 													</div>
 													<span class="text">Emails</span>
@@ -327,9 +216,7 @@
 											</a>
 											<a class="col-6 col-md-4 p-0" href="#">
 												<div class="quick-actions-item">
-													<div
-															class="avatar-item bg-primary rounded-circle"
-													>
+													<div class="avatar-item bg-primary rounded-circle">
 														<i class="fas fa-file-invoice-dollar"></i>
 													</div>
 													<span class="text">Invoice</span>
@@ -337,9 +224,7 @@
 											</a>
 											<a class="col-6 col-md-4 p-0" href="#">
 												<div class="quick-actions-item">
-													<div
-															class="avatar-item bg-secondary rounded-circle"
-													>
+													<div class="avatar-item bg-secondary rounded-circle">
 														<i class="fas fa-credit-card"></i>
 													</div>
 													<span class="text">Payments</span>
@@ -355,12 +240,17 @@
 							<a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#" aria-expanded="false">
 								<div class="avatar-sm">
 									<!-- Utilisation de la route pour afficher l'image statique -->
-									<img src="{{ path('user_photo', {'id': app.user.userId}) }}" alt="Image Profile" class="avatar-img rounded-circle"/>
+									<img
+										src="{{ path('user_photo', {'id': app.user.userId}) }}"
+										alt="Image Profile"
+										class="avatar-img rounded-circle"
+									/>
 								</div>
 								<span class="profile-username">
-            <span class="op-7">Hi,</span>
-            <span class="fw-bold">{{ app.user.name }}</span> <!-- Affichage du nom de l'utilisateur -->
-        </span>
+									<span class="op-7">Hi,</span>
+									<span class="fw-bold">{{ app.user.name }}</span>
+									<!-- Affichage du nom de l'utilisateur -->
+								</span>
 							</a>
 							<ul class="dropdown-menu dropdown-user animated fadeIn">
 								<div class="dropdown-user-scroll scrollbar-outer">
@@ -368,11 +258,17 @@
 										<div class="user-box">
 											<div class="avatar-lg">
 												<!-- Utilisation de la route pour afficher l'image statique -->
-												<img src="{{ path('user_photo', {'id': app.user.userId}) }}" alt="Image Profile" class="avatar-img rounded"/>
+												<img
+													src="{{ path('user_photo', {'id': app.user.userId}) }}"
+													alt="Image Profile"
+													class="avatar-img rounded"
+												/>
 											</div>
 											<div class="u-text">
-												<h4>{{ app.user.name }}</h4> <!-- Affichage du nom de l'utilisateur -->
-												<p class="text-muted">{{ app.user.email }}</p> <!-- Affichage de l'email -->
+												<h4>{{ app.user.name }}</h4>
+												<!-- Affichage du nom de l'utilisateur -->
+												<p class="text-muted">{{ app.user.email }}</p>
+												<!-- Affichage de l'email -->
 											</div>
 										</div>
 									</li>
@@ -387,7 +283,6 @@
 								</div>
 							</ul>
 						</li>
-
 					</ul>
 				</div>
 			</nav>
@@ -396,9 +291,7 @@
 
 		<div class="container">
 			<div class="page-inner">
-				<div
-						class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4"
-				>
+				<div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
 					<div>
 						<h3 class="fw-bold mb-3">Dashboard</h3>
 					</div>
@@ -409,9 +302,7 @@
 							<div class="card-body">
 								<div class="row align-items-center">
 									<div class="col-icon">
-										<div
-												class="icon-big text-center icon-primary bubble-shadow-small"
-										>
+										<div class="icon-big text-center icon-primary bubble-shadow-small">
 											<i class="fas fa-users"></i>
 										</div>
 									</div>
@@ -430,9 +321,7 @@
 							<div class="card-body">
 								<div class="row align-items-center">
 									<div class="col-icon">
-										<div
-												class="icon-big text-center icon-info bubble-shadow-small"
-										>
+										<div class="icon-big text-center icon-info bubble-shadow-small">
 											<i class="fas fa-user-check"></i>
 										</div>
 									</div>
@@ -452,9 +341,7 @@
 							<div class="card-body">
 								<div class="row align-items-center">
 									<div class="col-icon">
-										<div
-												class="icon-big text-center icon-secondary bubble-shadow-small"
-										>
+										<div class="icon-big text-center icon-secondary bubble-shadow-small">
 											<i class="far fa-check-circle"></i>
 										</div>
 									</div>
@@ -474,9 +361,7 @@
 							<div class="card-body">
 								<div class="row align-items-center">
 									<div class="col-icon">
-										<div
-												class="icon-big text-center icon-success bubble-shadow-small"
-										>
+										<div class="icon-big text-center icon-success bubble-shadow-small">
 											<i class="fas fa-luggage-cart"></i>
 										</div>
 									</div>
@@ -490,7 +375,6 @@
 							</div>
 						</div>
 					</div>
-
 				</div>
 
 				<div class="row">
@@ -498,23 +382,34 @@
 						<div class="card card-round">
 							<div class="card-body">
 								<div class="card-head-row card-tools-still-right">
-									<h4 class="card-title text-primary">
-										<i class="fas fa-users-cog me-2"></i>User Management
-									</h4>
+									<h4 class="card-title text-primary"><i class="fas fa-users-cog me-2"></i>User Management</h4>
 									<div class="card-tools">
 										<div class="input-group">
 											<!-- Recherche par email -->
-											<input type="text" class="form-control border-primary" placeholder="Search users by email..." id="userSearch" onkeyup="filterUsers()" style="width: 200px;">
+											<input
+												type="text"
+												class="form-control border-primary"
+												placeholder="Search users by email..."
+												id="userSearch"
+												onkeyup="filterUsers()"
+												style="width: 200px"
+											/>
 
 											<!-- Recherche par statut -->
-											<select id="userStatus" class="form-control border-primary" style="width: 150px" onchange="filterUsers()">
+											<select
+												id="userStatus"
+												class="form-control border-primary"
+												style="width: 150px"
+												onchange="filterUsers()"
+											>
 												<option value="">All Status</option>
 												<option value="blocked">Blocked</option>
 												<option value="unblocked">UnBlocked</option>
 											</select>
 
 											<button class="btn btn-primary" type="button" onclick="resetFilters()" title="Reset filters">
-												&#x274C; <!-- Emoji croix rouge -->
+												&#x274C;
+												<!-- Emoji croix rouge -->
 											</button>
 										</div>
 									</div>
@@ -523,33 +418,37 @@
 								<div class="table-responsive mt-3">
 									<table class="table table-hover table-striped" id="usersTable">
 										<thead class="bg-light-blue">
-										<tr>
-											<th class="text-center"><i class="fas fa-image"></i> Photo</th>
-											<th><i class="fas fa-user me-1"></i> First Name</th>
-											<th><i class="fas fa-user me-1"></i> Last Name</th>
-											<th><i class="fas fa-envelope me-1"></i> Email</th>
-											<th><i class="fas fa-phone me-1"></i> Phone</th>
-											<th><i class="fas fa-map-marker-alt me-1"></i> Address</th>
-											<th class="text-center"><i class="fas fa-circle-notch me-1"></i> Status</th>
-											<th class="text-center"><i class="fas fa-cog"></i> Actions</th>
-										</tr>
+											<tr>
+												<th class="text-center"><i class="fas fa-image"></i> Photo</th>
+												<th><i class="fas fa-user me-1"></i> First Name</th>
+												<th><i class="fas fa-user me-1"></i> Last Name</th>
+												<th><i class="fas fa-envelope me-1"></i> Email</th>
+												<th><i class="fas fa-phone me-1"></i> Phone</th>
+												<th><i class="fas fa-map-marker-alt me-1"></i> Address</th>
+												<th class="text-center"><i class="fas fa-circle-notch me-1"></i> Status</th>
+												<th class="text-center"><i class="fas fa-cog"></i> Actions</th>
+											</tr>
 										</thead>
 										<tbody>
-										{% for user in users %}
+											{% for user in users %}
 											<tr class="align-middle">
 												<td class="text-center">
 													{% if user.photo %}
-														<img src="{{ user.getPhotoBase64() }}"
-															 class="rounded-circle shadow-sm"
-															 width="40"
-															 height="40"
-															 alt="Profile"
-															 onerror="this.onerror=null;this.src='{{ asset('images/default-avatar.png') }}'">
+													<img
+														src="{{ user.getPhotoBase64() }}"
+														class="rounded-circle shadow-sm"
+														width="40"
+														height="40"
+														alt="Profile"
+														onerror="this.onerror=null;this.src='{{ asset('images/default-avatar.png') }}'"
+													/>
 													{% else %}
-														<div class="avatar-placeholder rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center"
-															 style="width:40px;height:40px;">
-															{{ user.name|first|upper }}{{ user.lastName|first|upper }}
-														</div>
+													<div
+														class="avatar-placeholder rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center"
+														style="width: 40px; height: 40px"
+													>
+														{{ user.name|first|upper }}{{ user.lastName|first|upper }}
+													</div>
 													{% endif %}
 												</td>
 												<td>{{ user.name }}</td>
@@ -560,21 +459,29 @@
 													{{ user.address|length > 20 ? user.address|slice(0, 20) ~ '...' : user.address }}
 												</td>
 												<td class="text-center">
-                                        <span class="badge rounded-pill bg-{{ user.isBlocked() ? 'danger' : 'success' }}">
-                                            <i class="fas fa-{{ user.isBlocked() ? 'lock' : 'check-circle' }} me-1"></i>
-                                            {{ user.isBlocked() ? 'Blocked' : 'UnBlocked' }}
-                                        </span>
+													<span class="badge rounded-pill bg-{{ user.isBlocked() ? 'danger' : 'success' }}">
+														<i class="fas fa-{{ user.isBlocked() ? 'lock' : 'check-circle' }} me-1"></i>
+														{{ user.isBlocked() ? 'Blocked' : 'UnBlocked' }}
+													</span>
 												</td>
 												<td class="text-center">
 													<div class="btn-group" role="group">
-														<form method="POST"
-															  action="{{ path('admin_user_toggle_block', {'id': user.userId}) }}"
-															  class="d-inline toggle-block-form"
-															  data-user-id="{{ user.userId }}">
-															<input type="hidden" name="_token" value="{{ csrf_token('toggle-block' ~ user.userId) }}">
-															<button type="submit"
-																	class="btn btn-sm btn-{{ user.isBlocked() ? 'success' : 'danger' }} mx-1"
-																	title="{{ user.isBlocked() ? 'UnBlocked' : 'Blocked' }}">
+														<form
+															method="POST"
+															action="{{ path('admin_user_toggle_block', {'id': user.userId}) }}"
+															class="d-inline toggle-block-form"
+															data-user-id="{{ user.userId }}"
+														>
+															<input
+																type="hidden"
+																name="_token"
+																value="{{ csrf_token('toggle-block' ~ user.userId) }}"
+															/>
+															<button
+																type="submit"
+																class="btn btn-sm btn-{{ user.isBlocked() ? 'success' : 'danger' }} mx-1"
+																title="{{ user.isBlocked() ? 'UnBlocked' : 'Blocked' }}"
+															>
 																<i class="fas fa-{{ user.isBlocked() ? 'unlock' : 'ban' }}"></i>
 																{{ user.isBlocked() ? 'UnBlocked' : 'Blocked' }}
 															</button>
@@ -584,28 +491,26 @@
 															<i class="fas fa-envelope"></i>
 														</a>
 
-														<button class="btn btn-sm btn-warning mx-1 edit-user"
-																data-user-id="{{ user.userId }}"
-																title="Edit">
+														<button
+															class="btn btn-sm btn-warning mx-1 edit-user"
+															data-user-id="{{ user.userId }}"
+															title="Edit"
+														>
 															<i class="fas fa-edit"></i>
 														</button>
 													</div>
 												</td>
 											</tr>
-										{% endfor %}
+											{% endfor %}
 										</tbody>
 									</table>
 								</div>
 
-								<div class="d-flex justify-content-center mt-4">
-									{{ knp_pagination_render(users) }}
-								</div>
+								<div class="d-flex justify-content-center mt-4">{{ knp_pagination_render(users) }}</div>
 							</div>
 						</div>
 					</div>
 				</div>
-
-
 			</div>
 		</div>
 	</div>
@@ -618,183 +523,51 @@
 				<div class="switch-block">
 					<h4>Logo Header</h4>
 					<div class="btnSwitch">
-						<button
-								type="button"
-								class="selected changeLogoHeaderColor"
-								data-color="dark"
-						></button>
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="blue"
-						></button>
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="purple"
-						></button>
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="light-blue"
-						></button>
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="green"
-						></button>
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="orange"
-						></button>
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="red"
-						></button>
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="white"
-						></button>
+						<button type="button" class="selected changeLogoHeaderColor" data-color="dark"></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="blue"></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="purple"></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="light-blue"></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="green"></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="orange"></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="red"></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="white"></button>
 						<br />
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="dark2"
-						></button>
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="blue2"
-						></button>
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="purple2"
-						></button>
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="light-blue2"
-						></button>
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="green2"
-						></button>
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="orange2"
-						></button>
-						<button
-								type="button"
-								class="changeLogoHeaderColor"
-								data-color="red2"
-						></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="dark2"></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="blue2"></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="purple2"></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="light-blue2"></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="green2"></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="orange2"></button>
+						<button type="button" class="changeLogoHeaderColor" data-color="red2"></button>
 					</div>
 				</div>
 				<div class="switch-block">
 					<h4>Navbar Header</h4>
 					<div class="btnSwitch">
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="dark"
-						></button>
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="blue"
-						></button>
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="purple"
-						></button>
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="light-blue"
-						></button>
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="green"
-						></button>
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="orange"
-						></button>
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="red"
-						></button>
-						<button
-								type="button"
-								class="selected changeTopBarColor"
-								data-color="white"
-						></button>
+						<button type="button" class="changeTopBarColor" data-color="dark"></button>
+						<button type="button" class="changeTopBarColor" data-color="blue"></button>
+						<button type="button" class="changeTopBarColor" data-color="purple"></button>
+						<button type="button" class="changeTopBarColor" data-color="light-blue"></button>
+						<button type="button" class="changeTopBarColor" data-color="green"></button>
+						<button type="button" class="changeTopBarColor" data-color="orange"></button>
+						<button type="button" class="changeTopBarColor" data-color="red"></button>
+						<button type="button" class="selected changeTopBarColor" data-color="white"></button>
 						<br />
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="dark2"
-						></button>
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="blue2"
-						></button>
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="purple2"
-						></button>
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="light-blue2"
-						></button>
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="green2"
-						></button>
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="orange2"
-						></button>
-						<button
-								type="button"
-								class="changeTopBarColor"
-								data-color="red2"
-						></button>
+						<button type="button" class="changeTopBarColor" data-color="dark2"></button>
+						<button type="button" class="changeTopBarColor" data-color="blue2"></button>
+						<button type="button" class="changeTopBarColor" data-color="purple2"></button>
+						<button type="button" class="changeTopBarColor" data-color="light-blue2"></button>
+						<button type="button" class="changeTopBarColor" data-color="green2"></button>
+						<button type="button" class="changeTopBarColor" data-color="orange2"></button>
+						<button type="button" class="changeTopBarColor" data-color="red2"></button>
 					</div>
 				</div>
 				<div class="switch-block">
 					<h4>Sidebar</h4>
 					<div class="btnSwitch">
-						<button
-								type="button"
-								class="changeSideBarColor"
-								data-color="white"
-						></button>
-						<button
-								type="button"
-								class="selected changeSideBarColor"
-								data-color="dark"
-						></button>
-						<button
-								type="button"
-								class="changeSideBarColor"
-								data-color="dark2"
-						></button>
+						<button type="button" class="changeSideBarColor" data-color="white"></button>
+						<button type="button" class="selected changeSideBarColor" data-color="dark"></button>
+						<button type="button" class="changeSideBarColor" data-color="dark2"></button>
 					</div>
 				</div>
 			</div>
@@ -806,284 +579,272 @@
 	<!-- End Custom template -->
 </div>
 
-{% endblock %}
+{% endblock %} {% block js2 %}
+<!--   Core JS Files   -->
+<script src="{{ asset('js2/core/jquery-3.7.1.min.js') }}"></script>
+<script src="{{ asset('js2/core/popper.min.js') }}"></script>
+<script src="{{ asset('js2/core/bootstrap.min.js') }}"></script>
 
-{% block js2 %}
-	<!--   Core JS Files   -->
-	<script src="{{ asset('js2/core/jquery-3.7.1.min.js') }}"></script>
-	<script src="{{ asset('js2/core/popper.min.js') }}"></script>
-	<script src="{{ asset('js2/core/bootstrap.min.js') }}"></script>
+<!-- jQuery Scrollbar -->
+<script src="{{ asset('js2/plugin/jquery-scrollbar/jquery.scrollbar.min.js') }}"></script>
 
-	<!-- jQuery Scrollbar -->
-	<script src="{{ asset('js2/plugin/jquery-scrollbar/jquery.scrollbar.min.js') }}"></script>
+<!-- Chart JS -->
+<script src="{{ asset('js2/plugin/chart.js/chart.min.js') }}"></script>
 
-	<!-- Chart JS -->
-	<script src="{{ asset('js2/plugin/chart.js/chart.min.js') }}"></script>
+<!-- jQuery Sparkline -->
+<script src="{{ asset('js2/plugin/jquery.sparkline/jquery.sparkline.min.js') }}"></script>
 
-	<!-- jQuery Sparkline -->
-	<script src="{{ asset('js2/plugin/jquery.sparkline/jquery.sparkline.min.js') }}"></script>
+<!-- Chart Circle -->
+<script src="{{ asset('js2/plugin/chart-circle/circles.min.js') }}"></script>
 
-	<!-- Chart Circle -->
-	<script src="{{ asset('js2/plugin/chart-circle/circles.min.js') }}"></script>
+<!-- Datatables -->
+<script src="{{ asset('js2/plugin/datatables/datatables.min.js') }}"></script>
 
-	<!-- Datatables -->
-	<script src="{{ asset('js2/plugin/datatables/datatables.min.js') }}"></script>
+<!-- Bootstrap Notify -->
+<script src="{{ asset('js2/plugin/bootstrap-notify/bootstrap-notify.min.js') }}"></script>
 
-	<!-- Bootstrap Notify -->
-	<script src="{{ asset('js2/plugin/bootstrap-notify/bootstrap-notify.min.js') }}"></script>
+<!-- jQuery Vector Maps -->
+<script src="{{ asset('js2/plugin/jsvectormap/jsvectormap.min.js') }}"></script>
+<script src="{{ asset('js2/plugin/jsvectormap/world.js') }}"></script>
 
-	<!-- jQuery Vector Maps -->
-	<script src="{{ asset('js2/plugin/jsvectormap/jsvectormap.min.js') }}"></script>
-	<script src="{{ asset('js2/plugin/jsvectormap/world.js') }}"></script>
+<!-- Sweet Alert -->
+<script src="{{ asset('js2/plugin/sweetalert/sweetalert.min.js') }}"></script>
 
-	<!-- Sweet Alert -->
-	<script src="{{ asset('js2/plugin/sweetalert/sweetalert.min.js') }}"></script>
+<!-- Kaiadmin JS -->
+<script src="{{ asset('js2/kaiadmin.min.js') }}"></script>
 
-	<!-- Kaiadmin JS -->
-	<script src="{{ asset('js2/kaiadmin.min.js') }}"></script>
+<!-- Kaiadmin DEMO methods, don't include it in your project! -->
+<script src="{{ asset('js2/setting-demo.js') }}"></script>
+<script src="{{ asset('js2/demo.js') }}"></script>
 
-	<!-- Kaiadmin DEMO methods, don't include it in your project! -->
-	<script src="{{ asset('js2/setting-demo.js') }}"></script>
-	<script src="{{ asset('js2/demo.js') }}"></script>
+<script>
+	$("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
+		type: "line",
+		height: "70",
+		width: "100%",
+		lineWidth: "2",
+		lineColor: "#177dff",
+		fillColor: "rgba(23, 125, 255, 0.14)",
+	});
 
-	<script>
-		$("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
-			type: "line",
-			height: "70",
-			width: "100%",
-			lineWidth: "2",
-			lineColor: "#177dff",
-			fillColor: "rgba(23, 125, 255, 0.14)",
-		});
+	$("#lineChart2").sparkline([99, 125, 122, 105, 110, 124, 115], {
+		type: "line",
+		height: "70",
+		width: "100%",
+		lineWidth: "2",
+		lineColor: "#f3545d",
+		fillColor: "rgba(243, 84, 93, .14)",
+	});
 
-		$("#lineChart2").sparkline([99, 125, 122, 105, 110, 124, 115], {
-			type: "line",
-			height: "70",
-			width: "100%",
-			lineWidth: "2",
-			lineColor: "#f3545d",
-			fillColor: "rgba(243, 84, 93, .14)",
-		});
+	$("#lineChart3").sparkline([105, 103, 123, 100, 95, 105, 115], {
+		type: "line",
+		height: "70",
+		width: "100%",
+		lineWidth: "2",
+		lineColor: "#ffa534",
+		fillColor: "rgba(255, 165, 52, .14)",
+	});
 
-		$("#lineChart3").sparkline([105, 103, 123, 100, 95, 105, 115], {
-			type: "line",
-			height: "70",
-			width: "100%",
-			lineWidth: "2",
-			lineColor: "#ffa534",
-			fillColor: "rgba(255, 165, 52, .14)",
-		});
+	//userbloc
+	document.querySelectorAll(".toggle-block").forEach((button) => {
+		button.addEventListener("click", async function () {
+			const userId = this.dataset.userId;
 
-
-
-
-		//userbloc
-		document.querySelectorAll('.toggle-block').forEach(button => {
-			button.addEventListener('click', async function() {
-				const userId = this.dataset.userId;
-
-				try {
-					const response = await fetch(`/admin/user/toggle-block/${userId}`, {
-						method: 'POST',
-						headers: {
-							'X-Requested-With': 'XMLHttpRequest',
-							'Content-Type': 'application/json'
-						}
-					});
-
-					const result = await response.json();
-
-					if (result.success) {
-						// Mise à jour immédiate de l'interface
-						this.innerHTML = `<i class="fas fa-${result.isBlocked ? 'unlock' : 'ban'}"></i> ${result.newButtonText}`;
-						this.className = `btn btn-sm btn-${result.isBlocked ? 'success' : 'danger'} toggle-block`;
-						this.title = result.isBlocked ? 'Débloquer' : 'Bloquer';
-
-						// Mise à jour du statut
-						const statusBadge = this.closest('tr').querySelector('.badge');
-						statusBadge.className = `badge rounded-pill bg-${result.isBlocked ? 'danger' : 'success'}`;
-						statusBadge.innerHTML = `<i class="fas fa-${result.isBlocked ? 'lock' : 'check-circle'} me-1"></i> ${result.newStatusText}`;
-
-						alert(result.message); // Remplacer par un système de notification plus élégant
-					}
-				} catch (error) {
-					console.error('Erreur:', error);
-					alert('Une erreur est survenue');
-				}
-			});
-		});
-
-
-		//toggle
-
-		document.querySelectorAll('.toggle-block-form').forEach(form => {
-			form.addEventListener('submit', function (event) {
-				event.preventDefault();  // Empêche le formulaire de se soumettre de manière classique
-
-				let userId = this.getAttribute('data-user-id'); // Récupère l'ID de l'utilisateur
-				let button = this.querySelector('button');  // Le bouton de blocage/déblocage
-				let statusSpan = this.closest('tr').querySelector('.badge');  // Le badge de statut de l'utilisateur
-
-				// Envoi de la requête AJAX avec Fetch
-				fetch(this.action, {
-					method: 'POST',
+			try {
+				const response = await fetch(`/admin/user/toggle-block/${userId}`, {
+					method: "POST",
 					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-						'X-Requested-With': 'XMLHttpRequest',
-						'X-CSRF-TOKEN': this.querySelector('input[name="_token"]').value // Token CSRF
+						"X-Requested-With": "XMLHttpRequest",
+						"Content-Type": "application/json",
 					},
-					body: new URLSearchParams(new FormData(this))
-				})
-						.then(response => response.json())
-						.then(data => {
-							if (data.success) {
-								// Mise à jour du texte du bouton et du badge en fonction de l'état de l'utilisateur
-								if (data.isBlocked) {
-									statusSpan.textContent = 'Bloqué';
-									statusSpan.className = 'badge rounded-pill bg-danger';
-									button.innerHTML = '<i class="fas fa-ban"></i> Bloquer';
-									button.classList.remove('btn-success');
-									button.classList.add('btn-danger');
-								} else {
-									statusSpan.textContent = 'Actif';
-									statusSpan.className = 'badge rounded-pill bg-success';
-									button.innerHTML = '<i class="fas fa-unlock"></i> Débloquer';
-									button.classList.remove('btn-danger');
-									button.classList.add('btn-success');
-								}
-							} else {
-								alert('Erreur lors du changement de statut de l\'utilisateur.');
-							}
-						})
-						.catch(error => {
-							console.error('Erreur:', error);
-							alert('Une erreur est survenue lors de la mise à jour de l\'utilisateur.');
-						});
-			});
-		});
+				});
 
-		//recherche
-		function filterUsers() {
-			// Récupérer la valeur de recherche par email
-			const searchTerm = document.getElementById("userSearch").value.toLowerCase();
+				const result = await response.json();
 
-			// Récupérer la valeur de recherche par statut
-			const statusFilter = document.getElementById("userStatus").value;
+				if (result.success) {
+					// Mise à jour immédiate de l'interface
+					this.innerHTML = `<i class="fas fa-${result.isBlocked ? "unlock" : "ban"}"></i> ${result.newButtonText}`;
+					this.className = `btn btn-sm btn-${result.isBlocked ? "success" : "danger"} toggle-block`;
+					this.title = result.isBlocked ? "Débloquer" : "Bloquer";
 
-			// Cibler le tableau et ses lignes
-			const table = document.getElementById("usersTable");
-			const rows = table.querySelectorAll("tbody tr");
+					// Mise à jour du statut
+					const statusBadge = this.closest("tr").querySelector(".badge");
+					statusBadge.className = `badge rounded-pill bg-${result.isBlocked ? "danger" : "success"}`;
+					statusBadge.innerHTML = `<i class="fas fa-${result.isBlocked ? "lock" : "check-circle"} me-1"></i> ${result.newStatusText}`;
 
-			// Parcourir chaque ligne du tableau
-			rows.forEach(row => {
-				const emailCell = row.cells[3]; // La cellule contenant l'email (4ème colonne)
-				const email = emailCell.textContent.toLowerCase();
-
-				const statusCell = row.cells[6]; // La cellule contenant le statut (7ème colonne)
-				const statusBadge = statusCell.querySelector('.badge'); // On cible le badge
-				const statusText = statusBadge.textContent.trim().toLowerCase(); // Texte du statut en minuscules
-
-				// Vérifier si l'email correspond
-				const matchesEmail = email.includes(searchTerm);
-
-				// Vérifier si le statut correspond
-				let matchesStatus = true;
-				if (statusFilter === "blocked") {
-					matchesStatus = statusText === "blocked";
-				} else if (statusFilter === "unblocked") {
-					matchesStatus = statusText === "unblocked";
+					alert(result.message); // Remplacer par un système de notification plus élégant
 				}
+			} catch (error) {
+				console.error("Erreur:", error);
+				alert("Une erreur est survenue");
+			}
+		});
+	});
 
-				// Afficher ou masquer la ligne selon les critères
-				row.style.display = (matchesEmail && matchesStatus) ? "" : "none";
-			});
-		}
+	//toggle
 
-		//resetfiltre
-		function resetFilters() {
-			// Réinitialiser les champs de filtre
-			document.getElementById("userSearch").value = "";
-			document.getElementById("userStatus").value = "";
+	document.querySelectorAll(".toggle-block-form").forEach((form) => {
+		form.addEventListener("submit", function (event) {
+			event.preventDefault(); // Empêche le formulaire de se soumettre de manière classique
 
-			// Réafficher toutes les lignes
-			const rows = document.querySelectorAll("#usersTable tbody tr");
-			rows.forEach(row => {
-				row.style.display = "";
-			});
+			let userId = this.getAttribute("data-user-id"); // Récupère l'ID de l'utilisateur
+			let button = this.querySelector("button"); // Le bouton de blocage/déblocage
+			let statusSpan = this.closest("tr").querySelector(".badge"); // Le badge de statut de l'utilisateur
 
-			// Optionnel : Remettre le focus sur le champ de recherche
-			document.getElementById("userSearch").focus();
-		}
-
-		//nbre user
-
-		fetch("{{ path('admin_user_count') }}")
-				.then(response => response.json())
-				.then(data => {
+			// Envoi de la requête AJAX avec Fetch
+			fetch(this.action, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					"X-Requested-With": "XMLHttpRequest",
+					"X-CSRF-TOKEN": this.querySelector('input[name="_token"]').value, // Token CSRF
+				},
+				body: new URLSearchParams(new FormData(this)),
+			})
+				.then((response) => response.json())
+				.then((data) => {
 					if (data.success) {
-						document.getElementById('user-count').innerText = data.userCount;
-					} else {
-						alert(data.message); // Si une erreur survient
-					}
-				})
-				.catch(error => {
-					console.error('Error fetching user count:', error);
-				});
-
-		//nbre reclamation
-
-		fetch("{{ path('admin_reclamation_count') }}")
-				.then(response => response.json())
-				.then(data => {
-					if (data.success) {
-						document.getElementById('reclamation-count').innerText = data.reclamationCount;
-					} else {
-						alert(data.message); // Si une erreur survient
-					}
-				})
-				.catch(error => {
-					console.error('Error fetching reclamation count:', error);
-				});
-
-		//nbre reponse
-
-		fetch('/admin/reponses/count')
-				.then(response => response.json())
-				.then(data => {
-					if (data.success) {
-						document.getElementById('reponse-count').textContent = data.reponseCount;
-					} else {
-						document.getElementById('reponse-count').textContent = 'Erreur';
-					}
-				})
-				.catch(error => {
-					document.getElementById('reponse-count').textContent = 'Erreur';
-					console.error(error);
-				});
-
-		//nbre excursion
-
-		document.addEventListener("DOMContentLoaded", function () {
-			fetch('/admin/excursions/count')
-					.then(response => response.json())
-					.then(data => {
-						console.log(data); // Pour voir ce qui est renvoyé
-						if (data.success) {
-							document.getElementById('excursion-count').textContent = data.excursionCount;
+						// Mise à jour du texte du bouton et du badge en fonction de l'état de l'utilisateur
+						if (data.isBlocked) {
+							statusSpan.textContent = "Bloqué";
+							statusSpan.className = "badge rounded-pill bg-danger";
+							button.innerHTML = '<i class="fas fa-ban"></i> Bloquer';
+							button.classList.remove("btn-success");
+							button.classList.add("btn-danger");
 						} else {
-							document.getElementById('excursion-count').textContent = 'Erreur';
+							statusSpan.textContent = "Actif";
+							statusSpan.className = "badge rounded-pill bg-success";
+							button.innerHTML = '<i class="fas fa-unlock"></i> Débloquer';
+							button.classList.remove("btn-danger");
+							button.classList.add("btn-success");
 						}
-					})
-					.catch(error => {
-						document.getElementById('excursion-count').textContent = 'Erreur';
-						console.error(error);
-					});
+					} else {
+						alert("Erreur lors du changement de statut de l'utilisateur.");
+					}
+				})
+				.catch((error) => {
+					console.error("Erreur:", error);
+					alert("Une erreur est survenue lors de la mise à jour de l'utilisateur.");
+				});
+		});
+	});
+
+	//recherche
+	function filterUsers() {
+		// Récupérer la valeur de recherche par email
+		const searchTerm = document.getElementById("userSearch").value.toLowerCase();
+
+		// Récupérer la valeur de recherche par statut
+		const statusFilter = document.getElementById("userStatus").value;
+
+		// Cibler le tableau et ses lignes
+		const table = document.getElementById("usersTable");
+		const rows = table.querySelectorAll("tbody tr");
+
+		// Parcourir chaque ligne du tableau
+		rows.forEach((row) => {
+			const emailCell = row.cells[3]; // La cellule contenant l'email (4ème colonne)
+			const email = emailCell.textContent.toLowerCase();
+
+			const statusCell = row.cells[6]; // La cellule contenant le statut (7ème colonne)
+			const statusBadge = statusCell.querySelector(".badge"); // On cible le badge
+			const statusText = statusBadge.textContent.trim().toLowerCase(); // Texte du statut en minuscules
+
+			// Vérifier si l'email correspond
+			const matchesEmail = email.includes(searchTerm);
+
+			// Vérifier si le statut correspond
+			let matchesStatus = true;
+			if (statusFilter === "blocked") {
+				matchesStatus = statusText === "blocked";
+			} else if (statusFilter === "unblocked") {
+				matchesStatus = statusText === "unblocked";
+			}
+
+			// Afficher ou masquer la ligne selon les critères
+			row.style.display = matchesEmail && matchesStatus ? "" : "none";
+		});
+	}
+
+	//resetfiltre
+	function resetFilters() {
+		// Réinitialiser les champs de filtre
+		document.getElementById("userSearch").value = "";
+		document.getElementById("userStatus").value = "";
+
+		// Réafficher toutes les lignes
+		const rows = document.querySelectorAll("#usersTable tbody tr");
+		rows.forEach((row) => {
+			row.style.display = "";
 		});
 
+		// Optionnel : Remettre le focus sur le champ de recherche
+		document.getElementById("userSearch").focus();
+	}
 
+	//nbre user
 
+	fetch("{{ path('admin_user_count') }}")
+		.then((response) => response.json())
+		.then((data) => {
+			if (data.success) {
+				document.getElementById("user-count").innerText = data.userCount;
+			} else {
+				alert(data.message); // Si une erreur survient
+			}
+		})
+		.catch((error) => {
+			console.error("Error fetching user count:", error);
+		});
 
-	</script>
+	//nbre reclamation
+
+	fetch("{{ path('admin_reclamation_count') }}")
+		.then((response) => response.json())
+		.then((data) => {
+			if (data.success) {
+				document.getElementById("reclamation-count").innerText = data.reclamationCount;
+			} else {
+				alert(data.message); // Si une erreur survient
+			}
+		})
+		.catch((error) => {
+			console.error("Error fetching reclamation count:", error);
+		});
+
+	//nbre reponse
+
+	fetch("/admin/reponses/count")
+		.then((response) => response.json())
+		.then((data) => {
+			if (data.success) {
+				document.getElementById("reponse-count").textContent = data.reponseCount;
+			} else {
+				document.getElementById("reponse-count").textContent = "Erreur";
+			}
+		})
+		.catch((error) => {
+			document.getElementById("reponse-count").textContent = "Erreur";
+			console.error(error);
+		});
+
+	//nbre excursion
+
+	document.addEventListener("DOMContentLoaded", function () {
+		fetch("/admin/excursions/count")
+			.then((response) => response.json())
+			.then((data) => {
+				console.log(data); // Pour voir ce qui est renvoyé
+				if (data.success) {
+					document.getElementById("excursion-count").textContent = data.excursionCount;
+				} else {
+					document.getElementById("excursion-count").textContent = "Erreur";
+				}
+			})
+			.catch((error) => {
+				document.getElementById("excursion-count").textContent = "Erreur";
+				console.error(error);
+			});
+	});
+</script>
 {% endblock %}
-</body>
-</html>
