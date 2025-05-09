@@ -6,7 +6,6 @@ namespace App\Controller;
 
 use App\Entity\Excursions;
 use App\Form\ExcursionsType;
-use Psr\Log\LoggerInterface;
 use App\Service\NotificationService;
 use App\Repository\ExcursionsRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -108,26 +107,5 @@ class ExcursionsController extends AbstractController
         }
 
         return $this->redirectToRoute('app_excursions_read');
-    }
-
-    #[Route('/generate-description', name: 'app_excursions_generate_description', methods: ['POST'])]
-    public function generateDescription(Request $request, YourAIService $aiService, LoggerInterface $logger): Response
-    {
-        $title = $request->request->get('title');
-        if (empty($title)) {
-            $logger->error('Titre manquant pour la génération');
-
-            return $this->json(['error' => 'Le titre est requis'], 400);
-        }
-
-        try {
-            $description = $aiService->generateDescription($title);
-
-            return $this->json(['description' => $description]);
-        } catch (\Exception $e) {
-            $logger->critical('Échec OpenAI : '.$e->getMessage());
-
-            return $this->json(['error' => 'Erreur : '.$e->getMessage()], 500);
-        }
     }
 }
