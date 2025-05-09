@@ -18,9 +18,9 @@
 				<div class="mb-3">
 					<label for="typeEnu" class="form-label">Room Type</label>
 					<select id="typeEnu" name="typeEnu" class="form-select">
-						<option value="simple" {% if room.typeEnu=="simple" %}selected{% endif %}>Simple</option>
-						<option value="double" {% if room.typeEnu=="double" %}selected{% endif %}>Double</option>
-						<option value="suite" {% if room.typeEnu=="suite" %}selected{% endif %}>Suite</option>
+						<option value="simple" {% if room.typeEnu="" ="simple" %}selected{% endif %}>Simple</option>
+						<option value="double" {% if room.typeEnu="" ="double" %}selected{% endif %}>Double</option>
+						<option value="suite" {% if room.typeEnu="" ="suite" %}selected{% endif %}>Suite</option>
 					</select>
 				</div>
 				<div class="mb-3">
@@ -37,8 +37,8 @@
 				<div class="mb-3">
 					<label for="disponible" class="form-label">Available</label>
 					<select id="disponible" name="disponible" class="form-select">
-						<option value="1" {% if room.disponible=="1" %}selected{% endif %}>Yes</option>
-						<option value="0" {% if room.disponible=="0" %}selected{% endif %}>No</option>
+						<option value="1" {% if room.disponible="" ="1" %}selected{% endif %}>Yes</option>
+						<option value="0" {% if room.disponible="" ="0" %}selected{% endif %}>No</option>
 					</select>
 				</div>
 				<div id="error-messages" class="mt-3"></div>

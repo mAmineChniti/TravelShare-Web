@@ -44,9 +44,7 @@
 						<li><a class="dropdown-item" href="{{ path('app_dashboard_flights') }}">Flights Dashboard</a></li>
 						<li><a class="dropdown-item" href="{{ path('dashboard_hotels') }}">Hotels Dashboard</a></li>
 					</ul>
-
 				</li>
-
 
 				<li class="nav-item">
 					<a href="{{ path('app_flights') }}" class="nav-link px-3">Flights</a>
@@ -84,8 +82,6 @@
 					<a href="{{ path('app_list_rec_user') }}" class="nav-link px-3">Historic</a>
 				</li>
 
-
-
 				{% endif %} {% endif %}
 			</ul>
 			<div class="d-flex align-items-center">
@@ -105,7 +101,9 @@
 							<a class="dropdown-item" href="{{ path('app_profile') }}"><i class="fas fa-user me-2"></i>My Profile</a>
 						</li>
 						<li>
-							<a class="dropdown-item" href="{{ path('app_update_account') }}"><i class="fas fa-user me-2"></i>Account Settings</a>
+							<a class="dropdown-item" href="{{ path('app_update_account') }}"
+								><i class="fas fa-user me-2"></i>Account Settings</a
+							>
 						</li>
 						<li><hr class="dropdown-divider" /></li>
 						<li>
@@ -127,31 +125,31 @@
 	</div>
 </nav>
 <style>
-[data-bs-theme="dark"] .dropdown-menu {
-  background-color: #FFF;
-  color: #2b3035;
-}
+	[data-bs-theme="dark"] .dropdown-menu {
+		background-color: #fff;
+		color: #2b3035;
+	}
 
-[data-bs-theme="dark"] .dropdown-item {
-  color: #2b3035;
-}
+	[data-bs-theme="dark"] .dropdown-item {
+		color: #2b3035;
+	}
 
-[data-bs-theme="dark"] .dropdown-item:hover {
-  background-color: #2b3035;
-}
+	[data-bs-theme="dark"] .dropdown-item:hover {
+		background-color: #2b3035;
+	}
 
-[data-bs-theme="light"] .dropdown-menu {
-  background-color: #f8f9fa;
-  color: #212529;
-}
+	[data-bs-theme="light"] .dropdown-menu {
+		background-color: #f8f9fa;
+		color: #212529;
+	}
 
-[data-bs-theme="light"] .dropdown-item {
-  color: #212529;
-}
+	[data-bs-theme="light"] .dropdown-item {
+		color: #212529;
+	}
 
-[data-bs-theme="light"] .dropdown-item:hover {
-  background-color: #e9ecef;
-}
+	[data-bs-theme="light"] .dropdown-item:hover {
+		background-color: #e9ecef;
+	}
 </style>
 <script>
 	document.addEventListener("DOMContentLoaded", () => {

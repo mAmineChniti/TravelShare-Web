@@ -197,24 +197,24 @@
 </style>
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const shareButtons = document.querySelectorAll(".share-btn");
-        const shareModal = new bootstrap.Modal(document.getElementById("share-modal"));
+	document.addEventListener("DOMContentLoaded", () => {
+		const shareButtons = document.querySelectorAll(".share-btn");
+		const shareModal = new bootstrap.Modal(document.getElementById("share-modal"));
 
-        shareButtons.forEach((btn) => {
-            btn.addEventListener("click", (e) => {
-                e.preventDefault();
-                const url = btn.getAttribute("data-url");
-                const title = btn.getAttribute("data-title");
+		shareButtons.forEach((btn) => {
+			btn.addEventListener("click", (e) => {
+				e.preventDefault();
+				const url = btn.getAttribute("data-url");
+				const title = btn.getAttribute("data-title");
 
-                // Set modal content dynamically if needed
-                document.getElementById("modal-title").textContent = title;
-                document.getElementById("modal-url").value = url;
+				// Set modal content dynamically if needed
+				document.getElementById("modal-title").textContent = title;
+				document.getElementById("modal-url").value = url;
 
-                // Show the modal
-                shareModal.show();
-            });
-        });
-    });
+				// Show the modal
+				shareModal.show();
+			});
+		});
+	});
 </script>
 {% endblock %}
