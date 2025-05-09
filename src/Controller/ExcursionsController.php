@@ -5,7 +5,7 @@
 namespace App\Controller;
 
 use App\Entity\Excursions;
-use App\Form\ExcursionsType;
+use App\Form\ExcursionType;
 use App\Service\NotificationService;
 use App\Repository\ExcursionsRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -52,7 +52,7 @@ class ExcursionsController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $excursion = new Excursions();
-        $form = $this->createForm(ExcursionsType::class, $excursion);
+        $form = $this->createForm(ExcursionType::class, $excursion);
 
         $form->handleRequest($request);
 
@@ -77,7 +77,7 @@ class ExcursionsController extends AbstractController
     #[Route('/excursions/edit/{id}', name: 'app_excursions_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Excursions $excursion, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(ExcursionsType::class, $excursion);
+        $form = $this->createForm(ExcursionType::class, $excursion);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
